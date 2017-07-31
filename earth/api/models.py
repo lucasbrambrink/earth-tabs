@@ -1,6 +1,4 @@
-import base64
 from django.db import models
-from .data_source import EarthScraper
 
 
 class EarthImage(models.Model):
@@ -16,12 +14,10 @@ class EarthImage(models.Model):
     ups = models.IntegerField(default=0)
     downs = models.IntegerField(default=0)
     num_comments = models.IntegerField(default=0)
-    created_raw = models.DateField(max_length=255)
+    created_raw = models.CharField(max_length=255)
 
     @classmethod
-    def create(cls, post_data):
-        data = post_data.get('data')
-
+    def create(cls, data):
         image_obj = cls(
             permalink=data.get('permalink'),
             image_url=data.get('url'),
@@ -32,15 +28,8 @@ class EarthImage(models.Model):
             ups=data.get('ups', 0),
             downs=data.get('downs', 0),
             num_comments=data.get('num_comments', 0),
-            created_raw=data.get('created_utc')
+            created_raw=str(data.get('created_utc'))
         )
-        # get image data from preview object?
-        preview_images = data.get('preview', {}).get('images', [{}])[0].get('resolutions')
-        best_image = max(preview_images, key=lambda i: i.get('width'))
-        best_preview_url = best_image.get('url')
-        image_obj.preview_image_url = best_preview_url
-        image_obj.base64_encoded_image = cls.get_image_data(best_preview_url)
-
         return image_obj
 
 

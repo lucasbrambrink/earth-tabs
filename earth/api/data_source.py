@@ -1,9 +1,7 @@
 import json
 import requests
 import base64
-
-from .models import EarthImage
-
+from html import unescape
 
 class EarthScraper(object):
     DEFAULT_SUBREDDIT = 'EarthPorn'
@@ -35,19 +33,22 @@ class EarthScraper(object):
         # get image data from preview object?
         preview_images = data.get('preview', {}).get('images', [{}])[0].get('resolutions')
         best_image = max(preview_images, key=lambda i: i.get('width'))
-        return best_image.get('url')
+        return unescape(best_image.get('url'))
 
     def batch_import(self, limit_new=25):
+        from .models import EarthImage
+
         images_to_be_added = []
         for page_num in range(1, 100):
             posts = self.get(page_num=page_num)
 
             for post in posts:
-                image_url = self.get_preview_image(post)
+                post_data = post.get('data')
+                image_url = self.get_preview_image(post_data)
                 img_data = self.get_image_data(image_url)
-                image_obj = EarthImage.create(post)
+                image_obj = EarthImage.create(post_data)
                 image_obj.preview_image_url = image_url
-                image_obj.base64_encoded_image = img_data
+                image_obj.base64_encoded_image = str(img_data)
 
                 try:
                     # skip posts that already exist
@@ -58,4 +59,5 @@ class EarthScraper(object):
             if len(images_to_be_added) > limit_new:
                 break
 
+        import ipdb; ipdb.set_trace()
         EarthImage.objects.bulk_create(images_to_be_added[:limit_new])
