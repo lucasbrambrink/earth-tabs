@@ -18,6 +18,7 @@ class EarthImage(models.Model):
     num_comments = models.IntegerField(default=0)
     created_raw = models.CharField(max_length=255)
     cleaned = models.BooleanField(default=False)
+    last_seen = models.DateTimeField(auto_now=True)
 
     @classmethod
     def create(cls, data):
@@ -46,6 +47,9 @@ class EarthImage(models.Model):
         self.cleaned = True
         if commit:
             self.save(update_fields=['cleaned'])
+
+    def update_seen(self):
+        self.save(update_fields=['last_seen'])
 
 
 class QuerySetting(models.Model):
