@@ -30,8 +30,8 @@ class EarthScraper(object):
         return base64.b64encode(image)
 
     def get_preview_image(self, data):
-        # get image data from preview object?
-        preview_images = data.get('preview', {}).get('images', [{}])[0].get('resolutions')
+        # get best image URL based on size
+        preview_images = data.get('preview', {}).get('images', [{}])[0].get('resolutions', {})
         best_image = max(preview_images, key=lambda i: i.get('width'))
         return unescape(best_image.get('url'))
 
@@ -59,5 +59,4 @@ class EarthScraper(object):
             if len(images_to_be_added) > limit_new:
                 break
 
-        import ipdb; ipdb.set_trace()
         EarthImage.objects.bulk_create(images_to_be_added[:limit_new])

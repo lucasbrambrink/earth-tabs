@@ -1,3 +1,5 @@
+from os import urandom
+from hashlib import sha1
 from django.db import models
 
 
@@ -15,6 +17,7 @@ class EarthImage(models.Model):
     downs = models.IntegerField(default=0)
     num_comments = models.IntegerField(default=0)
     created_raw = models.CharField(max_length=255)
+    cleaned = models.BooleanField(default=False)
 
     @classmethod
     def create(cls, data):
@@ -32,4 +35,34 @@ class EarthImage(models.Model):
         )
         return image_obj
 
+    def clean(self, commit=False):
+        required_fields = ('permalink', 'base64_encoded_image',
+                           'title', 'preview_image_url')
+        for field in required_fields:
+            value = getattr(self, field)
+            if not len(value):
+                raise ValueError('%s has no value!' % field)
+
+        self.cleaned = True
+        if commit:
+            self.save(update_fields=['cleaned'])
+
+
+class QuerySetting(models.Model):
+    OPERANDS = (
+        ('ge', 'Greater than'),
+        ('le', 'Less than')
+    )
+
+    url_identifier = models.CharField(max_length=255)
+    query_keywords_title = models.TextField(null=True)
+    score_threshold_operand = models.CharField(choices=OPERANDS)
+    score_threshold = models.IntegerField(null=True)
+
+
+    def get_identifier(self):
+        """
+        creates unique identifier to be used in URL
+        """
+        return str(sha1(urandom(6)).hexdigest())[:5]
 
