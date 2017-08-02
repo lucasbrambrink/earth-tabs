@@ -127,3 +127,31 @@ STATIC_URL = '/static/'
 SHELL_PLUS_PRE_IMPORTS = (
     ('api.data_source', ('EarthScraper'))
 )
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'debug.log')
+        },
+        # 'mail_admins': {
+        #     'level': 'DEBUG',
+        #     'class': 'django.utils.log.AdminEmailHandler',
+        # },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
