@@ -82,6 +82,7 @@ DATABASES = {
         'NAME': 'earth',
         'HOST': 'localhost',
         'PORT': '5432',
+        'USER': 'lb',
         'PASSWORD': 'okaygo',
     },
 }
