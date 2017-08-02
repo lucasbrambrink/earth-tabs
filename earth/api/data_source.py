@@ -50,11 +50,14 @@ class EarthScraper(object):
                 image_obj.preview_image_url = image_url
                 image_obj.base64_encoded_image = str(img_data)
 
-                try:
-                    # skip posts that already exist
-                    EarthImage.objects.get(permalink=image_obj.permalink)
-                except EarthImage.DoesNotExist:
-                    images_to_be_added.append(image_obj)
+                images_to_be_added.append(image_obj)
+
+
+            # skip posts that already exist
+
+
+            urls = [obj.permalink for obj in images_to_be_added]
+            duplicates = EarthImage.objects.filter(permalink__in=urls)
 
             if len(images_to_be_added) > limit_new:
                 break

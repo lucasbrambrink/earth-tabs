@@ -4,8 +4,7 @@
   "name": "earth.tabs",
   "background": {
       "persistent": false,
-      "scripts": [ "src/js/onInstall.js" ]
-   },
+  },
   "version": "1.0.0",
      "permissions": [
           "storage",

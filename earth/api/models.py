@@ -60,7 +60,7 @@ class QuerySetting(models.Model):
 
     url_identifier = models.CharField(max_length=255)
     query_keywords_title = models.TextField(null=True)
-    score_threshold_operand = models.CharField(choices=OPERANDS)
+    score_threshold_operand = models.CharField(choices=OPERANDS, max_length=5)
     score_threshold = models.IntegerField(null=True)
 
 

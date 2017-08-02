@@ -4,6 +4,8 @@ chardet==3.0.4
 decorator==4.1.2
 Django==1.11.3
 django-extensions==1.8.1
+django-rest-framework==0.1.0
+djangorestframework==3.6.3
 idna==2.5
 ipython==6.1.0
 ipython-genutils==0.2.0
@@ -11,6 +13,7 @@ jedi==0.10.2
 pexpect==4.2.1
 pickleshare==0.7.4
 prompt-toolkit==1.0.15
+psycopg2==2.7.3
 ptyprocess==0.5.2
 Pygments==2.2.0
 pytz==2017.2
