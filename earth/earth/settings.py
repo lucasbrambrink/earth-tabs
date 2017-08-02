@@ -25,7 +25,7 @@ SECRET_KEY = '2m18h#t#r-+(d2^ysca7mhou-%!s_#3u5m6v8=qvo&%bbnv6mf'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['earth-tabs.tk', 'www.earth-tabs.tk', '127.0.0.1']
 
 
 # Application definition
