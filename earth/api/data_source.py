@@ -22,7 +22,10 @@ class EarthScraper(object):
 
     def get(self, **kwargs):
         url = self.get_url(**kwargs)
-        content = json.loads(self.get_data(url))
+        response = self.get_data(url)
+        if type(response) is bytes:
+            response = response.decode('utf-8', 'ignore')
+        content = json.loads(response)
         return content.get('data', {}).get('children')
 
     def get_image_data(self, image_url):
