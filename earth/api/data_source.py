@@ -34,10 +34,13 @@ class EarthScraper(object):
 
     def get_image_urls(self, data):
         image_url = data.get('url')
-        try:
-            image = self.get_data(image_url, timeout=1)
-        except (requests.HTTPError, requests.ReadTimeout):
-            image = None
+        if image_url in self.DISALLOWED_LINKS:
+           image = None
+        else:
+            try:
+                image = self.get_data(image_url, timeout=1)
+            except (requests.HTTPError, requests.ReadTimeout):
+                image = None
 
         # get reddit hosted preview image URL
         # fetch largest of them based on width
@@ -77,6 +80,7 @@ class EarthScraper(object):
                 image_obj = EarthImage.create(post_data)
                 image_obj.preview_image_url = preview
                 image_obj.preferred_image_url = preferred
+                image_obj.original_source = preferred == image_obj.image_url
 
                 if image_obj.permalink in seen_urls:
                     continue
@@ -84,8 +88,6 @@ class EarthScraper(object):
                 seen_urls.add(image_obj.permalink)
                 images_to_be_added.append(image_obj)
 
-            # import ipdb; ipdb.set_trace()
-            # sleep(10)
 
         # fetch posts that already exist (1 SQL query)
         urls = [obj.permalink for obj in images_to_be_added]
