@@ -1,6 +1,6 @@
 import json
 import requests
-from sys import getsizeof
+from time import sleep
 
 from html import unescape
 
@@ -38,22 +38,24 @@ class EarthScraper(object):
 
         # get reddit hosted preview image URL
         # fetch largest of them based on width
-        preview_images = data.get('preview', {}).get('images', [{}])[0].get('resolutions', {})
+        preview_images = data\
+            .get('preview', {})\
+            .get('images', [{}])[0]\
+            .get('resolutions', {})
         best_image = max(preview_images, key=lambda i: i.get('width'))
         preview_image_url = unescape(best_image.get('url'))
 
-        image = None
-        preferred_image_url = None
-        if image is None:
-            preview_image_url = preview_image_url
-        else:
-            preview_image = self.get_data(preview_image_url)
+        preferred_image_url = preview_image_url
+        # preferred_image_url = None
+        # if image is None:
+        # else:
+        #     preview_image = self.get_data(preview_image_url)
             # allow HTTP error here!
 
-            # compare which one is higher resolution (by sheer bytes)
-            preferred_image_url = preview_image_url if \
-                getsizeof(image) < getsizeof(preview_image) \
-                    else image_url
+            # # compare which one is higher resolution (by sheer bytes)
+            # preferred_image_url = preview_image_url if \
+            #     getsizeof(image) < getsizeof(preview_image) \
+            #         else image_url
 
         return preview_image_url, preferred_image_url
 
@@ -80,6 +82,7 @@ class EarthScraper(object):
                 images_to_be_added.append(image_obj)
 
             current_page_num += 1
+            sleep(10)
 
         # fetch posts that already exist (1 SQL query)
         urls = [obj.permalink for obj in images_to_be_added]
