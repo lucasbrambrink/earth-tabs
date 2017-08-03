@@ -1,6 +1,6 @@
 import json
 import requests
-from time import sleep
+from sys import getsizeof
 
 from html import unescape
 
@@ -8,13 +8,16 @@ class EarthScraper(object):
     DEFAULT_SUBREDDIT = 'EarthPorn'
     REDDIT_URL = 'https://www.reddit.com/r/{subreddit}/.json'
 
-    def get_url(self, page_num=1, subreddit=None):
+    DISALLOWED_LINKS = {
+        'http://i.imgur.com/removed.png'
+    }
+
+    def get_url(self, after_address=None, subreddit=None):
         subreddit = subreddit or self.DEFAULT_SUBREDDIT
-        base_url = self.REDDIT_URL.format(subreddit=subreddit)
-        return '{base_url}?page={page_num}'.format(
-            base_url=base_url,
-            page_num=page_num
-        )
+        url = self.REDDIT_URL.format(subreddit=subreddit)
+        if after_address is not None:
+            url = '{url}?after={address}'.format(url=url, address=after_address)
+        return url
 
     def get_data(self, url, timeout=10):
         response = requests.get(url, headers={'User-agent': 'Earth images bot 1.0'}, timeout=timeout)
@@ -27,14 +30,14 @@ class EarthScraper(object):
         if type(response) is bytes:
             response = response.decode('utf-8', 'ignore')
         content = json.loads(response)
-        return content.get('data', {}).get('children')
+        return content.get('data', {})
 
     def get_image_urls(self, data):
-        # image_url = data.get('url')
-        # try:
-        #     image = self.get_data(image_url, timeout=1)
-        # except requests.HTTPError:
-        #     image = None
+        image_url = data.get('url')
+        try:
+            image = self.get_data(image_url, timeout=1)
+        except (requests.HTTPError, requests.ReadTimeout):
+            image = None
 
         # get reddit hosted preview image URL
         # fetch largest of them based on width
@@ -45,29 +48,29 @@ class EarthScraper(object):
         best_image = max(preview_images, key=lambda i: i.get('width'))
         preview_image_url = unescape(best_image.get('url'))
 
-        preferred_image_url = preview_image_url
-        # preferred_image_url = None
-        # if image is None:
-        # else:
-        #     preview_image = self.get_data(preview_image_url)
-            # allow HTTP error here!
+        if image is None:
+            preferred_image_url = preview_image_url
+        else:
+            preview_image = self.get_data(preview_image_url)
+            # allow HTTP error here; i.reddit links should always work
 
-            # # compare which one is higher resolution (by sheer bytes)
-            # preferred_image_url = preview_image_url if \
-            #     getsizeof(image) < getsizeof(preview_image) \
-            #         else image_url
+            # compare which one is higher resolution (by sheer bytes)
+            preferred_image_url = preview_image_url if \
+                getsizeof(image) < getsizeof(preview_image) \
+                    else image_url
 
         return preview_image_url, preferred_image_url
 
-    def batch_import(self, limit_new=25, continue_batch=None, page_number=1):
+    def batch_import(self, limit_new=25, continue_batch=None, after_address=None):
         from .models import EarthImage
 
         images_to_be_added = continue_batch or []
         seen_urls = {i.permalink for i in images_to_be_added}
 
-        current_page_num = page_number
         while len(images_to_be_added) < limit_new:
-            posts = self.get(page_num=current_page_num)
+            data = self.get(after_address=after_address)
+            after_address = data.get('after')
+            posts = data.get('children')
             for post in posts:
                 post_data = post.get('data')
                 preview, preferred = self.get_image_urls(post_data)
@@ -81,8 +84,8 @@ class EarthScraper(object):
                 seen_urls.add(image_obj.permalink)
                 images_to_be_added.append(image_obj)
 
-            current_page_num += 1
-            sleep(10)
+            # import ipdb; ipdb.set_trace()
+            # sleep(10)
 
         # fetch posts that already exist (1 SQL query)
         urls = [obj.permalink for obj in images_to_be_added]
@@ -96,6 +99,6 @@ class EarthScraper(object):
         # keep adding to it until we have enough that don't filter
         if len(images_to_be_added) < limit_new:
             return self.batch_import(continue_batch=images_to_be_added,
-                                     page_number=current_page_num)
+                                     after_address=after_address)
 
         EarthImage.objects.bulk_create(images_to_be_added[:limit_new])
