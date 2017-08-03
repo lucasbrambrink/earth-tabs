@@ -1,6 +1,7 @@
 import json
 import requests
-import base64
+from sys import getsizeof
+
 from html import unescape
 
 class EarthScraper(object):
@@ -50,7 +51,7 @@ class EarthScraper(object):
 
             # compare which one is higher resolution (by sheer bytes)
             preferred_image_url = preview_image_url if \
-                len(base64.b64encode(image)) < len(base64.b64encode(preview_image)) \
+                getsizeof(image) < getsizeof(preview_image) \
                     else image_url
 
         return preview_image_url, preferred_image_url
