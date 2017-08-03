@@ -91,7 +91,7 @@ class EarthScraper(object):
                               if obj.permalink not in duplicates]
 
         # keep adding to it until we have enough that don't filter
-        if len(images_to_be_added) > limit_new:
+        if len(images_to_be_added) < limit_new:
             return self.batch_import(continue_batch=images_to_be_added,
                                      page_number=current_page_num)
 
