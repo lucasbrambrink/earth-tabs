@@ -1,16 +1,15 @@
 import json
 import requests
-from sys import getsizeof
-
 from html import unescape
+from sys import getsizeof
+from time import sleep
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 
 
 class EarthScraper(object):
     DEFAULT_SUBREDDIT = 'EarthPorn'
-    REDDIT_URL = 'https://www.reddit.com/r/{subreddit}'
+    REDDIT_URL = 'https://www.reddit.com/'
     JSON_SUFFIX = '.json'
-    SORT_BY_TOP = '/top/?sort=top&t=all'
 
     DISALLOWED_LINKS = {
         'http://i.imgur.com/removed.png'
@@ -24,19 +23,22 @@ class EarthScraper(object):
 
     def get_url(self, after_address=None, subreddit=None, sort_top=False, time_frame=None):
         subreddit = subreddit or self.DEFAULT_SUBREDDIT
-        url = self.REDDIT_URL.format(subreddit=subreddit)
+        path = [self.REDDIT_URL, 'r', subreddit]
+
         add_query_params = {}
         if after_address is not None:
             add_query_params['after'] = after_address
 
         if sort_top:
-            url += '/top'
+            path.append('top')
             add_query_params['sort'] = 'top'
             if time_frame is None or time_frame not in self.TIME_FRAMES:
                 time_frame = self.ALL
             add_query_params['t'] = time_frame
 
-        url = self.add_query_params(url, **add_query_params)
+        path.append(self.JSON_SUFFIX)
+        base_path = '/'.join(path)
+        url = self.add_query_params(base_path, **add_query_params)
         return url
 
     def get_data(self, url, timeout=10):
@@ -117,6 +119,8 @@ class EarthScraper(object):
                 seen_urls.add(image_obj.permalink)
                 images_to_be_added.append(image_obj)
 
+            # throttle request speed a little bit
+            sleep(5)
 
         # fetch posts that already exist (1 SQL query)
         urls = [obj.permalink for obj in images_to_be_added]
@@ -129,7 +133,8 @@ class EarthScraper(object):
 
         # keep adding to it until we have enough that don't filter
         if len(images_to_be_added) < limit_new:
-            return self.batch_import(continue_batch=images_to_be_added,
+            return self.batch_import(limit_new=limit_new,
+                                     continue_batch=images_to_be_added,
                                      after_address=after_address,
                                      sort_top=sort_top, time_frame=time_frame)
 

@@ -5,12 +5,12 @@ from django.db import models
 
 class EarthImage(models.Model):
     # fields
-    permalink = models.CharField(max_length=255)
-    image_url = models.CharField(max_length=255)
-    preview_image_url = models.CharField(max_length=255)
-    preferred_image_url = models.CharField(max_length=255, default='')
+    permalink = models.URLField()
+    image_url = models.URLField()
+    preview_image_url = models.URLField()
+    preferred_image_url = models.URLField(default='')
     original_source = models.BooleanField(default=False)
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=500)
     author = models.CharField(max_length=255)
     subreddit_name = models.CharField(max_length=255)
     score = models.IntegerField(default=0)
