@@ -30,11 +30,11 @@ class EarthScraper(object):
         return content.get('data', {}).get('children')
 
     def get_image_urls(self, data):
-        image_url = data.get('url')
-        try:
-            image = self.get_data(image_url, timeout=1)
-        except requests.HTTPError:
-            image = None
+        # image_url = data.get('url')
+        # try:
+        #     image = self.get_data(image_url, timeout=1)
+        # except requests.HTTPError:
+        #     image = None
 
         # get reddit hosted preview image URL
         # fetch largest of them based on width
@@ -42,6 +42,7 @@ class EarthScraper(object):
         best_image = max(preview_images, key=lambda i: i.get('width'))
         preview_image_url = unescape(best_image.get('url'))
 
+        image = None
         preferred_image_url = None
         if image is None:
             preview_image_url = preview_image_url
