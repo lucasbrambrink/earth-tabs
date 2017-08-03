@@ -16,8 +16,8 @@ class EarthScraper(object):
             page_num=page_num
         )
 
-    def get_data(self, url):
-        response = requests.get(url, headers = {'User-agent': 'Earth images bot 1.0'})
+    def get_data(self, url, timeout=10):
+        response = requests.get(url, headers={'User-agent': 'Earth images bot 1.0'}, timeout=timeout)
         response.raise_for_status()
         return response.content
 
@@ -32,7 +32,7 @@ class EarthScraper(object):
     def get_image_urls(self, data):
         image_url = data.get('url')
         try:
-            image = self.get_data(image_url)
+            image = self.get_data(image_url, timeout=1)
         except requests.HTTPError:
             image = None
 
