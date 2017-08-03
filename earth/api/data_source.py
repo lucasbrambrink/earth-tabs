@@ -1,5 +1,6 @@
 import json
 import requests
+from bs4 import BeautifulSoup
 from html import unescape
 from sys import getsizeof
 from time import sleep
@@ -65,8 +66,10 @@ class EarthScraper(object):
 
     def get_image_urls(self, data):
         image_url = data.get('url')
+        image_url = self.clean_imgur_link(image_url)
+
         image = None
-        if image_url not in self.DISALLOWED_LINKS:
+        if image_url is not None and image_url not in self.DISALLOWED_LINKS:
             try:
                 image = self.get_data(image_url, timeout=1)
             except (requests.HTTPError, requests.ReadTimeout):
@@ -93,6 +96,37 @@ class EarthScraper(object):
                     else image_url
 
         return preview_image_url, preferred_image_url
+
+    def clean_imgur_link(self, url):
+        IMGUR_DOMAIN = 'imgur.com'
+        if not IMGUR_DOMAIN in url:
+            return url
+
+        parsed_url = urlparse(url)
+        # might already be a direct link
+        DIRECT_LINK_DOMAIN = 'i.imgur.com'
+        if parsed_url.netloc == DIRECT_LINK_DOMAIN:
+            return url
+
+        # if not direct link, try to get it from HTML
+        direct_link = None
+        try:
+            image_html = self.get_data(url)
+            soup = BeautifulSoup(image_html,'html.parser')
+            direct_link = soup\
+                .find('div', attrs={'class': 'post-image'})\
+                .find('a').attrs.get('href')
+        except (requests.ReadTimeout, requests.HTTPError, ValueError, TypeError):
+            pass
+
+        if direct_link is not None:
+            parsed_direct_link = urlparse(direct_link)
+            if parsed_direct_link.scheme == '':
+                parsed_direct_link = parsed_direct_link._replace(scheme='https')
+
+            direct_link = urlunparse(parsed_direct_link)
+
+        return direct_link
 
     def batch_import(self, limit_new=25, continue_batch=None, after_address=None, sort_top=False, time_frame=None):
         from .models import EarthImage
