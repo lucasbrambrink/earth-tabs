@@ -8,7 +8,7 @@ class EarthImage(models.Model):
     permalink = models.CharField(max_length=255)
     image_url = models.CharField(max_length=255)
     preview_image_url = models.CharField(max_length=255)
-    base64_encoded_image = models.TextField(null=True)
+    preferred_image_url = models.CharField(null=True)
     title = models.CharField(max_length=255)
     author = models.CharField(max_length=255)
     subreddit_name = models.CharField(max_length=255)
@@ -37,7 +37,7 @@ class EarthImage(models.Model):
         return image_obj
 
     def clean(self, commit=False):
-        required_fields = ('permalink', 'base64_encoded_image',
+        required_fields = ('permalink',  # 'base64_encoded_image',
                            'title', 'preview_image_url')
         for field in required_fields:
             value = getattr(self, field)
@@ -62,7 +62,6 @@ class QuerySetting(models.Model):
     query_keywords_title = models.TextField(null=True)
     score_threshold_operand = models.CharField(choices=OPERANDS, max_length=5)
     score_threshold = models.IntegerField(null=True)
-
 
     def get_identifier(self):
         """

@@ -28,15 +28,29 @@ class EarthScraper(object):
         content = json.loads(response)
         return content.get('data', {}).get('children')
 
-    def get_image_data(self, image_url):
-        image = self.get_data(image_url)
-        return base64.b64encode(image)
+    def get_image_url(self, data):
+        image_url = data.get('url')
+        try:
+            image = self.get_data(image_url)
+        except requests.HTTPError:
+            image = None
 
-    def get_preview_image(self, data):
-        # get best image URL based on size
+        # get reddit hosted preview image URL
+        # fetch largest of them based on width
         preview_images = data.get('preview', {}).get('images', [{}])[0].get('resolutions', {})
         best_image = max(preview_images, key=lambda i: i.get('width'))
-        return unescape(best_image.get('url'))
+        preview_image_url = unescape(best_image.get('url'))
+
+        if image is None:
+            return preview_image_url
+        else:
+            preview_image = self.get_data(preview_image_url)
+            # allow HTTP error here!
+
+            # compare which one is higher resolution (by sheer bytes)
+            return preview_image_url if \
+                len(base64.b64encode(image)) < len(base64.b64encode(preview_image)) \
+                    else image_url
 
     def batch_import(self, limit_new=25):
         from .models import EarthImage
@@ -47,8 +61,7 @@ class EarthScraper(object):
 
             for post in posts:
                 post_data = post.get('data')
-                image_url = self.get_preview_image(post_data)
-                img_data = self.get_image_data(image_url)
+                img_data = self.get_image_data(post_data)
                 image_obj = EarthImage.create(post_data)
                 image_obj.preview_image_url = image_url
                 image_obj.base64_encoded_image = str(img_data)
