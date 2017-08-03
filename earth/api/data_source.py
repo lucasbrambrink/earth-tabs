@@ -3,20 +3,40 @@ import requests
 from sys import getsizeof
 
 from html import unescape
+from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
+
 
 class EarthScraper(object):
     DEFAULT_SUBREDDIT = 'EarthPorn'
-    REDDIT_URL = 'https://www.reddit.com/r/{subreddit}/.json'
+    REDDIT_URL = 'https://www.reddit.com/r/{subreddit}'
+    JSON_SUFFIX = '.json'
+    SORT_BY_TOP = '/top/?sort=top&t=all'
 
     DISALLOWED_LINKS = {
         'http://i.imgur.com/removed.png'
     }
+    ALL = 'all'
+    YEAR = 'year'
+    MONTH = 'month'
+    WEEK = 'week'
+    DAY = 'day'
+    TIME_FRAMES = (ALL, YEAR, MONTH, WEEK, DAY)
 
-    def get_url(self, after_address=None, subreddit=None):
+    def get_url(self, after_address=None, subreddit=None, sort_top=False, time_frame=None):
         subreddit = subreddit or self.DEFAULT_SUBREDDIT
         url = self.REDDIT_URL.format(subreddit=subreddit)
+        add_query_params = {}
         if after_address is not None:
-            url = '{url}?after={address}'.format(url=url, address=after_address)
+            add_query_params['after'] = after_address
+
+        if sort_top:
+            url += '/top'
+            add_query_params['sort'] = 'top'
+            if time_frame is None or time_frame not in self.TIME_FRAMES:
+                time_frame = self.ALL
+            add_query_params['t'] = time_frame
+
+        url = self.add_query_params(url, **add_query_params)
         return url
 
     def get_data(self, url, timeout=10):
@@ -31,6 +51,15 @@ class EarthScraper(object):
             response = response.decode('utf-8', 'ignore')
         content = json.loads(response)
         return content.get('data', {})
+
+    def add_query_params(self, url, **kwargs):
+        parsed_url = urlparse(url)
+        query_parameters = parse_qs(parsed_url.query)
+        for key, value in kwargs.items():
+            query_parameters[key] = [value]
+
+        url = urlunparse(parsed_url._replace(query=urlencode(query_parameters, doseq=True)))
+        return url
 
     def get_image_urls(self, data):
         image_url = data.get('url')
@@ -63,14 +92,15 @@ class EarthScraper(object):
 
         return preview_image_url, preferred_image_url
 
-    def batch_import(self, limit_new=25, continue_batch=None, after_address=None):
+    def batch_import(self, limit_new=25, continue_batch=None, after_address=None, sort_top=False, time_frame=None):
         from .models import EarthImage
 
         images_to_be_added = continue_batch or []
         seen_urls = {i.permalink for i in images_to_be_added}
 
         while len(images_to_be_added) < limit_new:
-            data = self.get(after_address=after_address)
+            data = self.get(after_address=after_address,
+                            sort_top=sort_top, time_frame=time_frame)
             after_address = data.get('after')
             posts = data.get('children')
             for post in posts:
@@ -100,6 +130,7 @@ class EarthScraper(object):
         # keep adding to it until we have enough that don't filter
         if len(images_to_be_added) < limit_new:
             return self.batch_import(continue_batch=images_to_be_added,
-                                     after_address=after_address)
+                                     after_address=after_address,
+                                     sort_top=sort_top, time_frame=time_frame)
 
         EarthImage.objects.bulk_create(images_to_be_added[:limit_new])
