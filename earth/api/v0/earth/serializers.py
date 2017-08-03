@@ -6,4 +6,4 @@ class EarthImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EarthImage
-        exclude = ('id')
+        exclude = ('id',)
