@@ -28,7 +28,7 @@ class EarthScraper(object):
         content = json.loads(response)
         return content.get('data', {}).get('children')
 
-    def get_image_url(self, data):
+    def get_image_urls(self, data):
         image_url = data.get('url')
         try:
             image = self.get_data(image_url)
@@ -41,41 +41,58 @@ class EarthScraper(object):
         best_image = max(preview_images, key=lambda i: i.get('width'))
         preview_image_url = unescape(best_image.get('url'))
 
+        preferred_image_url = None
         if image is None:
-            return preview_image_url
+            preview_image_url = preview_image_url
         else:
             preview_image = self.get_data(preview_image_url)
             # allow HTTP error here!
 
             # compare which one is higher resolution (by sheer bytes)
-            return preview_image_url if \
+            preferred_image_url = preview_image_url if \
                 len(base64.b64encode(image)) < len(base64.b64encode(preview_image)) \
                     else image_url
 
-    def batch_import(self, limit_new=25):
+        return preview_image_url, preferred_image_url
+
+    def batch_import(self, limit_new=25, continue_batch=None, page_number=1):
         from .models import EarthImage
 
         images_to_be_added = []
-        for page_num in range(1, 100):
-            posts = self.get(page_num=page_num)
+        seen_urls = set()
+        if continue_batch is not None:
+            images_to_be_added.extend(continue_batch)
 
+        current_page_num = page_number
+        while len(images_to_be_added) < limit_new:
+            posts = self.get(page_num=current_page_num)
             for post in posts:
                 post_data = post.get('data')
-                img_data = self.get_image_data(post_data)
+                preview, preferred = self.get_image_urls(post_data)
                 image_obj = EarthImage.create(post_data)
-                image_obj.preview_image_url = image_url
-                image_obj.base64_encoded_image = str(img_data)
+                image_obj.preview_image_url = preview
+                image_obj.preferred_image_url = preferred
 
+                if image_obj.permalink in seen_urls:
+                    continue
+
+                seen_urls.add(image_obj.permalink)
                 images_to_be_added.append(image_obj)
 
+            current_page_num += 1
 
-            # skip posts that already exist
+        # fetch posts that already exist (1 SQL query)
+        urls = [obj.permalink for obj in images_to_be_added]
+        duplicates = set(EarthImage.objects\
+            .filter(permalink__in=urls)\
+            .values_list('permalink', flat=True))
+        # filter by existence
+        images_to_be_added = [obj for obj in images_to_be_added
+                              if obj.permalink not in duplicates]
 
-
-            urls = [obj.permalink for obj in images_to_be_added]
-            duplicates = EarthImage.objects.filter(permalink__in=urls)
-
-            if len(images_to_be_added) > limit_new:
-                break
+        # keep adding to it until we have enough that don't filter
+        if len(images_to_be_added) > limit_new:
+            return self.batch_import(continue_batch=images_to_be_added,
+                                     page_number=current_page_num)
 
         EarthImage.objects.bulk_create(images_to_be_added[:limit_new])
