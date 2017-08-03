@@ -58,10 +58,8 @@ class EarthScraper(object):
     def batch_import(self, limit_new=25, continue_batch=None, page_number=1):
         from .models import EarthImage
 
-        images_to_be_added = []
-        seen_urls = set()
-        if continue_batch is not None:
-            images_to_be_added.extend(continue_batch)
+        images_to_be_added = continue_batch or []
+        seen_urls = {i.permalink for i in continue_batch}
 
         current_page_num = page_number
         while len(images_to_be_added) < limit_new:
