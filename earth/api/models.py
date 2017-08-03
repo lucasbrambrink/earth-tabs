@@ -8,7 +8,7 @@ class EarthImage(models.Model):
     permalink = models.CharField(max_length=255)
     image_url = models.CharField(max_length=255)
     preview_image_url = models.CharField(max_length=255)
-    preferred_image_url = models.CharField(null=True)
+    preferred_image_url = models.CharField(max_length=255, default='')
     title = models.CharField(max_length=255)
     author = models.CharField(max_length=255)
     subreddit_name = models.CharField(max_length=255)
