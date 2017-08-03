@@ -34,13 +34,12 @@ class EarthScraper(object):
 
     def get_image_urls(self, data):
         image_url = data.get('url')
-        if image_url in self.DISALLOWED_LINKS:
-           image = None
-        else:
+        image = None
+        if image_url not in self.DISALLOWED_LINKS:
             try:
                 image = self.get_data(image_url, timeout=1)
             except (requests.HTTPError, requests.ReadTimeout):
-                image = None
+                pass
 
         # get reddit hosted preview image URL
         # fetch largest of them based on width
