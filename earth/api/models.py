@@ -37,6 +37,24 @@ class EarthImage(models.Model):
         )
         return image_obj
 
+    def clean_title(self, title):
+        cleaned_title = []
+        characters = (c for c in title)
+        is_open = False
+        for c in characters:
+            if c == '[':
+                is_open = True
+                continue
+            elif c == ']':
+                is_open = False
+                continue
+
+            if not is_open:
+                cleaned_title.append(c)
+
+        return ''.join(cleaned_title)
+
+
     def clean(self, commit=False):
         required_fields = ('permalink',  # 'base64_encoded_image',
                            'title', 'preview_image_url')

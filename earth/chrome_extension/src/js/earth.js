@@ -44,29 +44,30 @@
 // }
 var API_URL = 'https://earth-pics.tk/api/v0/earth/get';
 
-var settings_identifier = null;
-chrome.storage.sync.get("settings_uid", function (item) {
-    settings_identifier = item;
-});
+// var callback = function(items) {
+//     settings_identifier = items.settings_uid;
+// }
+
 
 // Attempt to get a photo from local storage
-var currentImage = localStorage.getItem('currentImage');
+var currentImage = null; //localStorage.getItem('currentImage');
 if (currentImage === null) {
-    getNewImage(settings_identifier);
+    chrome.storage.sync.get("settings_uid", function (item) {
+        getNewImage(item.settings_uid);
+    });
 } else {
     setImage(JSON.parse(currentImage));
 }
 
 
 function setImage(imageData) {
-    $('.background').css("background-image", "url('" + imageData.preferred_image_url + "')");
+    $('.image').css("background-image", "url('" + imageData.preferred_image_url + "')");
 
     $('.title')
         .attr("href", "http://reddit.com" + imageData.permalink)
         .html(imageData.title);
     $('.author').html("By " + imageData.author);
     $('.ups').html(imageData.ups);
-    $('.info').css('opacity', '0.6');
 
 }
 
@@ -81,13 +82,16 @@ function setImage(imageData) {
 
 function getNewImage(settings_uid) {
     var url = API_URL;
+
     if (settings_uid !== null) {
         url += '/' + settings_uid;
     }
+    console.log(url);
 
     $.getJSON(url)
         .success(function(resp) {
             newImage = resp;
+            localStorage.removeItem('currentImage');
             localStorage.setItem('currentImage', JSON.stringify(newImage));
             setImage(newImage);
         }).fail(function () {

@@ -4,25 +4,23 @@
   "name": "earth.tabs",
   "background": {
       "persistent": false,
+      "scripts": ["src/js/earth.js"]
   },
   "version": "1.0.0",
      "permissions": [
           "storage",
+           "https://earth-pics.tk/"
         ],
   "manifest_version": 2,
-  "options_page": "src/options.html",
+  "options_page": "src/settings.html",
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
-  "description": "Photos of earth compiled from various sources"
+  "description": "Photos of earth compiled from various sources",
   "homepage_url": "https://earth.pics.tk",
   
   "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "16": "icons/mountain.ico"
   },
-  
   "default_locale": "en",
-
   "chrome_url_overrides": {
     "newtab": "src/earth.html"
   }
