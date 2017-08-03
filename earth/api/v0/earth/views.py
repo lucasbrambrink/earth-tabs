@@ -41,7 +41,6 @@ class EarthImageView(generics.RetrieveAPIView):
         return self.get_random_object(query_ids)
 
     def get(self, request, settings_uid=None, *args, **kwargs):
-        import ipdb; ipdb.set_trace()
         obj = self.get_random_object() if settings_uid is None else \
             self.get_object_via_settings(settings_uid)
 
