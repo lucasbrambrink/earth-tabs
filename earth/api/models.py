@@ -72,12 +72,14 @@ class EarthImage(models.Model):
 
 
     def clean(self, commit=False):
-        required_fields = ('permalink',  # 'base64_encoded_image',
-                           'title', 'preview_image_url')
+        required_fields = ('permalink', 'title', 'preferred_image_url')
         for field in required_fields:
             value = getattr(self, field)
             if not len(value):
                 raise ValueError('%s has no value!' % field)
+
+        if not self.image_url and not self.preview_image_url:
+            raise ValueError('Must specify either image_url or preview_url')
 
         self.cleaned = True
         if commit:
@@ -113,7 +115,11 @@ class EarthImage(models.Model):
         if self.resolution_width is not None and self.resolution_width < RESOLUTION_THRESHOLD_WIDTH:
             self.public = False
 
-        self.clean()
+        try:
+            self.clean()
+        except ValueError:
+            self.public = False
+
         self.save()
 
 
