@@ -42,7 +42,8 @@ class ApodScraper(ScrapingMixin,
             raw_title=raw_title,
             created_raw=created_raw,
             permalink=permalink,
-            source=EarthImage.APOD
+            source=EarthImage.APOD,
+            score=100
         )
         return obj
 

@@ -102,7 +102,7 @@ class QuerySettingSave(generics.RetrieveAPIView):
             return Response(serializer.data)
 
         values['url_identifier'] = self.kwargs[self.lookup_field]
-        if values['score_threshold'] == '':
+        if values.get('score_threshold', '') == '':
             values['score_threshold'] = None
 
         selected_sources = []
