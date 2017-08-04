@@ -74,8 +74,8 @@ class EarthImage(models.Model):
 
 class QuerySetting(models.Model):
     OPERANDS = (
-        ('ge', 'Greater than'),
-        ('le', 'Less than')
+        ('gte', 'Greater than'),
+        ('lte', 'Less than')
     )
     SCORE = 'score'
     DOWNVOTE = 'downs'
@@ -89,7 +89,7 @@ class QuerySetting(models.Model):
     url_identifier = models.CharField(max_length=255)
     query_keywords_title = models.TextField(null=True, blank=True)
     score_type = models.CharField(max_length=100, choices=TYPES, default=SCORE)
-    score_threshold_operand = models.CharField(choices=OPERANDS, max_length=5, default='ge')
+    score_threshold_operand = models.CharField(choices=OPERANDS, max_length=5, default='gte')
     score_threshold = models.IntegerField(null=True, blank=True)
 
     def get_identifier(self):
