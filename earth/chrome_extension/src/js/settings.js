@@ -31,9 +31,9 @@ var loadSettings = function() {
 
         allowed_sources = resp.allowed_sources.split(',');
         var source;
-        for(var i; i < allowed_sources.length; i++) {
+        for(var i = 0; i < allowed_sources.length; i++) {
             source = allowed_sources[i];
-            $('#allow_' + source).prop('checked');
+            $('#allow_' + source).prop('checked', true);
         }
     });
 };

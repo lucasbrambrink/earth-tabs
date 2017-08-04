@@ -105,6 +105,9 @@ class QuerySettingSave(generics.RetrieveAPIView):
         if values.get('score_threshold', '') == '':
             values['score_threshold'] = None
 
+        if values.get('resolution_threshold', '') == '':
+            values['resolution_threshold'] = None
+
         selected_sources = []
         for source in EarthImage.VERIFIED_SOURCE:
             is_selected = values.pop('allow_{}'.format(source[0]), 'false')
