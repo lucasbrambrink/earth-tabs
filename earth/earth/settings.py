@@ -126,9 +126,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'root')
 
-SHELL_PLUS_PRE_IMPORTS = (
-    ('api.data_source', ('EarthScraper'))
-)
+SHELL_PLUS_POST_IMPORTS = [
+    ('api.data_source', ('EarthScraper')),
+]
 
 
 LOGGING = {
