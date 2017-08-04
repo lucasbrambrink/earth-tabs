@@ -25,6 +25,8 @@ var loadSettings = function() {
         $('#vote_type').val(resp.score_type);
         $('#threshold').val(resp.score_threshold_operand);
         $('#threshold_value').val(resp.score_threshold);
+        $('#resolution_threshold').val(resp.resolution_threshold_operand);
+        $('#resolution_threshold_value').val(resp.resolution_threshold);
     });
 };
 getNewImage();
@@ -60,7 +62,9 @@ $('form').on('submit', function (e) {
         query_keywords_title: $('#query').val(),
         score_type: $('#vote_type').val(),
         score_threshold_operand: $('#threshold').val(),
-        score_threshold: $('#threshold_value').val()
+        score_threshold: $('#threshold_value').val(),
+        resolution_threshold_operand: $('#resolution_threshold').val(),
+        resolution_threshold: $('#resolution_threshold_value').val()
     };
     var url = addAsQueryParams(API_URL + '/settings/save/' + settings.uid, values);
 

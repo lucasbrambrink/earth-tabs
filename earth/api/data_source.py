@@ -150,12 +150,18 @@ class EarthScraper(object):
         return direct_link
 
     def get_post_data_from_permalink(self, permalink):
-        response = self.get_data(url='{base}{permalink}{json}'
-            .format(base=self.REDDIT_URL, permalink=permalink[1:], json=self.JSON_SUFFIX))
+        url = '{base}{permalink}{json}'.format(
+            base=self.REDDIT_URL, permalink=permalink[1:], json=self.JSON_SUFFIX)
+        try:
+            response = self.get_data(url=url)
+            if type(response) is bytes:
+                response = response.decode('utf-8', 'ignore')
+            content = json.loads(response)
+        except Exception as exc:
+            logger.warning('Unable to load %s' % url)
+            logger.warning(exc)
+            content = []
 
-        if type(response) is bytes:
-            response = response.decode('utf-8', 'ignore')
-        content = json.loads(response)
         data = None
         try:
             data = content[0]['data']['children'][0]['data']

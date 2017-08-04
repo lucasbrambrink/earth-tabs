@@ -131,12 +131,20 @@ class QuerySetting(models.Model):
         (DOWNVOTE, 'Downvotes'),
         (UPVOTE, 'Upvotes')
     )
+    WIDTH = 'width'
+    HEIGHT = 'height'
+    RESOLUTIONS = (
+        (WIDTH, 'Width'),
+        (HEIGHT, 'Height')
+    )
 
     url_identifier = models.CharField(max_length=255)
     query_keywords_title = models.TextField(null=True, blank=True)
     score_type = models.CharField(max_length=100, choices=TYPES, default=SCORE)
     score_threshold_operand = models.CharField(choices=OPERANDS, max_length=5, default='gte')
     score_threshold = models.IntegerField(null=True, blank=True)
+    resolution_threshold = models.IntegerField(null=True, blank=True)
+    resolution_threshold_operand = models.CharField(choices=RESOLUTIONS, default=WIDTH, max_length=8)
 
     @classmethod
     def get_identifier(cls):

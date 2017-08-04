@@ -33,7 +33,18 @@
                 </select>
                 <input id="threshold_value" type="text" name="threshold"/>
 
-                <p class="help-text">Threshold for  a threshold score as filter. </p>
+                <p class="help-text">Leave blank to set inactive.</p>
+            </div>
+
+            <div class="resolution">
+                <span>Resolution must be</span>
+                <select id="resolution_threshold">
+                    <option value="gte">greater than</option>
+                    <option value="lte">less than</option>
+                </select>
+                <input id="resolution_threshold_value" type="text" name="threshold"/>
+
+                <p class="help-text">Leave blank to set inactive. </p>
             </div>
 
             <input class="save" value="Save" type="submit" />
