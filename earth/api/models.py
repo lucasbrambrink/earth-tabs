@@ -70,7 +70,7 @@ class EarthImage(models.Model):
                 cleaned_title.append(c)
 
         title_string = ''.join(cleaned_title)
-        DISALLOWED_KEYWORDS = ('OC', 'oc', '(OC)')
+        DISALLOWED_KEYWORDS = ('OC', 'oc', '(OC)', '()')
         for disallowed_word in DISALLOWED_KEYWORDS:
             title_string = title_string.replace(disallowed_word, '')
 
