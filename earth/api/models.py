@@ -19,6 +19,7 @@ class EarthImage(models.Model):
     preferred_image_url = models.URLField(default='')
     original_source = models.BooleanField(default=False)
     title = models.CharField(max_length=500)
+    raw_title = models.CharField(max_length=500, default='')
     author = models.CharField(max_length=255)
     subreddit_name = models.CharField(max_length=255)
     score = models.IntegerField(default=0)
@@ -39,6 +40,7 @@ class EarthImage(models.Model):
         image_obj = cls(
             permalink=data.get('permalink'),
             image_url=data.get('url'),
+            raw_title=data.get('title'),
             title=cls.clean_title(data.get('title')),
             author=data.get('author'),
             subreddit_name=data.get('subreddit'),
@@ -84,26 +86,34 @@ class EarthImage(models.Model):
     def update_seen(self):
         self.save(update_fields=['last_seen'])
 
+    def update_raw_title(self, post_data):
+        if post_data is not None:
+            self.raw_title = post_data.get('title', '')
+            if self.raw_title:
+                self.set_public()
+
     def set_public(self):
         """
         based on certain quality inspections, make public or not
         """
-        RESOLUTION_THRESHOLD_WIDTH = 1000
+        RESOLUTION_THRESHOLD_WIDTH = 1200
         # resolution from title
-        for word in self.title.split():
+        for word in self.raw_title.split():
             if 'x' not in word:
                 continue
 
             try:
-                width, height = word.split('x')
+                width, height = [''.join(c for c in w if c.isdigit())
+                                 for w in word.split('x')]
                 self.resolution_width = int(width)
                 self.resolution_height = int(height)
             except ValueError:
                 continue
 
-        if self.resolution_width < RESOLUTION_THRESHOLD_WIDTH:
+        if self.resolution_width is not None and self.resolution_width < RESOLUTION_THRESHOLD_WIDTH:
             self.public = False
 
+        self.clean()
         self.save()
 
 

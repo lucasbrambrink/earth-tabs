@@ -1,10 +1,14 @@
 import json
 import requests
+import logging
 from bs4 import BeautifulSoup
 from html import unescape
 from sys import getsizeof
 from time import sleep
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
+
+
+logger = logging.getLogger(__name__)
 
 
 class EarthScraper(object):
@@ -56,8 +60,8 @@ class EarthScraper(object):
         response.raise_for_status()
         return response.content
 
-    def get(self, **kwargs):
-        url = self.get_url(**kwargs)
+    def get(self, url=None, **kwargs):
+        url = url or self.get_url(**kwargs)
         response = self.get_data(url)
         if type(response) is bytes:
             response = response.decode('utf-8', 'ignore')
@@ -144,6 +148,30 @@ class EarthScraper(object):
             direct_link = urlunparse(parsed_direct_link)
 
         return direct_link
+
+    def get_post_data_from_permalink(self, permalink):
+        response = self.get_data(url='{base}{permalink}{json}'
+            .format(base=self.REDDIT_URL, permalink=permalink[1:], json=self.JSON_SUFFIX))
+
+        if type(response) is bytes:
+            response = response.decode('utf-8', 'ignore')
+        content = json.loads(response)
+        data = None
+        try:
+            data = content[0]['data']['children'][0]['data']
+        except (IndexError, KeyError):
+            pass
+
+        return data
+
+    def update_existing_instances(self):
+        from .models import EarthImage
+        for instance in EarthImage.objects.filter(raw_title=''):
+            post_data = self.get_post_data_from_permalink(instance.permalink)
+            instance.update_raw_title(post_data)
+            instance.set_public()
+            logger.info('Updated %s' % instance.title)
+            sleep(0.5)
 
     def batch_import(self, limit_new=25, continue_batch=None, after_address=None, sort_top=False, time_frame=None, search_param=None):
         from .models import EarthImage
