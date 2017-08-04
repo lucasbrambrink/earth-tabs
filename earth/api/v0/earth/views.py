@@ -61,12 +61,41 @@ class QuerySettingCreate(generics.RetrieveAPIView):
 class QuerySettingSave(generics.RetrieveAPIView):
     permission_classes = (AllowAny,)
     serializer_class = QuerySettingSerializer
+    queryset = QuerySetting.objects.all()
+    lookup_field = 'settings_uid'
 
-    def get(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+    def get_object(self):
+        obj = None
+        try:
+            obj = QuerySetting.objects.get(url_identifier=self.kwargs[self.lookup_field])
+        except QuerySetting.DoesNotExist:
+            pass
+
+        return obj
+
+    def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        # self.perform_update(serializer)
+        if instance is None:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        values = {key: value for key, value in request.GET.items()}
+        if not len(values):
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+
+        values['url_identifier'] = self.kwargs[self.lookup_field]
+        if values['score_threshold'] == '':
+            values['score_threshold'] = None
+
+        serializer = self.get_serializer(data=values)
+        if serializer.is_valid():
+            for attr, value in serializer.validated_data.items():
+                setattr(instance, attr, value)
+            instance.save()
+            return Response(serializer.data)
+        else:
+            return Response({}, status=status.HTTP_304_NOT_MODIFIED)
+
+
 
 

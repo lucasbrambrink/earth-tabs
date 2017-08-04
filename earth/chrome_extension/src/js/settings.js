@@ -9,7 +9,7 @@
 
 */
 var API_URL = 'https://earth-pics.tk/api/v0/earth';
-function getNewImage() {
+var getNewImage = function() {
     $.getJSON(API_URL + '/get')
         .success(function(resp) {
             newImage = resp;
@@ -17,7 +17,13 @@ function getNewImage() {
         }).fail(function () {
             console.log('Image Request Failed');
         });
-}
+};
+
+var loadSettings = function() {
+  $.getJSON(API_URL + '/settings/' + settings.uid).success(function (resp) {
+      console.log(resp);
+    });
+};
 getNewImage();
 
 
@@ -41,19 +47,19 @@ chrome.storage.sync.get("settings_uid", function(item) {
     else {
         settings['uid'] = item.settings_uid;
     }
+    loadSettings();
 });
 
 
 $('form').on('submit', function (e) {
     e.preventDefault();
     var values = {
-        query: $('#query').val(),
+        query_keywords_title: $('#query').val(),
         score_type: $('#vote_type').val(),
-        operator: $('#threshold').val(),
-        threshold: $('#threshold_value').val(),
-        setting_uid: settings.uid
+        score_threshold_operand: $('#threshold').val(),
+        score_threshold: $('#threshold_value').val()
     };
-    var url = addAsQueryParams(API_URL + '/settings/save', values);
+    var url = addAsQueryParams(API_URL + '/settings/save/' + settings.uid, values);
     console.log(url);
 
     $.get(url).success(function(resp) {

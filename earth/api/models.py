@@ -87,10 +87,10 @@ class QuerySetting(models.Model):
     )
 
     url_identifier = models.CharField(max_length=255)
-    query_keywords_title = models.TextField(null=True)
-    score_type = models.CharField(max_length=100, choices=TYPES)
-    score_threshold_operand = models.CharField(choices=OPERANDS, max_length=5)
-    score_threshold = models.IntegerField(null=True)
+    query_keywords_title = models.TextField(null=True, blank=True)
+    score_type = models.CharField(max_length=100, choices=TYPES, default=SCORE)
+    score_threshold_operand = models.CharField(choices=OPERANDS, max_length=5, default='ge')
+    score_threshold = models.IntegerField(null=True, blank=True)
 
     def get_identifier(self):
         """
