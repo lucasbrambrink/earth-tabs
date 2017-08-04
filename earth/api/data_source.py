@@ -81,6 +81,10 @@ class EarthScraper(object):
             .get('preview', {})\
             .get('images', [{}])[0]\
             .get('resolutions', {})
+
+        if not len(preview_images):
+            return '', image_url
+
         best_image = max(preview_images, key=lambda i: i.get('width'))
         preview_image_url = unescape(best_image.get('url'))
 
