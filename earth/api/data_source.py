@@ -179,7 +179,8 @@ class EarthScraper(object):
             logger.info('Updated %s' % instance.title)
             sleep(0.5)
 
-    def batch_import(self, limit_new=25, continue_batch=None, after_address=None, sort_top=False, time_frame=None, search_param=None):
+    def batch_import(self, limit_new=25, continue_batch=None, after_address=None,
+                     sort_top=False, time_frame=None, search_param=None):
         from .models import EarthImage
 
         images_to_be_added = continue_batch or []
@@ -192,14 +193,14 @@ class EarthScraper(object):
             posts = data.get('children')
             for post in posts:
                 post_data = post.get('data')
-                preview, preferred = self.get_image_urls(post_data)
                 image_obj = EarthImage.create(post_data)
+                if image_obj.permalink in seen_urls:
+                    continue
+
+                preview, preferred = self.get_image_urls(post_data)
                 image_obj.preview_image_url = preview
                 image_obj.preferred_image_url = preferred
                 image_obj.original_source = preferred == image_obj.image_url
-
-                if image_obj.permalink in seen_urls:
-                    continue
 
                 seen_urls.add(image_obj.permalink)
                 images_to_be_added.append(image_obj)
@@ -221,6 +222,7 @@ class EarthScraper(object):
             return self.batch_import(limit_new=limit_new,
                                      continue_batch=images_to_be_added,
                                      after_address=after_address,
-                                     sort_top=sort_top, time_frame=time_frame)
+                                     sort_top=sort_top, time_frame=time_frame,
+                                     search_param=search_param)
 
         EarthImage.objects.bulk_create(images_to_be_added[:limit_new])
