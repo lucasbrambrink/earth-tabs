@@ -43,7 +43,6 @@
 //
 // }
 var API_URL = 'https://earth-pics.tk/api/v0/earth';
-var REDDIT_URL = 'https://reddit.com';
 // var callback = function(items) {
 //     settings_identifier = items.settings_uid;
 // }
@@ -90,7 +89,7 @@ function setImage(imageData) {
     $('.image').css("background-image", "url('" + imageData.preferred_image_url + "')");
 
     $('.title')
-        .attr("href", REDDIT_URL + imageData.permalink)
+        .attr("href", imageData.permalink)
         .html(imageData.title);
     $('.author').html("-- " + imageData.author);
     $('.ups').html(imageData.ups);

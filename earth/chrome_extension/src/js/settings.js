@@ -88,7 +88,11 @@ $('form').on('submit', function (e) {
     $.get(url).success(function(resp, textStatus, xhr) {
         console.log(resp);
         console.log(xhr);
-        $('input[type=submit]').val('Saved!').addClass('saved');
+        var copy = 'Saved!';
+        if (xhr.status === 204) {
+            copy = '(Too Restrictive!)'
+        }
+        $('input[type=submit]').val(copy).addClass('saved');
         setTimeout(function() {
             $('input[type=submit]').val('Save').removeClass('saved');
         }, 1000);

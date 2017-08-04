@@ -179,7 +179,8 @@ class EarthScraper(ScrapingMixin, object):
                 image_obj.preview_image_url = preview
                 image_obj.preferred_image_url = preferred
                 image_obj.original_source = preferred == image_obj.image_url
-
+                image_obj.permalink = '{}{}'.format(self.REDDIT_URL[:-1],
+                                                    image_obj.permalink)
                 seen_urls.add(image_obj.permalink)
                 images_to_be_added.append(image_obj)
 
