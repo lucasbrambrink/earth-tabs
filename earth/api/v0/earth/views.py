@@ -23,7 +23,9 @@ class EarthImageView(generics.RetrieveAPIView):
         try:
             setting = QuerySetting.objects\
                 .exclude(query_keywords_title='')\
-                .get(url_identifier=settings_uid)
+                .get(url_identifier=settings_uid)\
+                .__dict__
+            
         except QuerySetting.DoesNotExist:
             pass
         else:
@@ -35,7 +37,7 @@ class EarthImageView(generics.RetrieveAPIView):
 
             lazy_query = EarthImage.objects.filter(query)
 
-            if setting.score_threshold:
+            if setting.score_threshold is not None:
                 score_query = '{type}__{operator}'.format(type=setting.score_type,
                                                           operator=setting.score_threshold_operand)
                 lazy_query.filter(**{score_query: setting.score_threshold})
