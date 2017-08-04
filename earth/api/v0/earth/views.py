@@ -29,7 +29,7 @@ class EarthImageView(generics.RetrieveAPIView):
         except QuerySetting.DoesNotExist:
             pass
         else:
-            lazy_query = QuerySetting.objects\
+            lazy_query = EarthImage.objects\
                 .filter(score__gte=20)
 
             if len(setting.query_keywords_title):
