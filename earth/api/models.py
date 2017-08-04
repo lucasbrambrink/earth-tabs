@@ -8,7 +8,7 @@ class EarthManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset()\
             .filter(score__gte=20)\
-            .filter(public=True)
+            .filter(is_public=True)
 
 
 class EarthImage(models.Model):
