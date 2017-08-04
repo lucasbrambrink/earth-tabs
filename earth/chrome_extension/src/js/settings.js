@@ -8,7 +8,7 @@
 
 
 */
-var API_URL = 'https://earth-pics.tk/api/v0/earth';
+var API_URL = 'http://earth-pics.tk/api/v0/earth';
 function getNewImage() {
     $.getJSON(API_URL + '/get')
         .success(function(resp) {
@@ -50,7 +50,8 @@ $('form').on('submit', function (e) {
         query: $('#query').val(),
         score_type: $('#vote_type').val(),
         operator: $('#threshold').val(),
-        threshold: $('#threshold_value').val()
+        threshold: $('#threshold_value').val(),
+        setting_uid: settings.uid
     };
     var url = addAsQueryParams(API_URL + '/settings/save', values);
     console.log(url);
