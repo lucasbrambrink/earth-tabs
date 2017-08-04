@@ -49,13 +49,13 @@ form {
   label {
 
   }
-  input {
+  input, select {
     margin: 5px 0;
     width: 90%;
     background: transparent;
     border: 1px solid @weak-white;
     font-size: 18px;
-    padding: 10px 0 10px 45px;
+    padding: 10px 0 10px 10px;
     color: @white;
     &:focus {
       outline: none;
@@ -84,5 +84,23 @@ form {
       transition: background 130ms ease-in;
       color: @white;
     }
+  }
+}
+
+.limit {
+  input, select {
+    display: inline-block;
+    width: 30%;
+    font-size: 14px;
+  }
+  input {
+    width: 20%;
+  }
+  select {
+    border-radius: 0;
+    display: inline-block;
+    //width: 10%;
+    font-size: 15px;
+
   }
 }

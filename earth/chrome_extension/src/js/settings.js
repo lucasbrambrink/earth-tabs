@@ -8,9 +8,9 @@
 
 
 */
-var API_URL = 'https://earth-pics.tk/api/v0/earth/get';
+var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
 function getNewImage() {
-    $.getJSON(API_URL)
+    $.getJSON(API_URL + '/get')
         .success(function(resp) {
             newImage = resp;
             $('body').css("background-image", "url('" + newImage.preferred_image_url + "')");
@@ -21,12 +21,44 @@ function getNewImage() {
 getNewImage();
 
 
+var addAsQueryParams = function(url, values) {
+    queries = [];
+    Object.keys(values).forEach(function(key, index) {
+        queries.push(key + '=' + values[key]);
+    });
+    return url + '?' + queries.join('&');
+};
+
+var settings = {};
 chrome.storage.sync.get("settings_uid", function(item) {
-    if (item === null) {
-        $.getJSON('https://earth-pics.tk/api/v0/earth/settings/new', function(item) {
-            chrome.storage.sync.set({"settings_uid": item.url_identifier});
-        });
+    if (item === null || item === undefined) {
+        $.getJSON(API_URL + '/settings/new')
+            .success(function(resp) {
+                chrome.storage.sync.set({"settings_uid": resp.url_identifier});
+                settings['uid'] = resp.url_identifier;
+            });
+    }
+    else {
+        settings['uid'] = item.settings_uid;
     }
 });
 
 
+$('form').on('submit', function (e) {
+    e.preventDefault();
+    var values = {
+        query: $('#query').val(),
+        score_type: $('#vote_type').val(),
+        operator: $('#threshold').val(),
+        threshold: $('#threshold_value').val()
+    };
+    var url = addAsQueryParams(API_URL + '/settings/save', values);
+    console.log(url);
+
+    $.get(url).success(function(resp) {
+        $('input[type=submit]').value('Saved!')
+        setTimeout(function() {
+            $('input[type=submit]').value('Save')
+        }, 1000)
+    });
+});

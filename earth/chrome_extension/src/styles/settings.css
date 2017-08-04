@@ -34,30 +34,36 @@ form {
   width: 100%;
   margin: 0 auto;
 }
-form input {
+form input,
+form select {
   margin: 5px 0;
   width: 90%;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.4);
   font-size: 18px;
-  padding: 10px 0 10px 45px;
+  padding: 10px 0 10px 10px;
   color: #FCFCFC;
 }
-form input:focus {
+form input:focus,
+form select:focus {
   outline: none;
 }
-form input::-webkit-input-placeholder {
+form input::-webkit-input-placeholder,
+form select::-webkit-input-placeholder {
   color: #FCFCFC;
 }
-form input:-moz-placeholder {
+form input:-moz-placeholder,
+form select:-moz-placeholder {
   /* Firefox 18- */
   color: #FCFCFC;
 }
-form input::-moz-placeholder {
+form input::-moz-placeholder,
+form select::-moz-placeholder {
   /* Firefox 19+ */
   color: #FCFCFC;
 }
-form input:-ms-input-placeholder {
+form input:-ms-input-placeholder,
+form select:-ms-input-placeholder {
   color: #FCFCFC;
 }
 form input[type=submit] {
@@ -69,4 +75,18 @@ form input[type=submit]:focus {
   background: rgba(0, 0, 0, 0.3);
   transition: background 130ms ease-in;
   color: #FCFCFC;
+}
+.limit input,
+.limit select {
+  display: inline-block;
+  width: 30%;
+  font-size: 14px;
+}
+.limit input {
+  width: 20%;
+}
+.limit select {
+  border-radius: 0;
+  display: inline-block;
+  font-size: 15px;
 }

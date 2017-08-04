@@ -9,7 +9,8 @@
   "version": "1.0.0",
      "permissions": [
           "storage",
-           "https://earth-pics.tk/"
+           "https://earth-pics.tk/",
+           "http://127.0.0.1"
         ],
   "manifest_version": 2,
   "options_page": "src/settings.html",

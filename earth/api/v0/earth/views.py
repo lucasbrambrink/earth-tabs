@@ -56,3 +56,17 @@ class QuerySettingCreate(generics.RetrieveAPIView):
         new_setting = QuerySetting.objects.create()
         new_setting.url_identifier = new_setting.get_identifier()
         return new_setting
+
+
+class QuerySettingSave(generics.RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = QuerySettingSerializer
+
+    def get(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        # self.perform_update(serializer)
+
+

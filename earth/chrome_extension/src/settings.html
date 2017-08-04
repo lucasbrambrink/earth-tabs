@@ -10,17 +10,35 @@
 <body class="settings">
     <main>
         <header>
-            <h1>Settings</h1>
+            <h1>Filters</h1>
         </header>
 
         <form>
-            <label for="query">Query</label>
-            <input id="query" type="text" name="query">
-            <p class="help-text">Use comma separated key-words to filter down images by title</p>
+            <div>
+                <label for="query">By Title</label>
+                <input id="query" type="text" name="query">
+                <p class="help-text">Use comma separated keywords</p>
+            </div>
+
+            <div class="limit">
+                <select id="vote_type">
+                    <option value="score">Score</option>
+                    <option value="ups">Upvotes</option>
+                    <option value="downs">Downvotes</option>
+                </select>
+                <span>must be</span>
+                <select id="threshold">
+                    <option value="ge">greater than</option>
+                    <option value="le">less than</option>
+                </select>
+                <input id="threshold_value" type="text" name="threshold"/>
+
+                <p class="help-text">Threshold for  a threshold score as filter. </p>
+            </div>
+
+            <input class="save" value="Save" type="submit" />
         </form>
 
-
-        <button class="save">Save</button>
     </main>
 </body>
 
