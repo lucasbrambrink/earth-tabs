@@ -69,7 +69,12 @@ class EarthImage(models.Model):
             if not is_open:
                 cleaned_title.append(c)
 
-        return ''.join(cleaned_title)
+        title_string = ''.join(cleaned_title)
+        DISALLOWED_KEYWORDS = ('OC', 'oc', '(OC)')
+        for disallowed_word in DISALLOWED_KEYWORDS:
+            title_string = title_string.replace(disallowed_word, '')
+
+        return title_string.strip()
 
 
     def clean(self, commit=False):
