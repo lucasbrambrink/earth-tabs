@@ -180,7 +180,7 @@ class QuerySetting(models.Model):
         lazy_query = query_set\
             .filter(source__in=self.allowed_sources.split(','))
 
-        if self.query_keywords_title != '':
+        if self.query_keywords_title:
             query_kwargs = [models.Q(title__icontains=kw.strip())
                             for kw in self.query_keywords_title.split(',')]
             query = query_kwargs.pop()

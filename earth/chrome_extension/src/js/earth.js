@@ -60,9 +60,10 @@ var getNewSettings = function () {
 
 // Attempt to get a photo from local storage
 var cachedImage  = localStorage.getItem('cachedImage');
-if (cachedImage !== null) {
+if (cachedImage !== null && cachedImage !== undefined) {
     setImage(JSON.parse(cachedImage));
 }
+
 var settings = {};
 chrome.storage.sync.get("settings_uid", function(item) {
     if (item === null || item === undefined) {
@@ -86,6 +87,7 @@ function setLastSeenImage(cachedImage) {
 
 
 function setImage(imageData) {
+    console.log(imageData);
     $('.image').css("background-image", "url('" + imageData.preferred_image_url + "')");
 
     $('.title')
