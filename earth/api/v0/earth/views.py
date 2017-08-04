@@ -16,7 +16,6 @@ class EarthImageView(generics.RetrieveAPIView):
 
     def get_random_object(self, all_ids=None):
         all_ids = all_ids or EarthImage.objects\
-            .filter(score__gte=20)\
             .values_list('id', flat=True)
         return EarthImage.objects.get(id=random.choice(all_ids))
 
@@ -29,8 +28,7 @@ class EarthImageView(generics.RetrieveAPIView):
         except QuerySetting.DoesNotExist:
             pass
         else:
-            lazy_query = EarthImage.objects\
-                .filter(score__gte=20)
+            lazy_query = EarthImage.objects.all()
 
             if len(setting.query_keywords_title):
                 query_kwargs = [Q(title__icontains=kw.strip())
@@ -46,7 +44,10 @@ class EarthImageView(generics.RetrieveAPIView):
                                                           operator=setting.score_threshold_operand)
                 lazy_query = lazy_query.filter(**{score_query: setting.score_threshold})
 
+            # resolve query
             query_ids = lazy_query.values_list('id', flat=True)
+
+            # if no results, allow random -- prevent null response
             if not query_ids.count():
                 query_ids = None
 

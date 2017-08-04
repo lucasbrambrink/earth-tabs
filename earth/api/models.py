@@ -3,6 +3,14 @@ from hashlib import sha1
 from django.db import models
 
 
+class EarthManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset()\
+            .filter(score__gte=20)\
+            .filter(public=True)
+
+
 class EarthImage(models.Model):
     # fields
     permalink = models.URLField()
@@ -19,7 +27,12 @@ class EarthImage(models.Model):
     num_comments = models.IntegerField(default=0)
     created_raw = models.CharField(max_length=255)
     cleaned = models.BooleanField(default=False)
+    public = models.BooleanField(default=True)
+    resolution_width = models.IntegerField(null=True)
+    resolution_height = models.IntegerField(null=True)
     last_seen = models.DateTimeField(auto_now=True)
+
+    objects = EarthManager()
 
     @classmethod
     def create(cls, data):
@@ -70,6 +83,29 @@ class EarthImage(models.Model):
 
     def update_seen(self):
         self.save(update_fields=['last_seen'])
+
+    def set_public(self):
+        """
+        based on certain quality inspections, make public or not
+        """
+        RESOLUTION_THRESHOLD_WIDTH = 1000
+        # resolution from title
+        for word in self.title.split():
+            if 'x' not in word:
+                continue
+
+            try:
+                width, height = word.split('x')
+                self.resolution_width = int(width)
+                self.resolution_height = int(height)
+            except ValueError:
+                continue
+
+        if self.resolution_width < RESOLUTION_THRESHOLD_WIDTH:
+            self.public = False
+
+        self.save()
+
 
 
 class QuerySetting(models.Model):
