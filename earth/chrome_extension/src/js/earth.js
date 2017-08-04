@@ -42,12 +42,22 @@
 //     });
 //
 // }
-var API_URL = 'https://earth-pics.tk/api/v0/earth/get';
+var API_URL = 'https://earth-pics.tk/api/v0/earth';
 var REDDIT_URL = 'https://reddit.com';
 // var callback = function(items) {
 //     settings_identifier = items.settings_uid;
 // }
-
+var getNewSettings = function () {
+    $.getJSON(API_URL + '/settings/new/')
+        .success(function(resp) {
+            chrome.storage.sync.set({"settings_uid": resp.url_identifier});
+            settings['uid'] = resp.url_identifier;
+            console.log('success!', resp);
+        })
+        .fail(function (resp) {
+            console.log(resp);
+        });
+};
 
 // Attempt to get a photo from local storage
 var cachedImage  = localStorage.getItem('cachedImage');
@@ -56,6 +66,9 @@ if (cachedImage !== null) {
 }
 var settings = {};
 chrome.storage.sync.get("settings_uid", function(item) {
+    if (item === null || item === undefined) {
+        getNewSettings();
+    }
     getNewImage(item.settings_uid);
     settings['uid'] = item.settings_uid;
 });
@@ -86,10 +99,12 @@ function setImage(imageData) {
 
 
 function getNewImage(settings_uid) {
-    var url = API_URL;
+    var url = API_URL + '/get';
 
-    if (settings_uid !== null) {
+    if (settings_uid !== null && settings_uid !== undefined) {
         url += '/' + settings_uid;
+    } else {
+        getNewSettings();
     }
     console.log(url);
 
@@ -100,9 +115,6 @@ function getNewImage(settings_uid) {
             localStorage.setItem('cachedImage', JSON.stringify(newImage));
             if (cachedImage === null) {
                 setImage(newImage);
-            } else {
-                $('.cached-image')
-                    .css("background-image", "url('" + imageData.preferred_image_url + "')");
             }
         }).fail(function () {
             console.log('Image Request Failed');
