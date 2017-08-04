@@ -141,7 +141,7 @@ class EarthScraper(object):
 
         return direct_link
 
-    def batch_import(self, limit_new=25, continue_batch=None, after_address=None, sort_top=False, time_frame=None):
+    def batch_import(self, limit_new=25, continue_batch=None, after_address=None, sort_top=False, time_frame=None, search_param=None):
         from .models import EarthImage
 
         images_to_be_added = continue_batch or []
@@ -149,7 +149,7 @@ class EarthScraper(object):
 
         while len(images_to_be_added) < limit_new:
             data = self.get(after_address=after_address,
-                            sort_top=sort_top, time_frame=time_frame)
+                            sort_top=sort_top, time_frame=time_frame, search_param=search_param)
             after_address = data.get('after')
             posts = data.get('children')
             for post in posts:
