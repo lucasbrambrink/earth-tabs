@@ -8,7 +8,7 @@
 
 
 */
-var API_URL = 'http://earth-pics.tk/api/v0/earth';
+var API_URL = 'https://earth-pics.tk/api/v0/earth';
 function getNewImage() {
     $.getJSON(API_URL + '/get')
         .success(function(resp) {
