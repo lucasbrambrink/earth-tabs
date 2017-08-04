@@ -22,10 +22,8 @@ class EarthImageView(generics.RetrieveAPIView):
         query_ids = None
         try:
             setting = QuerySetting.objects\
-                .exclude(query_keywords_title='')\
-                .get(url_identifier=settings_uid)\
-                .__dict__
-            
+                .get(url_identifier=settings_uid)
+
         except QuerySetting.DoesNotExist:
             pass
         else:
