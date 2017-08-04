@@ -15,7 +15,9 @@ class EarthImageView(generics.RetrieveAPIView):
     serializers = EarthImageSerializer
 
     def get_random_object(self, all_ids=None):
-        all_ids = all_ids or EarthImage.objects.values_list('id', flat=True)
+        all_ids = all_ids or EarthImage.objects\
+            .filter(score__gte=20)\
+            .values_list('id', flat=True)
         return EarthImage.objects.get(id=random.choice(all_ids))
 
     def get_object_via_settings(self, settings_uid):
@@ -27,13 +29,17 @@ class EarthImageView(generics.RetrieveAPIView):
         except QuerySetting.DoesNotExist:
             pass
         else:
-            query_kwargs = [Q(title__icontains=kw.strip())
-                            for kw in setting.query_keywords_title.split(',')]
-            query = query_kwargs.pop()
-            for item in query_kwargs:
-                query |= item
+            lazy_query = QuerySetting.objects\
+                .filter(score__gte=20)
 
-            lazy_query = EarthImage.objects.filter(query)
+            if len(setting.query_keywords_title):
+                query_kwargs = [Q(title__icontains=kw.strip())
+                                for kw in setting.query_keywords_title.split(',')]
+                query = query_kwargs.pop()
+                for item in query_kwargs:
+                    query |= item
+
+                lazy_query = lazy_query.filter(query)
 
             if setting.score_threshold is not None:
                 score_query = '{type}__{operator}'.format(type=setting.score_type,
