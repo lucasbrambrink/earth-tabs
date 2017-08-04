@@ -38,7 +38,7 @@ class EarthImageView(generics.RetrieveAPIView):
             if setting.score_threshold is not None:
                 score_query = '{type}__{operator}'.format(type=setting.score_type,
                                                           operator=setting.score_threshold_operand)
-                lazy_query.filter(**{score_query: setting.score_threshold})
+                lazy_query = lazy_query.filter(**{score_query: setting.score_threshold})
 
             query_ids = lazy_query.values_list('id', flat=True)
             if not query_ids.count():
