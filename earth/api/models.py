@@ -176,3 +176,30 @@ class QuerySetting(models.Model):
         """
         return str(sha1(urandom(6)).hexdigest())[:5]
 
+    def filter_queryset(self, query_set):
+        lazy_query = query_set\
+            .filter(source__in=self.allowed_sources.split(','))
+
+        if self.query_keywords_title != '':
+            query_kwargs = [models.Q(title__icontains=kw.strip())
+                            for kw in self.query_keywords_title.split(',')]
+            query = query_kwargs.pop()
+            for item in query_kwargs:
+                query |= item
+
+            lazy_query = lazy_query.filter(query)
+
+        if self.score_threshold is not None:
+            score_query = '{type}__{operator}'.format(
+                type=self.score_type,
+                operator=self.score_threshold_operand)
+            lazy_query = lazy_query.filter(**{score_query: self.score_threshold})
+
+        if self.resolution_threshold is not None:
+            resolution_query = 'resolution_{type}__{operator}'.format(
+                type=self.resolution_type,
+                operator=self.resolution_threshold_operand)
+            lazy_query = lazy_query.filter(**{resolution_query: self.resolution_threshold})
+
+        # resolve query
+        return lazy_query.values_list('id', flat=True)

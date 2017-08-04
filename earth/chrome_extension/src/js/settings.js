@@ -37,7 +37,13 @@ var loadSettings = function() {
         }
     });
 };
-getNewImage();
+var cachedImage  = localStorage.getItem('cachedImage');
+if (cachedImage !== null) {
+    var image = JSON.parse(cachedImage);
+    $('body').css("background-image", "url('" + image.preferred_image_url + "')");
+} else {
+    getNewImage();
+}
 
 
 var addAsQueryParams = function(url, values) {
@@ -79,7 +85,9 @@ $('form').on('submit', function (e) {
     };
     var url = addAsQueryParams(API_URL + '/settings/save/' + settings.uid, values);
     console.log(url);
-    $.get(url).success(function(resp) {
+    $.get(url).success(function(resp, textStatus, xhr) {
+        console.log(resp);
+        console.log(xhr);
         $('input[type=submit]').val('Saved!').addClass('saved');
         setTimeout(function() {
             $('input[type=submit]').val('Save').removeClass('saved');

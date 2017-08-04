@@ -1,5 +1,4 @@
 import random
-
 from django.db.models import Q
 
 from rest_framework.permissions import AllowAny
@@ -13,6 +12,7 @@ from api.models import EarthImage, QuerySetting
 class EarthImageView(generics.RetrieveAPIView):
     permission_classes = (AllowAny,)
     serializers = EarthImageSerializer
+    too_restrictive = False
 
     def get_random_object(self, all_ids=None):
         all_ids = all_ids or EarthImage.public\
@@ -28,32 +28,11 @@ class EarthImageView(generics.RetrieveAPIView):
         except QuerySetting.DoesNotExist:
             pass
         else:
-            lazy_query = EarthImage.public.filter(source__in=setting.allowed_sources.split(','))
-
-            if len(setting.query_keywords_title):
-                query_kwargs = [Q(title__icontains=kw.strip())
-                                for kw in setting.query_keywords_title.split(',')]
-                query = query_kwargs.pop()
-                for item in query_kwargs:
-                    query |= item
-
-                lazy_query = lazy_query.filter(query)
-
-            if setting.score_threshold is not None:
-                score_query = '{type}__{operator}'.format(type=setting.score_type,
-                                                          operator=setting.score_threshold_operand)
-                lazy_query = lazy_query.filter(**{score_query: setting.score_threshold})
-
-            if setting.resolution_threshold is not None:
-                resolution_query = 'resolution_{type}__{operator}'.format(type=setting.resolution_type,
-                                                               operator=setting.resolution_threshold_operand)
-                lazy_query = lazy_query.filter(**{resolution_query: setting.resolution_threshold})
-
-            # resolve query
-            query_ids = lazy_query.values_list('id', flat=True)
+            query_ids = setting.filter_queryset(EarthImage.public)
 
             # if no results, allow random -- prevent null response
             if not query_ids.count():
+                self.too_restrictive = True
                 query_ids = None
 
         return self.get_random_object(query_ids)
@@ -62,8 +41,10 @@ class EarthImageView(generics.RetrieveAPIView):
         obj = self.get_random_object() if settings_uid is None else \
             self.get_object_via_settings(settings_uid)
 
+        response_status = status.HTTP_204_NO_CONTENT if self.too_restrictive\
+            else status.HTTP_200_OK
         return Response(EarthImageSerializer(obj).data,
-                        status=status.HTTP_200_OK)
+                        status=response_status)
 
 
 class QuerySettingCreate(generics.RetrieveAPIView):
@@ -120,7 +101,10 @@ class QuerySettingSave(generics.RetrieveAPIView):
             for attr, value in serializer.validated_data.items():
                 setattr(instance, attr, value)
             instance.save()
-            return Response(serializer.data)
+            too_restrictive = not instance.filter_queryset(EarthImage.public).count()
+            response_status = status.HTTP_204_NO_CONTENT if too_restrictive \
+                else status.HTTP_200_OK
+            return Response(serializer.data, status=response_status)
         else:
             return Response({}, status=status.HTTP_304_NOT_MODIFIED)
 
