@@ -54,8 +54,10 @@ var cachedImage  = localStorage.getItem('cachedImage');
 if (cachedImage !== null) {
     setImage(JSON.parse(cachedImage));
 }
+var settings = {};
 chrome.storage.sync.get("settings_uid", function(item) {
     getNewImage(item.settings_uid);
+    settings['uid'] = item.settings_uid;
 });
 
 function setLastSeenImage(cachedImage) {
@@ -98,6 +100,9 @@ function getNewImage(settings_uid) {
             localStorage.setItem('cachedImage', JSON.stringify(newImage));
             if (cachedImage === null) {
                 setImage(newImage);
+            } else {
+                $('.cached-image')
+                    .css("background-image", "url('" + imageData.preferred_image_url + "')");
             }
         }).fail(function () {
             console.log('Image Request Failed');

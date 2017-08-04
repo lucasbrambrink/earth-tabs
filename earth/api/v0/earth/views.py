@@ -33,8 +33,12 @@ class EarthImageView(generics.RetrieveAPIView):
             for item in query_kwargs:
                 query |= item
 
-            query_ids = EarthImage.objects.filter(query).values_list('id', flat=True)
+            if setting.score_threshold:
+                score_query = '{type}__{operator}'.format(type=setting.score_type,
+                                                          operator=setting.score_threshold_operand)
+                query &= Q(**{score_query: setting.score_threshold})
 
+            query_ids = EarthImage.objects.filter(query).values_list('id', flat=True)
             if not query_ids.count():
                 query_ids = None
 

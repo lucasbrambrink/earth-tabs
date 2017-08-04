@@ -21,7 +21,10 @@ var getNewImage = function() {
 
 var loadSettings = function() {
   $.getJSON(API_URL + '/settings/' + settings.uid).success(function (resp) {
-      console.log(resp);
+        $('#query').val(resp.query_keywords_title);
+        $('#vote_type').val(resp.score_type);
+        $('#threshold').val(resp.score_threshold_operand);
+        $('#threshold_value').val(resp.score_threshold);
     });
 };
 getNewImage();
@@ -60,12 +63,12 @@ $('form').on('submit', function (e) {
         score_threshold: $('#threshold_value').val()
     };
     var url = addAsQueryParams(API_URL + '/settings/save/' + settings.uid, values);
-    console.log(url);
 
     $.get(url).success(function(resp) {
-        $('input[type=submit]').value('Saved!')
+        $('input[type=submit]').val('Saved!').addClass('saved');
         setTimeout(function() {
-            $('input[type=submit]').value('Save')
-        }, 1000)
+            $('input[type=submit]').val('Save').removeClass('saved');
+        }, 1000);
+        localStorage.clear();
     });
 });

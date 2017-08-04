@@ -90,3 +90,7 @@ form input[type=submit]:focus {
   display: inline-block;
   font-size: 15px;
 }
+.saved {
+  border-color: green;
+  color: green;
+}
