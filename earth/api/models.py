@@ -26,7 +26,7 @@ class EarthImage(models.Model):
         image_obj = cls(
             permalink=data.get('permalink'),
             image_url=data.get('url'),
-            title=data.get('title'),
+            title=cls.clean_title(data.get('title')),
             author=data.get('author'),
             subreddit_name=data.get('subreddit'),
             score=data.get('score', 0),
@@ -37,7 +37,8 @@ class EarthImage(models.Model):
         )
         return image_obj
 
-    def clean_title(self, title):
+    @classmethod
+    def clean_title(cls, title):
         cleaned_title = []
         characters = (c for c in title)
         is_open = False

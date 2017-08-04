@@ -3,25 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Earth Tabs: Settings</title>
-    <link href="styles/extension.css" rel="stylesheet">
+    <link href="styles/settings.css" rel="stylesheet">
+
 </head>
 
-<body>
-    <header>
-        <h1>Settings</h1>
-    </header>
-
+<body class="settings">
     <main>
-        <div>
+        <header>
+            <h1>Settings</h1>
+        </header>
+
+        <form>
             <label for="query">Query</label>
             <input id="query" type="text" name="query">
             <p class="help-text">Use comma separated key-words to filter down images by title</p>
-        </div>
+        </form>
 
 
+        <button class="save">Save</button>
     </main>
 </body>
 
 <script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="js/settings.js"></script>
 
 </html>

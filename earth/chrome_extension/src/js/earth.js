@@ -43,20 +43,31 @@
 //
 // }
 var API_URL = 'https://earth-pics.tk/api/v0/earth/get';
-
+var REDDIT_URL = 'https://reddit.com';
 // var callback = function(items) {
 //     settings_identifier = items.settings_uid;
 // }
 
 
 // Attempt to get a photo from local storage
-var currentImage = null; //localStorage.getItem('currentImage');
-if (currentImage === null) {
-    chrome.storage.sync.get("settings_uid", function (item) {
-        getNewImage(item.settings_uid);
-    });
-} else {
-    setImage(JSON.parse(currentImage));
+var cachedImage  = localStorage.getItem('cachedImage');
+if (cachedImage !== null) {
+    setImage(JSON.parse(cachedImage));
+}
+chrome.storage.sync.get("settings_uid", function(item) {
+    getNewImage(item.settings_uid);
+});
+
+function setLastSeenImage(cachedImage) {
+    var lastImage = localStorage.getItem('lastImage');
+    var $link = $('.last-image');
+    if (lastImage === null) {
+        $link.remove();
+        $('nav span').remove();
+    } else {
+        $link.attr('href', REDDIT_URL + lastImage);
+    }
+    localStorage.setItem('lastImage', cachedImage.permalink);
 }
 
 
@@ -64,21 +75,13 @@ function setImage(imageData) {
     $('.image').css("background-image", "url('" + imageData.preferred_image_url + "')");
 
     $('.title')
-        .attr("href", "http://reddit.com" + imageData.permalink)
+        .attr("href", REDDIT_URL + imageData.permalink)
         .html(imageData.title);
-    $('.author').html("By " + imageData.author);
+    $('.author').html("-- " + imageData.author);
     $('.ups').html(imageData.ups);
-
+    setLastSeenImage(imageData);
 }
 
-// // cache photo as previous
-// var lastPhoto = localStorage.getItem('lastPhoto');
-// if (lastPhoto === null) {
-//     $('.last-title').remove();
-// } else {
-//     $('.last-title').attr('href', "http://reddit.com" + lastPhoto);
-// }
-// localStorage.setItem('lastPhoto', the_image.permalink);
 
 function getNewImage(settings_uid) {
     var url = API_URL;
@@ -91,9 +94,11 @@ function getNewImage(settings_uid) {
     $.getJSON(url)
         .success(function(resp) {
             newImage = resp;
-            localStorage.removeItem('currentImage');
-            localStorage.setItem('currentImage', JSON.stringify(newImage));
-            setImage(newImage);
+            localStorage.removeItem('cachedImage');
+            localStorage.setItem('cachedImage', JSON.stringify(newImage));
+            if (cachedImage === null) {
+                setImage(newImage);
+            }
         }).fail(function () {
             console.log('Image Request Failed');
         });

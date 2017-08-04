@@ -1,8 +1,9 @@
 from django.conf.urls import url, include
 
-from .views import EarthImageView
+from . import views
 
 urlpatterns = [
-    url(r'^get/(?P<settings_uid>[a-zA-Z0-9]+)', EarthImageView.as_view(), name='random-image'),
-    url(r'^get/', EarthImageView.as_view(), name='random-image')
+    url(r'^get/(?P<settings_uid>[a-zA-Z0-9]+)', views.EarthImageView.as_view(), name='settings-image'),
+    url(r'^get/', views.EarthImageView.as_view(), name='random-image'),
+    url(r'^settings/new/', views.QuerySettingCreate.as_view(), name='create-settings')
 ]

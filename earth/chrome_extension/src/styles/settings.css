@@ -1,0 +1,72 @@
+.settings {
+  width: 100%;
+  margin: 0;
+  height: 100vh;
+  float: left;
+}
+.settings main {
+  max-width: 400px;
+  margin: 25px auto;
+  color: #FCFCFC;
+  font-family: 'Open Sans', Arial, sans-serif;
+  background: rgba(26, 25, 51, 0.61);
+  width: 100%;
+  height: 60%;
+  padding: 5%;
+}
+body {
+  height: 100%;
+  width: 100%;
+  background-color: #000;
+  background-position: center center;
+  background-repeat: no-repeat;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -webkit-animation: fadein 0.5s;
+  -moz-animation: fadein 0.5s;
+  -o-animation: fadein 0.5s;
+  -ms-animation: fadein 0.5s;
+  animation: fadein 0.5s;
+  z-index: 100;
+}
+form {
+  width: 100%;
+  margin: 0 auto;
+}
+form input {
+  margin: 5px 0;
+  width: 90%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-size: 18px;
+  padding: 10px 0 10px 45px;
+  color: #FCFCFC;
+}
+form input:focus {
+  outline: none;
+}
+form input::-webkit-input-placeholder {
+  color: #FCFCFC;
+}
+form input:-moz-placeholder {
+  /* Firefox 18- */
+  color: #FCFCFC;
+}
+form input::-moz-placeholder {
+  /* Firefox 19+ */
+  color: #FCFCFC;
+}
+form input:-ms-input-placeholder {
+  color: #FCFCFC;
+}
+form input[type=submit] {
+  margin: 10px 0 0;
+  background: rgba(0, 0, 0, 0.2);
+}
+form input[type=submit]:hover,
+form input[type=submit]:focus {
+  background: rgba(0, 0, 0, 0.3);
+  transition: background 130ms ease-in;
+  color: #FCFCFC;
+}

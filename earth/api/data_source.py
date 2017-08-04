@@ -116,7 +116,7 @@ class EarthScraper(object):
             direct_link = soup\
                 .find('div', attrs={'class': 'post-image'})\
                 .find('a').attrs.get('href')
-        except (requests.ReadTimeout, requests.HTTPError, ValueError, TypeError):
+        except (requests.ReadTimeout, requests.HTTPError, ValueError, AttributeError):
             pass
 
         if direct_link is not None:

@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import EarthImageSerializer
+from .serializers import EarthImageSerializer, QuerySettingSerializer
 from api.models import EarthImage, QuerySetting
 
 
@@ -46,3 +46,13 @@ class EarthImageView(generics.RetrieveAPIView):
 
         return Response(EarthImageSerializer(obj).data,
                         status=status.HTTP_200_OK)
+
+
+class QuerySettingCreate(generics.RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = QuerySettingSerializer
+
+    def get_object(self):
+        new_setting = QuerySetting.objects.create()
+        new_setting.url_identifier = new_setting.get_identifier()
+        return new_setting

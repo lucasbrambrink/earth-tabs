@@ -8,3 +8,25 @@
 
 
 */
+var API_URL = 'https://earth-pics.tk/api/v0/earth/get';
+function getNewImage() {
+    $.getJSON(API_URL)
+        .success(function(resp) {
+            newImage = resp;
+            $('body').css("background-image", "url('" + newImage.preferred_image_url + "')");
+        }).fail(function () {
+            console.log('Image Request Failed');
+        });
+}
+getNewImage();
+
+
+chrome.storage.sync.get("settings_uid", function(item) {
+    if (item === null) {
+        $.getJSON('https://earth-pics.tk/api/v0/earth/settings/new', function(item) {
+            chrome.storage.sync.set({"settings_uid": item.url_identifier});
+        });
+    }
+});
+
+
