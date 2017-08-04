@@ -25,7 +25,7 @@ var loadSettings = function() {
         $('#vote_type').val(resp.score_type);
         $('#threshold').val(resp.score_threshold_operand);
         $('#threshold_value').val(resp.score_threshold);
-        $('#resolution_type').val(resp.resolution_threshold);
+        $('#resolution_type').val(resp.resolution_type);
         $('#resolution_threshold').val(resp.resolution_threshold_operand);
         $('#resolution_threshold_value').val(resp.resolution_threshold);
     });
