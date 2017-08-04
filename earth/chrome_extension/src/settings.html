@@ -14,13 +14,15 @@
         </header>
 
         <form>
-            <div>
+            <div class="filter-block query">
                 <label for="query">By Title</label>
                 <input id="query" type="text" name="query">
                 <p class="help-text">Use comma separated keywords</p>
             </div>
 
-            <div class="limit">
+            <div class="filter-block limit">
+                <label for="query">By Votes</label>
+
                 <select id="vote_type">
                     <option value="score">Score</option>
                     <option value="ups">Upvotes</option>
@@ -36,7 +38,8 @@
                 <p class="help-text">Leave blank to set inactive.</p>
             </div>
 
-            <div class="resolution">
+            <div class="filter-block resolution">
+                <label for="query">By Resolution</label>
                 <span>Resolution must be</span>
                 <select id="resolution_threshold">
                     <option value="gte">greater than</option>
@@ -47,7 +50,9 @@
                 <p class="help-text">Leave blank to set inactive. </p>
             </div>
 
-            <input class="save" value="Save" type="submit" />
+            <div class="filter-block">
+                <input class="save" value="Save" type="submit" />
+            </div>
         </form>
 
     </main>

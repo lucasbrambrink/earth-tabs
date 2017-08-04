@@ -34,6 +34,10 @@ form {
   width: 100%;
   margin: 0 auto;
 }
+form label {
+  display: block;
+  font-size: 105%;
+}
 form input,
 form select {
   margin: 5px 0;
@@ -97,4 +101,20 @@ form input[type=submit]:focus {
 .saved {
   border-color: green;
   color: green;
+}
+.resolution input,
+.resolution select {
+  display: inline-block;
+}
+.resolution select {
+  width: 30%;
+}
+.resolution input {
+  width: 95px;
+}
+.filter-block {
+  margin-top: 50px;
+}
+.filter-block p {
+  margin: 3px;
 }
