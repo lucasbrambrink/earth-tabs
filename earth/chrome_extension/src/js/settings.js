@@ -33,7 +33,7 @@ var loadSettings = function() {
         var source;
         for(var i; i < allowed_sources.length; i++) {
             source = allowed_sources[i];
-            $('#allow_' + source).val(true);
+            $('#allow_' + source).prop('checked');
         }
     });
 };
@@ -74,11 +74,11 @@ $('form').on('submit', function (e) {
         resolution_type: $('#resolution_type').val(),
         resolution_threshold_operand: $('#resolution_threshold').val(),
         resolution_threshold: $('#resolution_threshold_value').val(),
-        allow_reddit: $('#allow_reddit').val(),
-        allow_apod: $('#allow_apod').val()
+        allow_reddit: $('#allow_reddit').prop('checked'),
+        allow_apod: $('#allow_apod').prop('checked')
     };
     var url = addAsQueryParams(API_URL + '/settings/save/' + settings.uid, values);
-
+    console.log(url);
     $.get(url).success(function(resp) {
         $('input[type=submit]').val('Saved!').addClass('saved');
         setTimeout(function() {

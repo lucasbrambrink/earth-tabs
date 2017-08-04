@@ -107,8 +107,8 @@ class QuerySettingSave(generics.RetrieveAPIView):
 
         selected_sources = []
         for source in EarthImage.VERIFIED_SOURCE:
-            is_selected = values.pop('allow_{}'.format(source[0]), False)
-            if is_selected:
+            is_selected = values.pop('allow_{}'.format(source[0]), 'false')
+            if is_selected == 'true':
                 selected_sources.append(source[0])
         values['allowed_sources'] = ','.join(selected_sources)
 
