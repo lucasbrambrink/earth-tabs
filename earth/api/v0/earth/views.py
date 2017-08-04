@@ -15,7 +15,7 @@ class EarthImageView(generics.RetrieveAPIView):
     serializers = EarthImageSerializer
 
     def get_random_object(self, all_ids=None):
-        all_ids = all_ids or EarthImage.objects\
+        all_ids = all_ids or EarthImage.public\
             .values_list('id', flat=True)
         return EarthImage.objects.get(id=random.choice(all_ids))
 
@@ -28,7 +28,7 @@ class EarthImageView(generics.RetrieveAPIView):
         except QuerySetting.DoesNotExist:
             pass
         else:
-            lazy_query = EarthImage.objects.all()
+            lazy_query = EarthImage.public.all()
 
             if len(setting.query_keywords_title):
                 query_kwargs = [Q(title__icontains=kw.strip())

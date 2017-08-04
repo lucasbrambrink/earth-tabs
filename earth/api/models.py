@@ -28,12 +28,13 @@ class EarthImage(models.Model):
     num_comments = models.IntegerField(default=0)
     created_raw = models.CharField(max_length=255)
     cleaned = models.BooleanField(default=False)
-    public = models.BooleanField(default=True)
+    is_public = models.BooleanField(default=True)
     resolution_width = models.IntegerField(null=True)
     resolution_height = models.IntegerField(null=True)
     last_seen = models.DateTimeField(auto_now=True)
 
-    objects = EarthManager()
+    objects = models.Manager()
+    public = EarthManager()
 
     @classmethod
     def create(cls, data):
@@ -113,12 +114,12 @@ class EarthImage(models.Model):
                 continue
 
         if self.resolution_width is not None and self.resolution_width < RESOLUTION_THRESHOLD_WIDTH:
-            self.public = False
+            self.is_public = False
 
         try:
             self.clean()
         except ValueError:
-            self.public = False
+            self.is_public = False
 
         self.save()
 
