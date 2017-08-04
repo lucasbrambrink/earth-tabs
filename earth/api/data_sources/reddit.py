@@ -7,15 +7,17 @@ from sys import getsizeof
 from time import sleep
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 
+from api.utils.scraping import ScrapingMixin
 
 logger = logging.getLogger(__name__)
 
 
-class EarthScraper(object):
+class EarthScraper(ScrapingMixin, object):
     DEFAULT_SUBREDDIT = 'EarthPorn'
     REDDIT_URL = 'https://www.reddit.com/'
     JSON_SUFFIX = '.json'
     SEARCH = 'search?q=nepal&restrict_sr=on&sort=relevance&t=all'
+    HEADERS = {'User-agent': 'Earth images bot 1.0'}
 
     DISALLOWED_LINKS = {
         'http://i.imgur.com/removed.png'
@@ -53,28 +55,6 @@ class EarthScraper(object):
         path.append(self.JSON_SUFFIX)
         base_path = '/'.join(path)
         url = self.add_query_params(base_path, **add_query_params)
-        return url
-
-    def get_data(self, url, timeout=10):
-        response = requests.get(url, headers={'User-agent': 'Earth images bot 1.0'}, timeout=timeout)
-        response.raise_for_status()
-        return response.content
-
-    def get(self, url=None, **kwargs):
-        url = url or self.get_url(**kwargs)
-        response = self.get_data(url)
-        if type(response) is bytes:
-            response = response.decode('utf-8', 'ignore')
-        content = json.loads(response)
-        return content.get('data', {})
-
-    def add_query_params(self, url, **kwargs):
-        parsed_url = urlparse(url)
-        query_parameters = parse_qs(parsed_url.query)
-        for key, value in kwargs.items():
-            query_parameters[key] = [value]
-
-        url = urlunparse(parsed_url._replace(query=urlencode(query_parameters, doseq=True)))
         return url
 
     def get_image_urls(self, data):
@@ -153,10 +133,7 @@ class EarthScraper(object):
         url = '{base}{permalink}{json}'.format(
             base=self.REDDIT_URL, permalink=urlparse(permalink).path[1:], json=self.JSON_SUFFIX)
         try:
-            response = self.get_data(url=url)
-            if type(response) is bytes:
-                response = response.decode('utf-8', 'ignore')
-            content = json.loads(response)
+            content = self.get(url=url)
         except Exception as exc:
             logger.warning('Unable to load %s' % url)
             logger.warning(exc)
@@ -171,7 +148,7 @@ class EarthScraper(object):
         return data
 
     def update_existing_instances(self):
-        from .models import EarthImage
+        from api.models import EarthImage
         for instance in EarthImage.objects.filter(raw_title=''):
             post_data = self.get_post_data_from_permalink(instance.permalink)
             instance.update_raw_title(post_data)
@@ -181,14 +158,15 @@ class EarthScraper(object):
 
     def batch_import(self, limit_new=25, continue_batch=None, after_address=None,
                      sort_top=False, time_frame=None, search_param=None):
-        from .models import EarthImage
+        from api.models import EarthImage
 
         images_to_be_added = continue_batch or []
         seen_urls = {i.permalink for i in images_to_be_added}
 
         while len(images_to_be_added) < limit_new:
-            data = self.get(after_address=after_address,
-                            sort_top=sort_top, time_frame=time_frame, search_param=search_param)
+            url = self.get_url(after_address=after_address, sort_top=sort_top,
+                               time_frame=time_frame, search_param=search_param)
+            data = self.get(url).get('data', {})
             after_address = data.get('after')
             posts = data.get('children')
             for post in posts:

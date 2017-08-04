@@ -127,7 +127,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'root')
 
 SHELL_PLUS_POST_IMPORTS = [
-    ('api.data_source', ('EarthScraper')),
+    ('api.data_sources.reddit', ('EarthScraper')),
+    ('api.data_sources.apod', ('ApodScraper')),
 ]
 
 

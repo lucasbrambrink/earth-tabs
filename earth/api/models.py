@@ -12,6 +12,14 @@ class EarthManager(models.Manager):
 
 
 class EarthImage(models.Model):
+    REDDIT = 'reddit'
+    APOD = 'apod'
+    # WIKIPEDIA = 'wikipedia'
+    VERIFIED_SOURCE = (
+        (REDDIT, 'reddit.com/r/Earth'),
+        (APOD, "NASA's Astronomy Picture of the Day")
+    )
+
     # fields
     permalink = models.URLField()
     image_url = models.URLField()
@@ -32,6 +40,7 @@ class EarthImage(models.Model):
     resolution_width = models.IntegerField(null=True)
     resolution_height = models.IntegerField(null=True)
     last_seen = models.DateTimeField(auto_now=True)
+    source = models.CharField(max_length=100, choices=VERIFIED_SOURCE, default=REDDIT)
 
     objects = models.Manager()
     public = EarthManager()
@@ -158,6 +167,7 @@ class QuerySetting(models.Model):
     resolution_type = models.CharField(choices=RESOLUTIONS, default=WIDTH, max_length=8)
     resolution_threshold_operand = models.CharField(choices=OPERANDS, default='gte', max_length=8)
     resolution_threshold = models.IntegerField(null=True, blank=True)
+    allowed_sources = models.CharField(max_length=255, default=EarthImage.REDDIT)
 
     @classmethod
     def get_identifier(cls):

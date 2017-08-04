@@ -28,6 +28,13 @@ var loadSettings = function() {
         $('#resolution_type').val(resp.resolution_type);
         $('#resolution_threshold').val(resp.resolution_threshold_operand);
         $('#resolution_threshold_value').val(resp.resolution_threshold);
+
+        allowed_sources = resp.allowed_sources.split(',');
+        var source;
+        for(var i; i < allowed_sources.length; i++) {
+            source = allowed_sources[i];
+            $('#allow_' + source).val(true);
+        }
     });
 };
 getNewImage();
@@ -66,7 +73,9 @@ $('form').on('submit', function (e) {
         score_threshold: $('#threshold_value').val(),
         resolution_type: $('#resolution_type').val(),
         resolution_threshold_operand: $('#resolution_threshold').val(),
-        resolution_threshold: $('#resolution_threshold_value').val()
+        resolution_threshold: $('#resolution_threshold_value').val(),
+        allow_reddit: $('#allow_reddit').val(),
+        allow_apod: $('#allow_apod').val()
     };
     var url = addAsQueryParams(API_URL + '/settings/save/' + settings.uid, values);
 

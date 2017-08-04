@@ -28,7 +28,7 @@ class EarthImageView(generics.RetrieveAPIView):
         except QuerySetting.DoesNotExist:
             pass
         else:
-            lazy_query = EarthImage.public.all()
+            lazy_query = EarthImage.public.filter(source__in=setting.allowed_sources.split(','))
 
             if len(setting.query_keywords_title):
                 query_kwargs = [Q(title__icontains=kw.strip())
@@ -104,6 +104,13 @@ class QuerySettingSave(generics.RetrieveAPIView):
         values['url_identifier'] = self.kwargs[self.lookup_field]
         if values['score_threshold'] == '':
             values['score_threshold'] = None
+
+        selected_sources = []
+        for source in EarthImage.VERIFIED_SOURCE:
+            is_selected = values.pop('allow_{}'.format(source[0]), False)
+            if is_selected:
+                selected_sources.append(source[0])
+        values['allowed_sources'] = ','.join(selected_sources)
 
         serializer = self.get_serializer(data=values)
         if serializer.is_valid():

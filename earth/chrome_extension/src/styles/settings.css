@@ -111,3 +111,9 @@ form input[type=submit]:focus {
 .filter-block p {
   margin: 3px;
 }
+.sources label {
+  display: inline-block;
+}
+.sources input {
+  width: 20px;
+}
