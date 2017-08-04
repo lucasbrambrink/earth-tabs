@@ -85,32 +85,25 @@ form input[type=submit]:focus {
   color: #FCFCFC;
 }
 .limit input,
-.limit select {
+.resolution input,
+.limit select,
+.resolution select {
   display: inline-block;
   width: 30%;
   font-size: 14px;
 }
-.limit input {
+.limit input,
+.resolution input {
   width: 95px;
 }
-.limit select {
+.limit select,
+.resolution select {
   border-radius: 0;
-  display: inline-block;
   font-size: 15px;
 }
 .saved {
   border-color: green;
   color: green;
-}
-.resolution input,
-.resolution select {
-  display: inline-block;
-}
-.resolution select {
-  width: 30%;
-}
-.resolution input {
-  width: 95px;
 }
 .filter-block {
   margin-top: 50px;

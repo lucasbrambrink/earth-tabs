@@ -150,8 +150,9 @@ class QuerySetting(models.Model):
     score_type = models.CharField(max_length=100, choices=TYPES, default=SCORE)
     score_threshold_operand = models.CharField(choices=OPERANDS, max_length=5, default='gte')
     score_threshold = models.IntegerField(null=True, blank=True)
+    resolution_type = models.CharField(choices=RESOLUTIONS, default=WIDTH, max_length=8)
+    resolution_threshold_operand = models.CharField(choices=OPERANDS, default='gte', max_length=8)
     resolution_threshold = models.IntegerField(null=True, blank=True)
-    resolution_threshold_operand = models.CharField(choices=RESOLUTIONS, default=WIDTH, max_length=8)
 
     @classmethod
     def get_identifier(cls):

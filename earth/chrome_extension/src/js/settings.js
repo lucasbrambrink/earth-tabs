@@ -25,6 +25,7 @@ var loadSettings = function() {
         $('#vote_type').val(resp.score_type);
         $('#threshold').val(resp.score_threshold_operand);
         $('#threshold_value').val(resp.score_threshold);
+        $('#resolution_type').val(resp.resolution_threshold);
         $('#resolution_threshold').val(resp.resolution_threshold_operand);
         $('#resolution_threshold_value').val(resp.resolution_threshold);
     });
@@ -63,6 +64,7 @@ $('form').on('submit', function (e) {
         score_type: $('#vote_type').val(),
         score_threshold_operand: $('#threshold').val(),
         score_threshold: $('#threshold_value').val(),
+        resolution_type: $('#resolution_type').val(),
         resolution_threshold_operand: $('#resolution_threshold').val(),
         resolution_threshold: $('#resolution_threshold_value').val()
     };

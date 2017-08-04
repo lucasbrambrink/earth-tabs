@@ -40,7 +40,11 @@
 
             <div class="filter-block resolution">
                 <label for="query">By Resolution</label>
-                <span>Resolution must be</span>
+                <select id="resolution_type">
+                    <option value="width">Width</option>
+                    <option value="height">Height</option>
+                </select>
+                <span>must be</span>
                 <select id="resolution_threshold">
                     <option value="gte">greater than</option>
                     <option value="lte">less than</option>
