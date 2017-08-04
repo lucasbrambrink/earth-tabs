@@ -45,7 +45,7 @@ class EarthImageView(generics.RetrieveAPIView):
                 lazy_query = lazy_query.filter(**{score_query: setting.score_threshold})
 
             if setting.resolution_threshold is not None:
-                resolution_query = '{type}__{operator}'.format(type=setting.resolution_type,
+                resolution_query = 'resolution_{type}__{operator}'.format(type=setting.resolution_type,
                                                                operator=setting.resolution_threshold_operand)
                 lazy_query = lazy_query.filter(**{resolution_query: setting.score_threshold})
 
