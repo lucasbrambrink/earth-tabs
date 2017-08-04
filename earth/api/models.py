@@ -92,7 +92,8 @@ class QuerySetting(models.Model):
     score_threshold_operand = models.CharField(choices=OPERANDS, max_length=5, default='gte')
     score_threshold = models.IntegerField(null=True, blank=True)
 
-    def get_identifier(self):
+    @classmethod
+    def get_identifier(cls):
         """
         creates unique identifier to be used in URL
         """

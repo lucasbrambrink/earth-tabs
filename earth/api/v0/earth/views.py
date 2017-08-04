@@ -59,8 +59,8 @@ class QuerySettingCreate(generics.RetrieveAPIView):
     serializer_class = QuerySettingSerializer
 
     def get_object(self):
-        new_setting = QuerySetting.objects.create()
-        new_setting.url_identifier = new_setting.get_identifier()
+        new_setting = QuerySetting.objects.create(
+            url_identifier=QuerySetting.get_identifier())
         return new_setting
 
 
