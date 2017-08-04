@@ -151,7 +151,7 @@ class EarthScraper(object):
 
     def get_post_data_from_permalink(self, permalink):
         url = '{base}{permalink}{json}'.format(
-            base=self.REDDIT_URL, permalink=permalink[1:], json=self.JSON_SUFFIX)
+            base=self.REDDIT_URL, permalink=urlparse(permalink).path[1:], json=self.JSON_SUFFIX)
         try:
             response = self.get_data(url=url)
             if type(response) is bytes:
