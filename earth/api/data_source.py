@@ -11,6 +11,7 @@ class EarthScraper(object):
     DEFAULT_SUBREDDIT = 'EarthPorn'
     REDDIT_URL = 'https://www.reddit.com/'
     JSON_SUFFIX = '.json'
+    SEARCH = 'search?q=nepal&restrict_sr=on&sort=relevance&t=all'
 
     DISALLOWED_LINKS = {
         'http://i.imgur.com/removed.png'
@@ -22,13 +23,21 @@ class EarthScraper(object):
     DAY = 'day'
     TIME_FRAMES = (ALL, YEAR, MONTH, WEEK, DAY)
 
-    def get_url(self, after_address=None, subreddit=None, sort_top=False, time_frame=None):
+    def get_url(self, after_address=None, subreddit=None, sort_top=False, time_frame=None, search_param=None):
         subreddit = subreddit or self.DEFAULT_SUBREDDIT
         path = [self.REDDIT_URL, 'r', subreddit]
 
         add_query_params = {}
         if after_address is not None:
             add_query_params['after'] = after_address
+
+        if search_param is not None:
+            sort_top = False
+            path.append('search')
+            add_query_params['q'] = search_param
+            add_query_params['restrict_sr'] = 'on'
+            add_query_params['sort'] = 'relevance'
+            add_query_params['t'] = time_frame
 
         if sort_top:
             path.append('top')
