@@ -131,6 +131,7 @@ class HistoryListApi(generics.ListAPIView):
         image_query = {i.id: i
                        for i in EarthImage.objects.filter(id__in=image_ids)}
         # preserver order
-        images = [image_query[image_id] for image_id in image_ids]
+        images = [EarthImageSerializer(data=image_query[image_id])
+                  for image_id in image_ids]
         return images
 
