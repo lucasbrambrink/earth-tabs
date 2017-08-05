@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import EarthImageSerializer, QuerySettingSerializer
+from .serializers import EarthImageSerializer, QuerySettingSerializer, HistorySerializer
 from api.models import EarthImage, QuerySetting
 
 
@@ -113,5 +113,24 @@ class QuerySettingSave(generics.RetrieveAPIView):
             return Response({}, status=status.HTTP_304_NOT_MODIFIED)
 
 
+class HistoryListApi(generics.ListAPIView):
+    serializer_class = HistorySerializer
+    permission_classes = (AllowAny,)
+    lookup_url_kwarg = 'settings_uid'
+    queryset = QuerySetting.objects.all()
 
+    def filter_queryset(self, queryset):
+        try:
+            setting = QuerySetting.objects\
+                .get(url_identifier=self.kwargs[self.lookup_url_kwarg])
+        except QuerySetting.DoesNotExist:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        image_ids = [int(image_id) for image_id in setting.history.split(',')
+                     if image_id != '']
+        image_query = {i.id: i
+                       for i in EarthImage.objects.filter(id__in=image_ids)}
+        # preserver order
+        images = [image_query[image_id] for image_id in image_ids]
+        return images
 

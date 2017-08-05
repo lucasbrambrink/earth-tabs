@@ -13,4 +13,13 @@ class QuerySettingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QuerySetting
-        exclude = ('id',)
+        exclude = ('id', 'history')
+
+
+class HistorySerializer(serializers.Serializer):
+    images = EarthImageSerializer(many=True,
+                                  read_only=True,
+                                  allow_null=True)
+
+    class Meta:
+        pass
