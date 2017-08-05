@@ -40,6 +40,10 @@ body {
   z-index:100;
 
 }
+main {
+  position: relative;
+}
+
 
 form {
   width: 100%;
@@ -135,6 +139,7 @@ img {
 }
 
 .history {
+  opacity: 0;
   a {
     text-decoration: none;
     color: @white;
@@ -150,4 +155,12 @@ img {
   li {
     padding: 5px 0;
   }
+}
+
+.filter-nav {
+  position: absolute;
+  bottom: 20px;
+}
+.filter {
+  display: none;
 }

@@ -29,6 +29,9 @@ body {
   animation: fadein 0.5s;
   z-index: 100;
 }
+main {
+  position: relative;
+}
 form {
   width: 100%;
   margin: 0 auto;
@@ -121,6 +124,9 @@ img {
   z-index: -1;
   opacity: 0;
 }
+.history {
+  opacity: 0;
+}
 .history a {
   text-decoration: none;
   color: #FCFCFC;
@@ -134,4 +140,11 @@ img {
 }
 .history li {
   padding: 5px 0;
+}
+.filter-nav {
+  position: absolute;
+  bottom: 20px;
+}
+.filter {
+  display: none;
 }
