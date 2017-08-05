@@ -133,7 +133,7 @@ class HistoryListApi(generics.ListAPIView):
         # preserver order
         images = [EarthImageSerializer(data=image_query[image_id])
                   for image_id in image_ids]
-        serializer = HistorySerializer(data=images)
+        serializer = HistorySerializer(data={'images': images})
         serializer.is_valid()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
