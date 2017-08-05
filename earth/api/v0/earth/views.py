@@ -134,5 +134,5 @@ class HistoryListApi(generics.ListAPIView):
         images = [EarthImageSerializer(data=image_query[image_id])
                   for image_id in image_ids]
         serializer = HistorySerializer(data=images)
-        return Response(serializer, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
