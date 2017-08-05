@@ -138,7 +138,7 @@ class HistoryListApi(generics.ListAPIView):
             images.append(earth_image.data)
 
         import json
-        return Response(json.dumps(images))
+        return Response(images)
 
         # serializer = HistorySerializer(data={'images': images})
         # serializer.is_valid()
