@@ -1,8 +1,8 @@
 import datetime
 
 from bs4 import BeautifulSoup
-from api.utils.scraping import ScrapingMixin
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
+from api.utils.scraping import ScrapingMixin
 
 
 class ApodScraper(ScrapingMixin,
@@ -43,7 +43,8 @@ class ApodScraper(ScrapingMixin,
             created_raw=created_raw,
             permalink=permalink,
             source=EarthImage.APOD,
-            score=100
+            score=100,
+            author=created_raw
         )
         return obj
 

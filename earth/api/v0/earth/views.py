@@ -35,6 +35,10 @@ class EarthImageView(generics.RetrieveAPIView):
                 self.too_restrictive = True
                 query_ids = None
 
+            image = self.get_random_object(query_ids)
+            setting.update_history(image)
+            return image
+
         return self.get_random_object(query_ids)
 
     def get(self, request, settings_uid=None, *args, **kwargs):

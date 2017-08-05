@@ -84,6 +84,13 @@ nav span {
 }
 
 
+img {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+  top: 0;
+  height: 0;
+}
 /*a.options:hover, a.last-title:hover { opacity: 1;}*/
 
 /*.top_sites { background: #000; width: 100%; padding: 10px 30px 10px; overflow: hidden; display: none; }*/

@@ -168,6 +168,8 @@ class QuerySetting(models.Model):
     resolution_threshold_operand = models.CharField(choices=OPERANDS, default='gte', max_length=8)
     resolution_threshold = models.IntegerField(null=True, blank=True)
     allowed_sources = models.CharField(max_length=255, default=EarthImage.REDDIT)
+    history = models.CharField(max_length=255, default='')
+
 
     @classmethod
     def get_identifier(cls):
@@ -175,6 +177,14 @@ class QuerySetting(models.Model):
         creates unique identifier to be used in URL
         """
         return str(sha1(urandom(6)).hexdigest())[:5]
+
+    def update_history(self, image):
+        HISTORY_LENGTH = 10
+        ledger = self.history.split(',')
+        ledger.insert(0, image.id)
+        ledger = ledger[:HISTORY_LENGTH]
+        self.history = ','.join(ledger)
+        self.save(update_fields=['history'])
 
     def filter_queryset(self, query_set):
         lazy_query = query_set\
