@@ -99,3 +99,28 @@ $('form').on('submit', function (e) {
         localStorage.clear();
     });
 });
+
+var getHistory = function() {
+    $.getJSON(API_URL + '/settings/history/' + settings.uid)
+        .success(function (resp) {
+            console.log(resp);
+            var obj;
+            for (var i = 1; i < resp.length; i++) {
+                obj = resp[i];
+                console.log(obj);
+                var tag = $('<a href="' + obj.permalink + '">' + obj.title + ' </a>');
+                var list = $('<li></li>').append(tag);
+                $('.history ol').append(list);
+            }
+        });
+};
+
+
+$('.history h4').on('click', function(e) {
+    $('main').css({'height': $('main').css('height')});
+    $('form').css({'display': 'none'});
+    getHistory();
+    $('.history h4').off('click');
+});
+
+$

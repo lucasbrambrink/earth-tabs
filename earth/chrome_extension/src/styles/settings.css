@@ -121,3 +121,17 @@ img {
   z-index: -1;
   opacity: 0;
 }
+.history a {
+  text-decoration: none;
+  color: #FCFCFC;
+  font-size: 120%;
+}
+.history a:hover {
+  text-decoration: underline;
+}
+.history ol {
+  padding: 0 12px;
+}
+.history li {
+  padding: 5px 0;
+}
