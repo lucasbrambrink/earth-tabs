@@ -13,8 +13,8 @@ var getNewSettings = function () {
 };
 
 // Attempt to get a photo from local storage
-var cachedImage  = localStorage.getItem('cachedImage');
-if (cachedImage !== null && cachedImage !== undefined) {
+var cachedImage = localStorage.getItem('cachedImage');
+if (cachedImage !== null && cachedImage !== undefined && cachedImage !== 'undefined') {
     setImage(JSON.parse(cachedImage));
 }
 
@@ -63,14 +63,18 @@ function getNewImage(settings_uid) {
     console.log(url);
 
     $.getJSON(url)
-        .success(function(resp) {
-            newImage = resp;
+        .complete(function(resp) {
+            var newImage = resp;
+            console.log(resp);
+            cachedImage = localStorage.getItem('cachedImage');
             localStorage.removeItem('cachedImage');
             localStorage.setItem('cachedImage', JSON.stringify(newImage));
-            $('#cached-image').attr('src', newImage.preferred_image_url);
+            // console.log(resp);
             if (cachedImage === null) {
                 setImage(newImage);
+                getNewImage(settings_uid);
             }
+            $('#cached-image').attr('src', newImage.preferred_image_url);
         }).fail(function () {
             console.log('Image Request Failed');
         });

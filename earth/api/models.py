@@ -182,7 +182,7 @@ class QuerySetting(models.Model):
         HISTORY_LENGTH = 10
         ledger = self.history.split(',')
         ledger.insert(0, image.id)
-        ledger = ledger[:HISTORY_LENGTH]
+        ledger = ledger[:HISTORY_LENGTH + 1]
         self.history = ','.join(map(str, ledger))
         self.save(update_fields=['history'])
 

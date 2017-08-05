@@ -45,7 +45,7 @@ class EarthImageView(generics.RetrieveAPIView):
         obj = self.get_random_object() if settings_uid is None else \
             self.get_object_via_settings(settings_uid)
 
-        response_status = status.HTTP_204_NO_CONTENT if self.too_restrictive\
+        response_status = status.HTTP_206_PARTIAL_CONTENT if self.too_restrictive\
             else status.HTTP_200_OK
         return Response(EarthImageSerializer(obj).data,
                         status=response_status)
@@ -106,7 +106,7 @@ class QuerySettingSave(generics.RetrieveAPIView):
                 setattr(instance, attr, value)
             instance.save()
             too_restrictive = not instance.filter_queryset(EarthImage.public).count()
-            response_status = status.HTTP_204_NO_CONTENT if too_restrictive \
+            response_status = status.HTTP_206_PARTIAL_CONTENT if too_restrictive \
                 else status.HTTP_200_OK
             return Response(serializer.data, status=response_status)
         else:
