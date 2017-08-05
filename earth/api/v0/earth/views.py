@@ -119,10 +119,10 @@ class HistoryListApi(generics.ListAPIView):
     lookup_url_kwarg = 'settings_uid'
     queryset = QuerySetting.objects.all()
 
-    def filter_queryset(self, queryset):
+    def list(self, request, settings_uid, *args, **kwargs):
         try:
             setting = QuerySetting.objects\
-                .get(url_identifier=self.kwargs[self.lookup_url_kwarg])
+                .get(url_identifier=settings_uid)
         except QuerySetting.DoesNotExist:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -133,5 +133,6 @@ class HistoryListApi(generics.ListAPIView):
         # preserver order
         images = [EarthImageSerializer(data=image_query[image_id])
                   for image_id in image_ids]
-        return images
+        serializer = HistorySerializer(data=images)
+        return Response(serializer, status=status.HTTP_200_OK)
 
