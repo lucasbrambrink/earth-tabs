@@ -22,4 +22,4 @@ class HistorySerializer(serializers.Serializer):
                                   allow_null=True)
 
     class Meta:
-        pass
+        fields = ('images')
