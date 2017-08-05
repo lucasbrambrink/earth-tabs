@@ -1,51 +1,5 @@
-// Get Options
 
-// chrome.topSites.get(top_sites);
-
-// var random_sub = [];
-
-// function restore_options() {
-//
-//     chrome.storage.sync.get({
-//         show_title: true,
-//         show_sites: false,
-//         subreddits: true
-//     }, function (items) {
-//
-//
-//         if (items.show_title == false) {
-//             $('.info').css('display', 'none');
-//         }
-//         if (items.show_sites == true) {
-//             $('.top_sites').css('display', 'inherit');
-//         }
-//
-//         subreddit = items.subreddits;
-//         x = 0;
-//         for (var index in subreddit) {
-//
-//             if (subreddit[index] == 1) {
-//                 //    console.log(index);
-//                 random_sub[x] = index;
-//                 x++;
-//             }
-//
-//         }
-//
-//         subreddit = random_sub[Math.floor(Math.random() * random_sub.length)];
-//         if (subreddit == null) {
-//             subreddit = 'earthporn';
-//         }
-//
-//         new_photo(subreddit);
-//
-//     });
-//
-// }
 var API_URL = 'https://earth-pics.tk/api/v0/earth';
-// var callback = function(items) {
-//     settings_identifier = items.settings_uid;
-// }
 var getNewSettings = function () {
     $.getJSON(API_URL + '/settings/new/')
         .success(function(resp) {
@@ -80,14 +34,13 @@ function setLastSeenImage(cachedImage) {
         $link.remove();
         $('nav span').remove();
     } else {
-        $link.attr('href', REDDIT_URL + lastImage);
+        $link.attr('href', lastImage);
     }
     localStorage.setItem('lastImage', cachedImage.permalink);
 }
 
 
 function setImage(imageData) {
-    console.log(imageData);
     $('.image').css("background-image", "url('" + imageData.preferred_image_url + "')");
 
     $('.title')
@@ -114,6 +67,7 @@ function getNewImage(settings_uid) {
             newImage = resp;
             localStorage.removeItem('cachedImage');
             localStorage.setItem('cachedImage', JSON.stringify(newImage));
+            $('#cached-image').attr('src', newImage.preferred_image_url);
             if (cachedImage === null) {
                 setImage(newImage);
             }
@@ -121,18 +75,3 @@ function getNewImage(settings_uid) {
             console.log('Image Request Failed');
         });
 }
-
-// function top_sites(data) {
-//
-//     $.each(data, function (index, value) {
-//
-//         $('.top_sites').append("<div class='site_container'><div class='site'><a href='" + value.url + "'>" + value.title.substring(0, 25) + "..<div class='url'>" + value.url + "</div></div></a></div>");
-//         index++;
-//         if (index == 5)
-//             return false;
-//     });
-//
-// }
-
-
-// document.addEventListener('DOMContentLoaded', restore_options);
