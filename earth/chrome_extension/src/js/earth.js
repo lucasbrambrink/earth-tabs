@@ -29,27 +29,20 @@ chrome.storage.sync.get("settings_uid", function(item) {
 
 function setLastSeenImage(cachedImage) {
     var lastImage = localStorage.getItem('lastImage');
-    var $link = $('.last-image');
+    var $links = $('a.last');
     if (lastImage === null) {
-        $link.remove();
+        $links.remove();
         $('nav span').remove();
     } else {
-        $link.attr('href', lastImage);
+        console.log(lastImage);
+        var links = lastImage.split('|');
+        $('a.last-link').attr('href', links[0]);
+        $('a.last-image-link').attr('href', links[1]);
     }
-    localStorage.setItem('lastImage', cachedImage.permalink);
+    localStorage.setItem('lastImage',
+        cachedImage.permalink + '|' + cachedImage.preferred_image_url);
 }
 
-
-function setImage(imageData) {
-    $('.image').css("background-image", "url('" + imageData.preferred_image_url + "')");
-
-    $('.title')
-        .attr("href", imageData.permalink)
-        .html(imageData.title);
-    $('.author').html("-- " + imageData.author);
-    $('.ups').html(imageData.ups);
-    setLastSeenImage(imageData);
-}
 
 
 function getNewImage(settings_uid) {
@@ -63,7 +56,7 @@ function getNewImage(settings_uid) {
     console.log(url);
 
     $.getJSON(url)
-        .complete(function(resp) {
+        .success(function(resp) {
             var newImage = resp;
             console.log(resp);
             cachedImage = localStorage.getItem('cachedImage');

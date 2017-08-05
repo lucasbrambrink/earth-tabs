@@ -37,10 +37,10 @@ var loadSettings = function() {
         }
     });
 };
-var cachedImage  = localStorage.getItem('cachedImage');
-if (cachedImage !== null) {
-    var image = JSON.parse(cachedImage);
-    $('body').css("background-image", "url('" + image.preferred_image_url + "')");
+var lastImage  = localStorage.getItem('lastImage');
+if (lastImage !== null) {
+    var links = lastImage.split('|');
+    $('body').css("background-image", "url('" + links[1] + "')");
 } else {
     getNewImage();
 }
@@ -109,7 +109,8 @@ var getHistory = function() {
                 obj = resp[i];
                 console.log(obj);
                 var tag = $('<a href="' + obj.permalink + '">' + obj.title + ' </a>');
-                var list = $('<li></li>').append(tag);
+                var imageTag = $('<a href="' + obj.preferred_image_url + '">[image]</a>');
+                var list = $('<li></li>').append(imageTag).append(tag);
                 $('.history ol').append(list);
             }
         });
@@ -129,8 +130,23 @@ $('.history-nav').on('click', function(e) {
 });
 
 $('.filter').on('click', function() {
-    $('form').show()
+    $('form').show();
     $(this).hide();
     $('.history-nav').show();
     $('.history').hide();
 });
+
+
+
+(function() {
+    var vmSetting = new Vue({
+        el: '#vault',
+        mixins: [ContentScriptApi],
+        data: {
+            history: [],
+            settings: [],
+            setting_uid: null
+        },
+
+    })
+})();

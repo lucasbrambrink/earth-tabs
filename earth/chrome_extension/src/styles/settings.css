@@ -131,9 +131,13 @@ img {
   text-decoration: none;
   color: #FCFCFC;
   font-size: 120%;
+  margin: 0 5px;
 }
 .history a:hover {
   text-decoration: underline;
+}
+.history a:first-child {
+  font-size: 100%;
 }
 .history ol {
   padding: 0 12px;

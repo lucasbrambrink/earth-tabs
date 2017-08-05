@@ -49,7 +49,7 @@ class EarthScraper(ScrapingMixin, object):
             path.append('top')
             add_query_params['sort'] = 'top'
             if time_frame is None or time_frame not in self.TIME_FRAMES:
-                time_frame = self.ALL
+                time_frame = self.MONTH
             add_query_params['t'] = time_frame
 
         path.append(self.JSON_SUFFIX)
