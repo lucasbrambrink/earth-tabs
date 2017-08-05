@@ -166,7 +166,7 @@ class EarthScraper(ScrapingMixin, object):
         while len(images_to_be_added) < limit_new:
             url = self.get_url(after_address=after_address, sort_top=sort_top,
                                time_frame=time_frame, search_param=search_param)
-            data = self.get(url).get('data', {})
+            data = self.get(url, headers=self.HEADERS).get('data', {})
             after_address = data.get('after')
             posts = data.get('children')
             for post in posts:
