@@ -5,8 +5,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import EarthImageSerializer, QuerySettingSerializer, HistorySerializer
-from api.models import EarthImage, QuerySetting
+from .serializers import EarthImageSerializer, QuerySettingSerializer, HistorySerializer, FilterSerializer
+from api.models import EarthImage, QuerySetting, Filter
 
 
 class EarthImageView(generics.RetrieveAPIView):
@@ -70,7 +70,9 @@ class QuerySettingSave(generics.RetrieveAPIView):
     def get_object(self):
         obj = None
         try:
-            obj = QuerySetting.objects.get(url_identifier=self.kwargs[self.lookup_field])
+            obj = QuerySetting.objects\
+                .prefetch_related('filter_set')\
+                .get(url_identifier=self.kwargs[self.lookup_field])
         except QuerySetting.DoesNotExist:
             pass
 
@@ -83,22 +85,49 @@ class QuerySettingSave(generics.RetrieveAPIView):
 
         values = {key: value for key, value in request.GET.items()}
         if not len(values):
+            instance.filters = instance.filter_set.all()
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
 
-        values['url_identifier'] = self.kwargs[self.lookup_field]
-        if values.get('score_threshold', '') == '':
-            values['score_threshold'] = None
+        filter_ids = set()
+        for filter_obj in filter(None, values.get('filters', '').split('|')):
+            print(filter_obj)
 
-        if values.get('resolution_threshold', '') == '':
-            values['resolution_threshold'] = None
+            parsed = dict(kw.split('=') for kw in filter_obj.split(','))
+            parsed['setting'] = instance.id
+            serializer = FilterSerializer(data=parsed)
+            serializer.setting = instance
+            if serializer.is_valid():
+                args = serializer.validated_data
+                args['arguments'] = '&'.join(args.get('arguments', '')\
+                    .replace('*', '=')\
+                    .split('$'))
+                try:
+                    obj = Filter.objects.get(source=args.get('source'),
+                                             filter_class=args.get('filter_class'),
+                                             setting=args.get('setting'))
+                    obj.arguments = args.get('arguments')
+                    obj.save()
+                except Filter.DoesNotExist:
+                    obj = Filter.objects.create(**args)
+
+                filter_ids.add(obj.id)
+
+        instance.filter_set.exclude(id__in=filter_ids).delete()
+
+        # import ipdb; ipdb.set_trace()
+        #     values['score_threshold'] = None
+        #
+        # if values.get('resolution_threshold', '') == '':
+        #     values['resolution_threshold'] = None
 
         selected_sources = []
-        for source in EarthImage.VERIFIED_SOURCE:
+        for source in EarthImage.VERIFIED_SOURCES:
             is_selected = values.pop('allow_{}'.format(source[0]), 'false')
             if is_selected == 'true':
                 selected_sources.append(source[0])
         values['allowed_sources'] = ','.join(selected_sources)
+        values['url_identifier'] = self.kwargs[self.lookup_field]
 
         serializer = self.get_serializer(data=values)
         if serializer.is_valid():
@@ -110,6 +139,7 @@ class QuerySettingSave(generics.RetrieveAPIView):
                 else status.HTTP_200_OK
             return Response(serializer.data, status=response_status)
         else:
+            import ipdb; ipdb.set_trace()
             return Response({}, status=status.HTTP_304_NOT_MODIFIED)
 
 

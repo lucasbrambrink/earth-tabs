@@ -3,6 +3,9 @@ from hashlib import sha1
 from django.db import models
 
 
+from . import filters
+
+
 class EarthManager(models.Manager):
 
     def get_queryset(self):
@@ -14,11 +17,14 @@ class EarthManager(models.Manager):
 class EarthImage(models.Model):
     REDDIT = 'reddit'
     APOD = 'apod'
+    ALL = 'all'
     # WIKIPEDIA = 'wikipedia'
-    VERIFIED_SOURCE = (
+    VERIFIED_SOURCES = (
+        (ALL, 'all'),
         (REDDIT, 'reddit.com/r/Earth'),
         (APOD, "NASA's Astronomy Picture of the Day")
     )
+    SOURCES = (REDDIT, APOD)
 
     # fields
     permalink = models.URLField()
@@ -40,7 +46,7 @@ class EarthImage(models.Model):
     resolution_width = models.IntegerField(null=True)
     resolution_height = models.IntegerField(null=True)
     last_seen = models.DateTimeField(auto_now=True)
-    source = models.CharField(max_length=100, choices=VERIFIED_SOURCE, default=REDDIT)
+    source = models.CharField(max_length=100, choices=VERIFIED_SOURCES, default=REDDIT)
 
     objects = models.Manager()
     public = EarthManager()
@@ -139,6 +145,40 @@ class EarthImage(models.Model):
 
 
 
+class Filter(models.Model):
+    QUERY = 'query'
+    RESOLUTION = 'resolution'
+    SCORE = 'score'
+    FILTER_TYPES = {
+        QUERY: filters.TitleKeyWordFilter,
+        RESOLUTION: filters.ResolutionFilter,
+        SCORE: filters.ScoreFilter
+    }
+    CLASSES = (
+        (QUERY, 'By keyword in title filter'),
+        (RESOLUTION, 'Resolution filter'),
+        (SCORE, 'Voting filter')
+    )
+
+    type = models.CharField(max_length=20, choices=filters.Filter.TYPES_CHOICES,
+                            default=filters.Filter.GLOBAL)
+    source = models.CharField(max_length=20, blank=True, default='', choices=EarthImage.VERIFIED_SOURCES)
+    filter_class = models.CharField(max_length=10, choices=CLASSES)
+    setting = models.ForeignKey(to='QuerySetting')
+    arguments = models.CharField(max_length=255)
+
+    def load_filter(self):
+        filter_class = self.FILTER_TYPES[self.filter_class]
+        kwargs = [arg.split('=') for arg in self.arguments.split('&')
+                  if arg != '']
+        filter = filter_class(type=self.type, source=self.source,
+                              **dict(kwargs))
+        return filter
+
+    def __str__(self):
+        return '%s %s %s' % (self.source, self.filter_class, self.arguments)
+
+
 class QuerySetting(models.Model):
     OPERANDS = (
         ('gte', 'Greater than'),
@@ -160,16 +200,11 @@ class QuerySetting(models.Model):
     )
 
     url_identifier = models.CharField(max_length=255)
-    query_keywords_title = models.TextField(null=True, blank=True)
-    score_type = models.CharField(max_length=100, choices=TYPES, default=SCORE)
-    score_threshold_operand = models.CharField(choices=OPERANDS, max_length=5, default='gte')
-    score_threshold = models.IntegerField(null=True, blank=True)
-    resolution_type = models.CharField(choices=RESOLUTIONS, default=WIDTH, max_length=8)
-    resolution_threshold_operand = models.CharField(choices=OPERANDS, default='gte', max_length=8)
-    resolution_threshold = models.IntegerField(null=True, blank=True)
     allowed_sources = models.CharField(max_length=255, default=EarthImage.REDDIT)
     history = models.CharField(max_length=255, default='')
 
+    def __str__(self):
+        return self.url_identifier
 
     @classmethod
     def get_identifier(cls):
@@ -187,29 +222,13 @@ class QuerySetting(models.Model):
         self.save(update_fields=['history'])
 
     def filter_queryset(self, query_set):
-        lazy_query = query_set\
-            .filter(source__in=self.allowed_sources.split(','))
+        for source in EarthImage.SOURCES:
+            if source not in self.allowed_sources:
+                query_set = query_set.exclude(source=source)
 
-        if self.query_keywords_title:
-            query_kwargs = [models.Q(title__icontains=kw.strip())
-                            for kw in self.query_keywords_title.split(',')]
-            query = query_kwargs.pop()
-            for item in query_kwargs:
-                query |= item
+        for filter_obj in self.filter_set.order_by('type'):
+            filter_instance = filter_obj.load_filter()
+            if filter_instance.source in self.allowed_sources:
+                query_set = filter_instance(query_set)
 
-            lazy_query = lazy_query.filter(query)
-
-        if self.score_threshold is not None:
-            score_query = '{type}__{operator}'.format(
-                type=self.score_type,
-                operator=self.score_threshold_operand)
-            lazy_query = lazy_query.filter(**{score_query: self.score_threshold})
-
-        if self.resolution_threshold is not None:
-            resolution_query = 'resolution_{type}__{operator}'.format(
-                type=self.resolution_type,
-                operator=self.resolution_threshold_operand)
-            lazy_query = lazy_query.filter(**{resolution_query: self.resolution_threshold})
-
-        # resolve query
-        return lazy_query.values_list('id', flat=True)
+        return query_set.values_list('id', flat=True)

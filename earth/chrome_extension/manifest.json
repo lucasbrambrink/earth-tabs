@@ -6,10 +6,12 @@
       "persistent": false,
       "scripts": ["src/js/earth.js"]
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
      "permissions": [
           "storage",
-           "https://earth-pics.tk/"
+           "https://earth-pics.tk/",
+          "http://127.0.0.1/",
+       "http://127.0.0.1:8000/"
         ],
   "manifest_version": 2,
   "options_page": "src/settings.html",

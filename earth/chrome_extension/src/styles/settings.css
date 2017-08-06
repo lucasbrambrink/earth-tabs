@@ -107,9 +107,6 @@ form input[type=submit]:focus {
   border-color: green;
   color: green;
 }
-.filter-block {
-  margin-top: 25px;
-}
 .filter-block p {
   margin: 3px;
 }
@@ -124,9 +121,6 @@ img {
   z-index: -1;
   opacity: 0;
 }
-.history {
-  opacity: 0;
-}
 .history a {
   text-decoration: none;
   color: #FCFCFC;
@@ -139,16 +133,101 @@ img {
 .history a:first-child {
   font-size: 100%;
 }
-.history ol {
-  padding: 0 12px;
-}
-.history li {
-  padding: 5px 0;
-}
 .filter-nav {
   position: absolute;
   bottom: 20px;
 }
-.filter {
-  display: none;
+nav {
+  height: 80px;
+}
+nav div {
+  width: 132px;
+  height: 35px;
+  border: 1px solid #FCFCFC;
+  display: inline-block;
+  float: left;
+}
+nav div:first-child {
+  width: 398px;
+  border-bottom: none;
+}
+nav div:nth-child(2),
+nav div:nth-child(3) {
+  border-right: none;
+}
+nav button {
+  height: 100%;
+  width: 100%;
+  font-size: 120%;
+  background-color: transparent;
+  color: white;
+  border: none;
+}
+nav button:hover,
+nav button.active {
+  background: rgba(26, 25, 51, 0.61);
+}
+nav button.selected {
+  background: url(../icons/tick.svg) no-repeat;
+  background-size: 16px;
+  background-position: 110px 9px;
+}
+nav button.selected.active {
+  background-color: rgba(26, 25, 51, 0.61);
+}
+input[type=checkbox] {
+  width: 20px;
+}
+.add-filter {
+  margin-top: 50px;
+}
+.add-filter button {
+  width: 100%;
+  height: 80px;
+  font-size: 120%;
+  background: transparent;
+  color: white;
+  border: 1px solid #FCFCFC;
+}
+.add-filter button:hover {
+  background: rgba(26, 25, 51, 0.61);
+}
+.filter-type {
+  height: 80px;
+  margin: 15px 0;
+}
+.filter-type div {
+  position: relative;
+}
+.filter-type span.x {
+  position: absolute;
+  right: 0;
+  top: -10px;
+  cursor: pointer;
+}
+.filter-type button {
+  width: 100%;
+  height: 80px;
+  background-color: transparent;
+  color: white;
+  border: none;
+}
+.filter-type button:hover,
+.filter-type button.active {
+  background: rgba(26, 25, 51, 0.61);
+}
+.history,
+form {
+  padding-bottom: 30px;
+}
+.row {
+  display: flex;
+}
+.row div {
+  align-items: left;
+  padding: 10px 5px;
+  min-width: 15px;
+}
+.row a {
+  margin: 5px 0;
 }

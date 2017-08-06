@@ -117,7 +117,6 @@ form {
 
 
 .filter-block {
-  margin-top: 25px;
   p {
     margin: 3px;
   }
@@ -139,7 +138,7 @@ img {
 }
 
 .history {
-  opacity: 0;
+  //opacity: 0;
   a {
     text-decoration: none;
     color: @white;
@@ -152,19 +151,110 @@ img {
       font-size: 100%;
     }
   }
-  ol {
-    //list-style-type: none;
-    padding: 0 12px;
-  }
-  li {
-    padding: 5px 0;
-  }
 }
 
 .filter-nav {
   position: absolute;
   bottom: 20px;
 }
-.filter {
-  display: none;
+
+nav {
+  height: 80px;
+  div {
+    width: 132px;
+    height: 35px;
+    border: 1px solid @white;
+    display: inline-block;
+    float: left;
+    &:first-child {
+      width: 398px;
+      border-bottom: none;
+    }
+    &:nth-child(2),
+    &:nth-child(3){
+      border-right: none;
+    }
+  }
+  button {
+    height: 100%;
+    width: 100%;
+    font-size: 120%;
+    background-color: transparent;
+    //transition: background 200ms ease;
+    color: white;
+    border: none;
+    &:hover, &.active {
+      background: @opaque-bg;
+    }
+    &.selected {
+      background: url(../icons/tick.svg) no-repeat;
+      background-size: 16px;
+      background-position: 110px 9px;
+    }
+    &.selected.active {
+      background-color: @opaque-bg;
+    }
+  }
+}
+
+input[type=checkbox] {
+  width: 20px;
+}
+
+.add-filter {
+  margin-top: 50px;
+  button {
+    width: 100%;
+    height: 80px;
+    font-size: 120%;
+    background: transparent;
+    //transition: background 200ms ease;
+    color: white;
+    border: 1px solid @white;
+    &:hover {
+      background: @opaque-bg;
+    }
+  }
+}
+
+.filter-type {
+  height: 80px;
+  margin: 15px 0;
+  div {
+    position: relative;
+  }
+  span.x {
+    position: absolute;
+    right: 0;
+    top: -10px;
+    cursor: pointer;
+  }
+  button {
+    width: 100%;
+    height: 80px;
+    background-color: transparent;
+    //transition: background 200ms ease;
+    color: white;
+    border: none;
+    &:hover, &.active {
+      background: @opaque-bg;
+    }
+  }
+  //.filter-bl/
+}
+
+.history, form {
+  padding-bottom: 30px;
+}
+
+.row {
+  display: flex;
+  div {
+    align-items: left;
+    padding: 10px 5px;
+    min-width: 15px;
+  }
+  a {
+    margin: 5px 0;
+  }
 }

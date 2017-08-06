@@ -8,80 +8,162 @@
 </head>
 
 <body class="settings">
-    <main>
+    <main id="vm-settings">
 
-        <form>
+        <form v-on:submit.prevent="submitSettings" v-show="!show_history">
             <header>
                 <h1>Filters</h1>
             </header>
-            <div class="filter-block query">
-                <label for="query">By Title</label>
-                <input id="query" type="text" name="query">
-                <p class="help-text">Use comma separated keywords</p>
+            <nav>
+                <div v-on:click.prevent="filterNav = 0">
+                    <button v-bind:class="{active: filterNav === 0}">All</button></div>
+                <div v-on:click.prevent="filterNav = 1">
+                    <button v-bind:class="{active: filterNav === 1, selected: allow_reddit}">Reddit</button> </div>
+                <div v-on:click.prevent="filterNav = 2">
+                    <button v-bind:class="{active: filterNav === 2, selected: allow_apod}">Apod</button></div>
+                <div v-on:click.prevent="filterNav = 3">
+                    <button v-bind:class="{active: filterNav === 3}">Wikipedia</button></div>
+            </nav>
+
+
+            <div v-show="filterNav === 0">
+                <filter v-for="filter in filters.all"
+                    :index="filter.index"
+                    :source="filter.source"
+                    :filter_class="filter.filter_class"
+                    :value="filter.value"
+                    :value_type="filter.value_type"
+                    :value_operand="filter.value_operand"></filter>
             </div>
 
-            <div class="filter-block limit">
-                <label for="query">By Votes</label>
-
-                <select id="vote_type">
-                    <option value="score">Score</option>
-                    <option value="ups">Upvotes</option>
-                    <option value="downs">Downvotes</option>
-                </select>
-                <span>must be</span>
-                <select id="threshold">
-                    <option value="gte">greater than</option>
-                    <option value="lte">less than</option>
-                </select>
-                <input id="threshold_value" type="text" name="threshold"/>
-
-                <p class="help-text">Leave blank to set inactive.</p>
+            <div v-show="filterNav === 1">
+                <label for="allow_reddit">
+                    <input type="checkbox" name="reddit" value="reddit" v-model="allow_reddit" id="allow_reddit">
+                    Allow reddit.com/r/Earth
+                </label>
+                <div v-for="filter in filters.reddit">
+                    <filter :index="filter.index"
+                        :source="filter.source"
+                        :filter_class="filter.filter_class"
+                        :value="filter.value"
+                        :value_type="filter.value_type"
+                        :value_operand="filter.value_operand"></filter>
+                </div>
             </div>
 
-            <div class="filter-block resolution">
-                <label for="query">By Resolution</label>
-                <select id="resolution_type">
-                    <option value="width">Width</option>
-                    <option value="height">Height</option>
-                </select>
-                <span>must be</span>
-                <select id="resolution_threshold">
-                    <option value="gte">greater than</option>
-                    <option value="lte">less than</option>
-                </select>
-                <input id="resolution_threshold_value" type="text" name="threshold"/>
-
-                <p class="help-text">Leave blank to set inactive. </p>
+            <div v-show="filterNav === 2">
+                <label for="allow_apod">
+                    <input type="checkbox" name="apod" value="apod" v-model="allow_apod" id="allow_apod">
+                    Allow NASA's Astromony Picture of the Day</label>
+                <div v-for="filter in filters.apod">
+                    <filter :index="filter.index"
+                        :source="filter.source"
+                        :filter_class="filter.filter_class"
+                        :value="filter.value"
+                        :value_type="filter.value_type"
+                        :value_operand="filter.value_operand"></filter>
+                </div>
             </div>
 
-            <div class="filter-block sources">
-                <p>Allowed sources</p>
-                <input type="checkbox" name="reddit" value="reddit" id="allow_reddit">
-                <label for="allow_reddit">reddit.com/r/Earth</label>
-                <br>
-                <input type="checkbox" name="apod" value="apod" id="allow_apod">
-                <label for="allow_apod">NASA's Astromony Picture of the Day</label>
+            <div v-show="filterNav === 3">
+                <p>Coming soon!</p>
             </div>
 
             <div class="filter-block">
-                <input class="save" value="Save" type="submit" />
+                <input class="save" value="Save" v-model="save_copy"
+                       v-bind:class="{saved: saving}"
+                       type="submit" />
             </div>
         </form>
 
         <div class="filter-nav">
-            <h4 class="history-nav">History</h4>
-            <h4 class="filter">Filters</h4>
+            <h4 v-on:click="getHistory" v-show="!show_history" class="history-nav">History</h4>
+            <h4 v-on:click="show_history = false" v-show="show_history" class="filter">Filters</h4>
         </div>
 
 
-        <div class="history">
-            <h1 >History</h1>
-            <ol start="1"></ol>
+        <div class="history" v-show="show_history">
+            <h1>History</h1>
+            <history v-for="(index, history) in history_items"
+                :index="index + 1"
+                :image_url="history.preferred_image_url"
+                :permalink="history.permalink"
+                :title="history.title">
+            </history>
         </div>
 
     </main>
 </body>
 
+
+<template id="filter">
+<div id="title" class="filter-type" v-if="index === 0">
+    <button v-on:click.prevent="active = !active" v-show="!active">filter by phrase</button>
+    <div v-show="active" class="filter-block query">
+        <span class="x" v-on:click.prevent="clear">x</span>
+        <input type="text" name="query"
+            v-bind:value="value"
+            v-on:input="updateValue('value', $event.target.value)"
+            v-bind:placeholder="suggestion">
+           <!--v-bind:value="key_words-->
+        <p class="help-text">Use comma separated keywords</p>
+    </div>
+</div>
+
+<div id="score" class="filter-type" v-if="index === 1">
+    <button v-on:click.prevent="active = !active" v-show="!active">filter by votes</button>
+
+    <div v-show="active" class="filter-block limit">
+        <span class="x" v-on:click.prevent="clear">x</span>
+        <select v-bind:value="value_type"
+                v-on:change="updateValue('value_type', $event.target.value)">
+            <option value="score">Score</option>
+            <option value="ups">Upvotes</option>
+            <option value="downs">Downvotes</option>
+        </select>
+        <span>must be</span>
+        <select v-bind:value="value_operand"
+                v-on:change="updateValue('value_operand', $event.target.value)">
+            <option value="gte">greater than</option>
+            <option value="lte">less than</option>
+        </select>
+        <input v-bind:value="value"
+               v-on:input="updateValue('value', $event.target.value)" type="text" name="threshold"/>
+
+        <p class="help-text">Leave blank to set inactive.</p>
+    </div>
+</div>
+
+<div id="resolution" class="filter-type" v-if="index === 2">
+    <button v-on:click.prevent="active = !active" v-show="!active">filter by resolution</button>
+    <div v-show="active" class="filter-block resolution">
+        <span class="x" v-on:click.prevent="clear">x</span>
+        <select v-bind:value="value_type"
+                v-on:change="updateValue('value_type', $event.target.value)">
+            <option value="width">Width</option>
+            <option value="height">Height</option>
+        </select>
+        <span>must be</span>
+        <select v-bind:value="value_operand"
+                v-on:change="updateValue('value_operand', $event.target.value)">
+            <option value="gte">greater than</option>
+            <option value="lte">less than</option>
+        </select>
+        <input v-bind:value="value"
+               v-on:input="updateValue('value', $event.target.value)" type="text" name="threshold"/>
+
+        <p class="help-text">Leave blank to set inactive. </p>
+    </div>
+</div>
+</template>
+
+<template id="history">
+    <div class="row">
+        <div>{{index}}</div>
+        <div><a v-bind:href="image_url">[image]</a></div>
+        <div><a v-bind:href="permalink">{{title}}</a></div>
+    </div>
+</template>
 <script type="text/javascript" src="js/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="js/vue.min.js"></script>
 <script type="text/javascript" src="js/settings.js"></script>
