@@ -62,7 +62,11 @@ class WikiScraper(ScrapingMixin,
             obj.author = 'Wikipedia: {}'.format(obj.created_raw)
             obj.is_public = True
             obj.score = 20
-            objects.append(obj)
+            # objects.append(obj)
+            try:
+                obj.save()
+            except Exception as exc:
+                logger.warning(exc)
 
         EarthImage.objects.bulk_create(objects)
 
