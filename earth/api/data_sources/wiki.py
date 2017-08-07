@@ -21,6 +21,8 @@ class WikiScraper(ScrapingMixin,
         for section in soup.findAll('table',
                 attrs={'role': 'presentation', 'class': ''}):
             tag = section.find('a', attrs={'class': 'image'})
+            if tag is None:
+                continue
             image = {
                 'title': tag.attrs.get('title', 'Not found')[:500],
                 'image_url': tag.attrs.get('href', '')
@@ -39,7 +41,7 @@ class WikiScraper(ScrapingMixin,
                 base=self.BASE_URL,
                 file=link['image_url'].split('File:')[1])
             picture_page_html = self.get(url, as_json=False, headers=self.HEADERS)
-            psoup = BeautifulSoup(picture_page_html)
+            psoup = BeautifulSoup(picture_page_html, 'html.parser')
             og_link = [a for a in psoup.findAll('a', attrs={'class': 'internal'})
                        if 'Original file' in a.text]
             if not len(og_link):
