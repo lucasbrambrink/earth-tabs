@@ -171,7 +171,8 @@ chrome.storage.sync.get("settings_uid", function(item) {
             show_history: false,
             filters: {
                 all: {
-                    query: Filter('query', 'global', 'all')
+                    query: Filter('query', 'global', 'all'),
+                    resolution: Filter('resolution', 'global', 'all')
                 },
                 reddit: {
                     query: Filter('query', 'specific', 'reddit'),
