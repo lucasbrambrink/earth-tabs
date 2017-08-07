@@ -16,7 +16,7 @@
             </header>
             <nav>
                 <div v-on:click.prevent="filterNav = 0">
-                    <button v-bind:class="{active: filterNav === 0}">All</button></div>
+                    <button v-bind:class="{active: filterNav === 0}" id="all-button" tabindex="-1">All</button></div>
                 <div v-on:click.prevent="filterNav = 1">
                     <button v-bind:class="{active: filterNav === 1, selected: allow_reddit}">Reddit</button> </div>
                 <div v-on:click.prevent="filterNav = 2">

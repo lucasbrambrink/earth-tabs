@@ -8,8 +8,8 @@
 
 
 */
-// var API_URL = 'https://earth-pics.tk/api/v0/earth';
-var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
+var API_URL = 'https://earth-pics.tk/api/v0/earth';
+// var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
 var getNewImage = function() {
     $.getJSON(API_URL + '/get')
         .success(function(resp) {
@@ -186,6 +186,9 @@ chrome.storage.sync.get("settings_uid", function(item) {
         },
         created: function() {
             setTimeout(this.getSettings, 100);
+            // setTimeout(function () {
+            //     $('#all-button').focus();
+            // }, 200)
         },
         methods: {
             settingsCallback: function(resp) {

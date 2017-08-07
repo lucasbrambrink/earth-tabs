@@ -228,6 +228,9 @@ form {
   padding: 10px 5px;
   min-width: 15px;
 }
+.row div:nth-child(2) {
+  min-width: 46px;
+}
 .row a {
   margin: 5px 0;
 }
