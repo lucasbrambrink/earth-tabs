@@ -235,6 +235,7 @@ chrome.storage.sync.get("settings_uid", function(item) {
                     this.filters.all,
                     this.filters.reddit,
                     this.filters.apod,
+                    this.filters.wiki,
                 ];
                 var serialized_filters = [];
                 var filter;
