@@ -8,8 +8,8 @@
 
 
 */
-// var API_URL = 'https://earth-pics.tk/api/v0/earth';
-var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
+var API_URL = 'https://earth-pics.tk/api/v0/earth';
+// var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
 var getNewImage = function() {
     $.getJSON(API_URL + '/get')
         .success(function(resp) {
@@ -77,6 +77,8 @@ chrome.storage.sync.get("settings_uid", function(item) {
                         return 'try ...yosemite';
                     case 'apod':
                         return 'try ...galaxy';
+                    case 'wiki':
+                        return 'try ...president';
                     default:
                         return 'try ...nepal'
                 }
@@ -183,6 +185,9 @@ chrome.storage.sync.get("settings_uid", function(item) {
                 apod: {
                     query: Filter('query', 'specific', 'apod'),
                     resolution: Filter('resolution', 'specific', 'apod')
+                },
+                wiki: {
+                    query: Filter('query', 'specific', 'wiki'),
                 }
             },
         },

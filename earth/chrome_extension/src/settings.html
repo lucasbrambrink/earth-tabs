@@ -73,6 +73,14 @@
                 <label for="allow_wiki">
                     <input type="checkbox" name="wiki" value="wiki" v-model="allow_wiki" id="allow_wiki">
                     Allow Wikipedia's Picture of the Day</label>
+                <div v-for="filter in filters.wiki">
+                    <filter :index="filter.index"
+                        :source="filter.source"
+                        :filter_class="filter.filter_class"
+                        :value="filter.value"
+                        :value_type="filter.value_type"
+                        :value_operand="filter.value_operand"></filter>
+                </div>
             </div>
 
             <div class="filter-block">
