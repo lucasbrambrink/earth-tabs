@@ -14,7 +14,7 @@ class InspectImage(ScrapingMixin,
 
     @classmethod
     def load_image(cls, url):
-        response = cls.get_data(url)
+        response = cls.get_data(url, fail_silently=True)
         if response is None:
             raise ValueError('Unable to load image')
 
@@ -28,10 +28,19 @@ class InspectImage(ScrapingMixin,
         return image
 
     @classmethod
-    def assign_resolution(cls, image_obj, commit=True):
-        image = cls.get_image(url=image_obj.preferred_image_url)
-        width, height = image.size
-        image_obj.resolution_width = width
-        image_obj.resolution_height = height
+    def inspect(cls, image_obj, commit=True):
+        try:
+            image = cls.get_image(url=image_obj.preferred_image_url)
+        except ValueError:
+            image = None
+
+        if image is not None:
+            width, height = image.size
+            image_obj.resolution_width = width
+            image_obj.resolution_height = height
+        else:
+            image.is_public = False
+            image.subreddit_name = 'Unable to load image'
+
         if commit:
             image_obj.save()
