@@ -39,8 +39,8 @@ class InspectImage(ScrapingMixin,
             image_obj.resolution_width = width
             image_obj.resolution_height = height
         else:
-            image.is_public = False
-            image.subreddit_name = 'Unable to load image'
+            image_obj.is_public = False
+            image_obj.subreddit_name = 'Unable to load image'
 
         if commit:
             image_obj.save()
