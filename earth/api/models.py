@@ -143,6 +143,14 @@ class EarthImage(models.Model):
 
         self.save()
 
+    @classmethod
+    def update_resolution(cls, limit=100):
+        from api.utils.image import InspectImage
+        unresolved = cls.objects\
+            .filter(models.Q(resolution_width__isnull=True) |
+                    models.Q(resolution_height__isnull=True))[:limit]
+        for image in unresolved:
+            InspectImage.assign_resolution(image)
 
 
 class Filter(models.Model):
