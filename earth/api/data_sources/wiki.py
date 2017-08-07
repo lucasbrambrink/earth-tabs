@@ -2,7 +2,7 @@ import logging
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 from api.utils.scraping import ScrapingMixin
-
+import datetime
 logger = logging.getLogger(__name__)
 
 
@@ -22,7 +22,7 @@ class WikiScraper(ScrapingMixin,
                 attrs={'role': 'presentation', 'class': ''}):
             tag = section.find('a', attrs={'class': 'image'})
             image = {
-                'title': tag.attrs.get('title', 'Not found'),
+                'title': tag.attrs.get('title', 'Not found')[:500],
                 'image_url': tag.attrs.get('href', '')
             }
             links.append(image)
@@ -64,6 +64,19 @@ class WikiScraper(ScrapingMixin,
 
         EarthImage.objects.bulk_create(objects)
 
+    def fetch_year(self, year):
+        months = [datetime.date(year, month, 1)
+                  for month in range(1, 13)]
+        urls = ['{base}{path}/{time}'.format(
+            base=self.BASE_URL,
+            path=self.PATH,
+            time=month.strftime('%B_%Y')
+        ) for month in months]
+        for url in urls:
+            self.run(url)
+        return urls
+
     def run(self, url):
         links = self.scrape_wiki(url)
         self.create_models(links)
+
