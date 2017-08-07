@@ -33,7 +33,7 @@ class WikiScraper(ScrapingMixin,
             attrs={'class': 'mw-headline'})]
 
         for title, link in zip(titles, links):
-            link['created_raw'] = title
+            link['created_raw'] = title[:200]
 
         # get the coveted original file link
         for link in links:
