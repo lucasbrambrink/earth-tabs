@@ -8,8 +8,8 @@
 
 
 */
-var API_URL = 'https://earth-pics.tk/api/v0/earth';
-// var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
+// var API_URL = 'https://earth-pics.tk/api/v0/earth';
+var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
 var getNewImage = function() {
     $.getJSON(API_URL + '/get')
         .success(function(resp) {
@@ -165,6 +165,7 @@ chrome.storage.sync.get("settings_uid", function(item) {
             setting_uid: null,
             allow_reddit: false,
             allow_apod: false,
+            allow_wiki: false,
             save_copy: "Save",
             saving: false,
             history_items: [],
@@ -248,6 +249,7 @@ chrome.storage.sync.get("settings_uid", function(item) {
                 values = {
                     allow_reddit: this.allow_reddit,
                     allow_apod: this.allow_apod,
+                    allow_wiki: this.allow_wiki,
                     filters: this.serializerFilters()
                 };
                 var url = this.addAsQueryParams(API_URL + '/settings/save/' + settings.uid, values);

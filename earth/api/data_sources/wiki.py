@@ -17,12 +17,53 @@ class WikiScraper(ScrapingMixin,
         html = self.get(url, as_json=False, headers=self.HEADERS)
         soup = BeautifulSoup(html, 'html.parser')
 
+        links = []
+        for section in soup.findAll('table',
+                attrs={'role': 'presentation', 'class': ''}):
+            tag = section.find('a', attrs={'class': 'image'})
+            image = {
+                'title': tag.attrs.get('title', 'Not found'),
+                'image_url': tag.attrs.get('href', '')
+            }
+            links.append(image)
 
-        all_tags = [a for a in soup.findAll('a')
-                    if self.PATH in a.attrs.get('href', '')]
+        titles = [t.text for t in soup.findAll('span',
+            attrs={'class': 'mw-headline'})]
 
+        for title, link in zip(titles, links):
+            link['created_raw'] = title
 
+        # get the coveted original file link
+        for link in links:
+            url = '{base}/wiki/File:{file}'.format(
+                base=self.BASE_URL,
+                file=link['image_url'].split('File:')[1])
+            picture_page_html = self.get(url, as_json=False, headers=self.HEADERS)
+            psoup = BeautifulSoup(picture_page_html)
+            og_link = [a for a in psoup.findAll('a', attrs={'class': 'internal'})
+                       if 'Original file' in a.text]
+            if not len(og_link):
+                continue
+            href = og_link[0].attrs.get('href', '')
+            parsed_url = urlparse(href)
+            parsed_url = parsed_url._replace(scheme='https')
+            link['preferred_image_url'] = urlunparse(parsed_url)
 
+        return links
 
+    def create_models(self, links):
+        from api.models import EarthImage
+        objects = []
+        for link in links:
+            obj = EarthImage(**link)
+            obj.source = 'wiki'
+            obj.author = 'Wikipedia: {}'.format(obj.created_raw)
+            obj.is_public = True
+            obj.score = 20
+            objects.append(obj)
 
-        import ipdb; ipdb.set_trace()
+        EarthImage.objects.bulk_create(objects)
+
+    def run(self, url):
+        links = self.scrape_wiki(url)
+        self.create_models(links)

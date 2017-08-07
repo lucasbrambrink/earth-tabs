@@ -17,14 +17,16 @@ class EarthManager(models.Manager):
 class EarthImage(models.Model):
     REDDIT = 'reddit'
     APOD = 'apod'
+    WIKI = 'wiki'
     ALL = 'all'
     # WIKIPEDIA = 'wikipedia'
     VERIFIED_SOURCES = (
         (ALL, 'all'),
         (REDDIT, 'reddit.com/r/Earth'),
-        (APOD, "NASA's Astronomy Picture of the Day")
+        (APOD, "NASA's Astronomy Picture of the Day"),
+        (WIKI, 'Wikipedia Picture of the Day')
     )
-    SOURCES = (REDDIT, APOD)
+    SOURCES = (REDDIT, APOD, WIKI)
 
     # fields
     permalink = models.URLField()
