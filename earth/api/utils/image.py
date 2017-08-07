@@ -31,7 +31,7 @@ class InspectImage(ScrapingMixin,
     def inspect(cls, image_obj, commit=True):
         try:
             image = cls.get_image(url=image_obj.preferred_image_url)
-        except ValueError:
+        except (ValueError, OSError):
             image = None
 
         if image is not None:
