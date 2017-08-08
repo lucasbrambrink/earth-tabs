@@ -63,10 +63,10 @@ class WikiScraper(ScrapingMixin,
             obj.source = 'wiki'
             obj.is_public = True
             obj.score = 20
-year_month = obj.preview_image_url.split('/')[-1]
-year = year_month.split('_')[1]
-date_string = '{}{}'.format(obj.created_raw.split('-')[0], year)
-date = datetime.datetime.strptime(date_string, '%B %d %Y')
+            year_month = obj.preview_image_url.split('/')[-1]
+            year = year_month.split('_')[1]
+            date_string = '{}{}'.format(obj.created_raw.split('-')[0], year)
+            date = datetime.datetime.strptime(date_string, '%B %d %Y')
             obj.permalink = '{base}{path}{time}'.format(
                 base=self.BASE_URL,
                 path=PERMALINK,
