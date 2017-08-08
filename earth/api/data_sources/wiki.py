@@ -25,7 +25,8 @@ class WikiScraper(ScrapingMixin,
                 continue
             image = {
                 'title': tag.attrs.get('title', 'Not found')[:500],
-                'image_url': tag.attrs.get('href', '')
+                'image_url': tag.attrs.get('href', ''),
+                'preview_image_url': url,
             }
             links.append(image)
 
@@ -55,20 +56,32 @@ class WikiScraper(ScrapingMixin,
 
     def create_models(self, links):
         from api.models import EarthImage
-        objects = []
+        PERMALINK = '/wiki/Template:POTD/'
+        # objects = []
         for link in links:
             obj = EarthImage(**link)
             obj.source = 'wiki'
             obj.author = 'Wikipedia: {}'.format(obj.created_raw)
             obj.is_public = True
             obj.score = 20
+            year_month = obj.preview_image_url.split('/')[-1]
+            year = year_month.split('_')[1]
+            date_string = '{}{}'.format(obj.created_raw.split('-')[0], year)
+            date = datetime.datetime.strptime(date_string, '%B %d %Y')
+            obj.permalink = '{base}{path}{time}'.format(
+                base=self.BASE_URL,
+                path=PERMALINK,
+                time=date.strftime('%Y-%m-%d')
+            )
             # objects.append(obj)
             try:
                 obj.save()
             except Exception as exc:
                 logger.warning(exc)
 
-        EarthImage.objects.bulk_create(objects)
+        # EarthImage.objects.bulk_create(objects)
+
+
 
     def fetch_year(self, year):
         months = [datetime.date(year, month, 1)
