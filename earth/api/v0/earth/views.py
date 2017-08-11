@@ -137,7 +137,7 @@ class QuerySettingSave(generics.RetrieveAPIView):
             is_selected = values.pop('contain_{}'.format(contained_source[0]), 'false') == 'true'
             if is_selected:
                 contained_data_sources.append(contained_source[0])
-        values['contained_data_sources'] = ','.join(contained_data_sources)
+        values['contain_data_sources'] = ','.join(contained_data_sources)
 
         serializer = self.get_serializer(data=values)
         if serializer.is_valid():
