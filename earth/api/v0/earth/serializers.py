@@ -3,6 +3,7 @@ from api.models import EarthImage, QuerySetting, Filter
 
 
 class EarthImageSerializer(serializers.ModelSerializer):
+    contain_image = serializers.BooleanField(default=False)
 
     class Meta:
         model = EarthImage

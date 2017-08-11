@@ -37,6 +37,8 @@ class EarthImageView(generics.RetrieveAPIView):
 
             image = self.get_random_object(query_ids)
             setting.update_history(image)
+            if image.source in setting.contain_data_sources:
+                image.contain_image = True
             return image
 
         return self.get_random_object(query_ids)
@@ -47,6 +49,7 @@ class EarthImageView(generics.RetrieveAPIView):
 
         response_status = status.HTTP_206_PARTIAL_CONTENT if self.too_restrictive\
             else status.HTTP_200_OK
+
         return Response(EarthImageSerializer(obj).data,
                         status=response_status)
 
@@ -123,11 +126,18 @@ class QuerySettingSave(generics.RetrieveAPIView):
 
         selected_sources = []
         for source in EarthImage.VERIFIED_SOURCES:
-            is_selected = values.pop('allow_{}'.format(source[0]), 'false')
-            if is_selected == 'true':
+            is_selected = values.pop('allow_{}'.format(source[0]), 'false') == 'true'
+            if is_selected:
                 selected_sources.append(source[0])
         values['allowed_sources'] = ','.join(selected_sources)
         values['url_identifier'] = self.kwargs[self.lookup_field]
+
+        contained_data_sources = []
+        for contained_source in EarthImage.VERIFIED_SOURCES:
+            is_selected = values.pop('contain_{}'.format(contained_source[0]), 'false') == 'true'
+            if is_selected:
+                contained_data_sources.append(contained_source[0])
+        values['contained_data_sources'] = ','.join(contained_data_sources)
 
         serializer = self.get_serializer(data=values)
         if serializer.is_valid():

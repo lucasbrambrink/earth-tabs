@@ -5,7 +5,9 @@
 
 function setImage(imageData) {
     $('.image').css("background-image", "url('" + imageData.preferred_image_url + "')");
-
+    if (imageData.contain_image) {
+        $('.image').css("background-size", "contain");
+    }
     $('.title')
         .attr("href", imageData.permalink)
         .html(imageData.title);

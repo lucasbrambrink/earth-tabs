@@ -49,6 +49,7 @@ class EarthImage(models.Model):
     resolution_height = models.IntegerField(null=True)
     last_seen = models.DateTimeField(auto_now=True)
     source = models.CharField(max_length=100, choices=VERIFIED_SOURCES, default=REDDIT)
+    contain_image = False
 
     objects = models.Manager()
     public = EarthManager()
@@ -215,6 +216,7 @@ class QuerySetting(models.Model):
     url_identifier = models.CharField(max_length=255)
     allowed_sources = models.CharField(max_length=255, default=EarthImage.REDDIT)
     history = models.CharField(max_length=255, default='')
+    contain_data_sources = models.CharField(max_length=255, default='')
 
     def __str__(self):
         return self.url_identifier

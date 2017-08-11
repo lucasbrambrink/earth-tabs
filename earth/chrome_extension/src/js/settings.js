@@ -168,6 +168,9 @@ chrome.storage.sync.get("settings_uid", function(item) {
             allow_reddit: false,
             allow_apod: false,
             allow_wiki: false,
+            contain_reddit: false,
+            contain_apod: false,
+            contain_wiki: false,
             save_copy: "Save",
             saving: false,
             history_items: [],
@@ -206,15 +209,19 @@ chrome.storage.sync.get("settings_uid", function(item) {
                     source = allowed_sources[i];
                     vmSettings['allow_' + source] = true;
                 }
+                var contain_data_sources = resp.contain_data_sources.split(',');
+                for(i = 0; i < contain_data_sources.length; i++) {
+                    source = contain_data_sources[i];
+                    vmSettings['contain_' + source] = true;
+                }
                 var filter;
                 for (i = 0; i < resp.filters.length; i++) {
                     filter = resp.filters[i];
-                    source = filter['type'] == 'global' ? 'all' : filter.source;
+                    source = filter['type'] === 'global' ? 'all' : filter.source;
                     var object = vmSettings.filters[source][filter.filter_class];
                     object.loadArguments(filter.arguments);
                     object.updateFields(this.getComponent(object));
                 }
-
             },
             getSettings: function () {
                 $.getJSON(API_URL + '/settings/' + settings.uid)
@@ -224,7 +231,7 @@ chrome.storage.sync.get("settings_uid", function(item) {
                 var child;
                 for (var i = 0; i < this.$children.length; i++) {
                     child = this.$children[i];
-                    if (child.filter_class == filter.filter_class && child.source == filter.source) {
+                    if (child.filter_class === filter.filter_class && child.source === filter.source) {
                         return child;
                     }
                 }
@@ -256,6 +263,9 @@ chrome.storage.sync.get("settings_uid", function(item) {
                     allow_reddit: this.allow_reddit,
                     allow_apod: this.allow_apod,
                     allow_wiki: this.allow_wiki,
+                    contain_reddit: this.contain_reddit,
+                    contain_apod: this.contain_apod,
+                    contain_wiki: this.contain_wiki,
                     filters: this.serializerFilters()
                 };
                 var url = this.addAsQueryParams(API_URL + '/settings/save/' + settings.uid, values);
