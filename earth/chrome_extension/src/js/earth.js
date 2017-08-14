@@ -7,10 +7,9 @@ var getNewSettings = function () {
         .success(function(resp) {
             chrome.storage.sync.set({"settings_uid": resp.url_identifier});
             settings['uid'] = resp.url_identifier;
-            console.log('success!', resp);
         })
         .fail(function (resp) {
-            console.log(resp);
+            console.log('Loading settings failed.');
         });
 };
 
@@ -36,7 +35,6 @@ function setLastSeenImage(cachedImage) {
         $links.remove();
         $('nav span').remove();
     } else {
-        console.log(lastImage);
         var links = lastImage.split('|');
         $('a.last-link').attr('href', links[0]);
         $('a.last-image-link').attr('href', links[1]);
@@ -55,16 +53,13 @@ function getNewImage(settings_uid) {
     } else {
         getNewSettings();
     }
-    console.log(url);
 
     $.getJSON(url)
         .success(function(resp) {
             var newImage = resp;
-            console.log(resp);
             cachedImage = localStorage.getItem('cachedImage');
             localStorage.removeItem('cachedImage');
             localStorage.setItem('cachedImage', JSON.stringify(newImage));
-            // console.log(resp);
             if (cachedImage === null) {
                 setImage(newImage);
                 getNewImage(settings_uid);

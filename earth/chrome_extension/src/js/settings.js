@@ -1,15 +1,8 @@
-/****** Settings *****
-
-1. without any settings specified, will operate on default values
-2. if settings are visited, ask API to provide new UID
-3. on save, POST to backend using UID to link to settings object
-    - auth/security not *really* necessary but might be a nice-to-have
-4. earth.js will fetch UID (from chrome.storage) and use to make API image request
-
-
+/*
+Created by Lucas Brambrink, 2017;
 */
+
 var API_URL = 'https://earth-pics.tk/api/v0/earth';
-// var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
 var getNewImage = function() {
     $.getJSON(API_URL + '/get')
         .success(function(resp) {
@@ -43,6 +36,8 @@ chrome.storage.sync.get("settings_uid", function(item) {
     }
 });
 
+/* Analytics */
+var _gaq = _gaq || [];
 
 
 (function() {
@@ -109,7 +104,7 @@ chrome.storage.sync.get("settings_uid", function(item) {
                 return data.join(',')
             },
             serializeArguments: function() {
-                var mapped_fields = this.fields.length == 1
+                var mapped_fields = this.fields.length === 1
                     ? ['value']
                     : ['value_type', 'value_operand', 'value'];
                 var field;
@@ -123,7 +118,7 @@ chrome.storage.sync.get("settings_uid", function(item) {
                 return arguments.join('$');
             },
             updateFields: function(component) {
-                var mapped_fields = this.fields.length == 1
+                var mapped_fields = this.fields.length === 1
                     ? ['value']
                     : ['value_type', 'value_operand', 'value'];
                 for (var i = 0; i < mapped_fields.length; i++) {
@@ -137,7 +132,6 @@ chrome.storage.sync.get("settings_uid", function(item) {
             case 'query':
                 filter.index = 0;
                 filter.fields = ['key_words'];
-                // console.log('test');
                 break;
             case 'score':
                 filter.index = 1;
@@ -175,6 +169,7 @@ chrome.storage.sync.get("settings_uid", function(item) {
             saving: false,
             history_items: [],
             show_history: false,
+            serialized_state: '',
             filters: {
                 all: {
                     query: Filter('query', 'global', 'all'),
@@ -196,13 +191,9 @@ chrome.storage.sync.get("settings_uid", function(item) {
         },
         created: function() {
             setTimeout(this.getSettings, 100);
-            // setTimeout(function () {
-            //     $('#all-button').focus();
-            // }, 200)
         },
         methods: {
             settingsCallback: function(resp) {
-                console.log(resp);
                 allowed_sources = resp.allowed_sources.split(',');
                 var source;
                 for(var i = 0; i < allowed_sources.length; i++) {
@@ -259,6 +250,7 @@ chrome.storage.sync.get("settings_uid", function(item) {
                 return serialized_filters.join('|');
             },
             submitSettings: function () {
+                _gaq.push(['_trackEvent', 'submit settings', 'clicked']);
                 values = {
                     allow_reddit: this.allow_reddit,
                     allow_apod: this.allow_apod,
@@ -269,21 +261,27 @@ chrome.storage.sync.get("settings_uid", function(item) {
                     filters: this.serializerFilters()
                 };
                 var url = this.addAsQueryParams(API_URL + '/settings/save/' + settings.uid, values);
-                console.log(url);
                 var that = this;
-                $.get(url).success(function(resp, textStatus, xhr) {
+                var submitSettingsCallback = function(resp, textStatus, xhr) {
                     that.save_copy = 'Saved!';
                     that.saving = true;
                     if (xhr.status === 206) {
                         that.save_copy = '(Too Restrictive!)'
                     }
-                    console.log(resp);
                     setTimeout(function () {
                         that.save_copy = 'Save';
                         that.saving = false;
                     }, 1000);
                     localStorage.clear();
-                });
+                };
+
+                // prevent excessive API calls if state has not changed.
+                if (this.serialized_state === url) {
+                    submitSettingsCallback(null, null, {});
+                } else {
+                    this.serialized_state = url;
+                    $.get(url).success(submitSettingsCallback);
+                }
             },
             getHistoryCallback: function(that, resp) {
                 return function (resp) {
@@ -292,6 +290,7 @@ chrome.storage.sync.get("settings_uid", function(item) {
             },
             getHistory: function () {
                 this.show_history = true;
+                _gaq.push(['_trackEvent', 'show history', 'clicked']);
                 if (this.history_items.length === 0) {
                     $.getJSON(API_URL + '/settings/history/' + settings.uid)
                      .success(this.getHistoryCallback(this));

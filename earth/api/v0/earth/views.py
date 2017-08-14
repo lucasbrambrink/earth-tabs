@@ -94,7 +94,6 @@ class QuerySettingSave(generics.RetrieveAPIView):
 
         filter_ids = set()
         for filter_obj in filter(None, values.get('filters', '').split('|')):
-            print(filter_obj)
 
             parsed = dict(kw.split('=') for kw in filter_obj.split(','))
             parsed['setting'] = instance.id
@@ -117,12 +116,6 @@ class QuerySettingSave(generics.RetrieveAPIView):
                 filter_ids.add(obj.id)
 
         instance.filter_set.exclude(id__in=filter_ids).delete()
-
-        # import ipdb; ipdb.set_trace()
-        #     values['score_threshold'] = None
-        #
-        # if values.get('resolution_threshold', '') == '':
-        #     values['resolution_threshold'] = None
 
         selected_sources = []
         for source in EarthImage.VERIFIED_SOURCES:
@@ -149,7 +142,6 @@ class QuerySettingSave(generics.RetrieveAPIView):
                 else status.HTTP_200_OK
             return Response(serializer.data, status=response_status)
         else:
-            import ipdb; ipdb.set_trace()
             return Response({}, status=status.HTTP_304_NOT_MODIFIED)
 
 
@@ -166,20 +158,16 @@ class HistoryListApi(generics.ListAPIView):
         except QuerySetting.DoesNotExist:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
+        # take slice to avoid showing cached result
         image_ids = [int(image_id) for image_id in setting.history.split(',')
-                     if image_id != '']
+                     if image_id != ''][1:]
         image_query = {i.id: i
                        for i in EarthImage.objects.filter(id__in=image_ids)}
-        # preserver order
 
+        # preserve order
         images = []
         for image_id in image_ids:
             earth_image = EarthImageSerializer(image_query[image_id])
             images.append(earth_image.data)
 
         return Response(images)
-
-        # serializer = HistorySerializer(data={'images': images})
-        # serializer.is_valid()
-        # return Response(serializer.data, status=status.HTTP_200_OK)
-
