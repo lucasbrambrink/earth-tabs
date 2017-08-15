@@ -81,7 +81,6 @@ class WikiScraper(ScrapingMixin,
 
         # EarthImage.objects.bulk_create(objects)
 
-
     def fetch_year(self, year):
         months = [datetime.date(year, month, 1)
                   for month in range(1, 13)]

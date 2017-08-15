@@ -17,6 +17,7 @@ class EarthImageView(generics.RetrieveAPIView):
     def get_random_object(self, all_ids=None):
         all_ids = all_ids or EarthImage.public\
             .values_list('id', flat=True)
+
         return EarthImage.objects.get(id=random.choice(all_ids))
 
     def get_object_via_settings(self, settings_uid):
@@ -29,13 +30,17 @@ class EarthImageView(generics.RetrieveAPIView):
             pass
         else:
             query_ids = setting.filter_queryset(EarthImage.public)
-
             # if no results, allow random -- prevent null response
             if not query_ids.count():
                 self.too_restrictive = True
                 query_ids = None
 
-            image = self.get_random_object(query_ids)
+            group_by_source = [
+                random.choice(query_ids.filter(source=source))
+                for source in setting.allowed_sources.split(',')
+            ]
+
+            image = self.get_random_object(group_by_source)
             setting.update_history(image)
             if image.source in setting.contain_data_sources:
                 image.contain_image = True
