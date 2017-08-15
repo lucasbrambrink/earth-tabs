@@ -1,0 +1,36 @@
+{% load staticfiles %}
+
+<html>
+<head>
+    <title>Earth.pics</title>
+    <link href="{% static 'styles/homepage.css' %}" rel="stylesheet">
+    <link rel="shortcut icon" href="icons/mountain.ico">
+
+</head>
+
+<body class="earth">
+
+    <main>
+        <header>
+            <h2>Earth tabs</h2>
+        </header>
+        <section>
+            <p>Experience a new image from a variety of different open-source photo collections in every new tab.</p>
+            <p>After installing the chrome extension, every new tab will load a new picture based on your settings.</p>
+        </section>
+
+        <section>
+            <p>You can check out the source code here.</p>
+        </section>
+    </main>
+
+    <img src="{{ image.preferred_image_url }}" />
+
+</body>
+
+<!--<script type="text/javascript" src="js/jquery/jquery.min.js"></script>-->
+<!--<script type="text/javascript" src="js/utils.js"></script>-->
+<!--<script type="text/javascript" src="js/earth.js"></script>-->
+<!--<script type="text/javascript" src="js/analytics.js"></script>-->
+
+</html>
