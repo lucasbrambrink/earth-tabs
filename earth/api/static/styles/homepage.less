@@ -1,0 +1,34 @@
+@black: #191919;
+@white: #FCFCFC;
+@weak-white: rgba(255, 255, 255, 0.4);
+@opaque-bg: rgba(26, 25, 51, .61);
+@opaque-blue-light: rgba(26, 25, 51, .11);
+@opaque-blue-dark: rgba(26, 25, 51, .41);
+@opaque-red:  rgba(62, 37, 45, 0.37);
+@error: #ff9494;
+
+img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100vw;
+  height: auto;
+}
+body {
+  overflow: hidden;
+}
+
+main {
+    max-width: 800px;
+    margin: 100px auto;
+    color: @white;
+    font-family: 'Open Sans', Arial, sans-serif;
+    background: @opaque-bg;
+    width: 100%;
+    padding: 60px 80px;
+}
+
+section {
+  margin: 50px 0;
+}

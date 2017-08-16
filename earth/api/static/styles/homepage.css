@@ -1,0 +1,23 @@
+img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100vw;
+  height: auto;
+}
+body {
+  overflow: hidden;
+}
+main {
+  max-width: 800px;
+  margin: 100px auto;
+  color: #FCFCFC;
+  font-family: 'Open Sans', Arial, sans-serif;
+  background: rgba(26, 25, 51, 0.61);
+  width: 100%;
+  padding: 60px 80px;
+}
+section {
+  margin: 50px 0;
+}
