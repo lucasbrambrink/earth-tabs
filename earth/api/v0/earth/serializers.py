@@ -24,9 +24,7 @@ class QuerySettingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QuerySetting
-        exclude = ('id', 'history')
-
-
+        exclude = ('id', 'history', 'device_token')
 
 
 class HistorySerializer(serializers.Serializer):
@@ -35,4 +33,4 @@ class HistorySerializer(serializers.Serializer):
                                   allow_null=True)
 
     class Meta:
-        fields = ('images')
+        fields = ('images',)

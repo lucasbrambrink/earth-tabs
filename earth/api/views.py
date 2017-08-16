@@ -8,7 +8,7 @@ class Homepage(TemplateView):
     template_name = 'earth/homepage.html'
 
     def get_context_data(self, **kwargs):
-        image_ids = EarthImage.objects\
+        image_ids = EarthImage.public\
             .filter(source='reddit')\
             .values_list('id', flat=True)
         return {

@@ -3,7 +3,8 @@ img {
   top: 0;
   left: 0;
   z-index: -1;
-  width: 100vw;
+  min-width: 100%;
+  min-height: 100vh;
   height: auto;
 }
 body {
@@ -20,4 +21,7 @@ main {
 }
 section {
   margin: 50px 0;
+}
+a {
+  color: #FCFCFC;
 }
