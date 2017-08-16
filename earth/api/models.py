@@ -217,6 +217,7 @@ class QuerySetting(models.Model):
     allowed_sources = models.CharField(max_length=255, default=EarthImage.REDDIT)
     history = models.CharField(max_length=255, default='')
     contain_data_sources = models.CharField(max_length=255, default='')
+    relative_frequency = models.CharField(max_length=20, default='')
     device_token = models.CharField(max_length=255, default='')
 
     def __str__(self):
@@ -227,7 +228,19 @@ class QuerySetting(models.Model):
         """
         creates unique identifier to be used in URL
         """
-        return str(sha1(urandom(6)).hexdigest())[:5]
+        return str(sha1(urandom(6)).hexdigest())[:8]
+
+    @property
+    def frequencies(self):
+        frequency = (1, 1, 1)
+        try:
+            frequency = tuple(
+                int(f) for f in self.relative_frequency.split(',')
+            )
+        except (ValueError, TypeError):
+            pass
+
+        return frequency
 
     def update_history(self, image):
         HISTORY_LENGTH = 10
@@ -248,3 +261,13 @@ class QuerySetting(models.Model):
                 query_set = filter_instance(query_set)
 
         return query_set.values_list('id', flat=True)
+
+
+class MarketingImage(models.Model):
+    """
+    EarthImage object that is especially well-suited to be displayed
+    """
+    image = models.ForeignKey(to=EarthImage)
+    title = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True)
+

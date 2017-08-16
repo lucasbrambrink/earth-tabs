@@ -35,10 +35,20 @@ class EarthImageView(generics.RetrieveAPIView):
                 self.too_restrictive = True
                 query_ids = None
 
-            group_by_source = [
-                random.choice(query_ids.filter(source=source))
-                for source in setting.allowed_sources.split(',')
-            ]
+            group_by_source = []
+            for source, frequency in zip(EarthImage.SOURCES,
+                                         setting.frequencies):
+                if source not in setting.allowed_sources:
+                    continue
+
+                filtered_by_source = query_ids.filter(source=source)
+                if not filtered_by_source.count():
+                    continue
+
+                for choice in range(frequency):
+                    group_by_source.append(
+                        random.choice(filtered_by_source)
+                    )
 
             image = self.get_random_object(group_by_source)
             setting.update_history(image)
@@ -88,8 +98,15 @@ class QuerySettingRetrieveMixin(object):
             obj = QuerySetting.objects\
                 .prefetch_related('filter_set')\
                 .get(url_identifier=self.kwargs[self.lookup_field])
+
+            # TODO: remove this before release
+            if obj.device_token == '':
+                obj.device_token = token
+                obj.save()
+
             if obj.device_token != token:
                obj = None
+
         except QuerySetting.DoesNotExist:
             pass
 
@@ -97,7 +114,7 @@ class QuerySettingRetrieveMixin(object):
 
 
 class QuerySettingRetrieveView(QuerySettingRetrieveMixin,
-                         generics.RetrieveAPIView):
+                               generics.RetrieveAPIView):
     permission_classes = (AllowAny,)
     serializer_class = QuerySettingSerializer
     queryset = QuerySetting.objects.all()
@@ -125,12 +142,9 @@ class QuerySettingSave(QuerySettingRetrieveMixin,
         if instance is None:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
-        values = {key: value for key, value in request.data.items()}
-        print(values)
+        values = dict(request.data)
         if not len(values):
-            instance.filters = instance.filter_set.all()
-            serializer = self.get_serializer(instance)
-            return Response(serializer.data)
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
         filter_ids = set()
         for filter_obj in values.get('filters', []):
@@ -153,20 +167,20 @@ class QuerySettingSave(QuerySettingRetrieveMixin,
         instance.filter_set.exclude(id__in=filter_ids).delete()
 
         selected_sources = []
-        for source in EarthImage.VERIFIED_SOURCES:
-            is_selected = values.pop('allow_{}'.format(source[0]), 'false') == 'true'
+        for source in EarthImage.SOURCES:
+            is_selected = values.pop('allow_{}'.format(source))
             if is_selected:
-                selected_sources.append(source[0])
+                selected_sources.append(source)
         values['allowed_sources'] = ','.join(selected_sources)
-        values['url_identifier'] = self.kwargs[self.lookup_field]
 
         contained_data_sources = []
-        for contained_source in EarthImage.VERIFIED_SOURCES:
-            is_selected = values.pop('contain_{}'.format(contained_source[0]), 'false') == 'true'
+        for contained_source in EarthImage.SOURCES:
+            is_selected = values.pop('contain_{}'.format(contained_source))
             if is_selected:
-                contained_data_sources.append(contained_source[0])
+                contained_data_sources.append(contained_source)
         values['contain_data_sources'] = ','.join(contained_data_sources)
 
+        values['url_identifier'] = self.kwargs[self.lookup_field]
         serializer = self.get_serializer(data=values)
         if serializer.is_valid():
             for attr, value in serializer.validated_data.items():
@@ -177,6 +191,7 @@ class QuerySettingSave(QuerySettingRetrieveMixin,
                 else status.HTTP_200_OK
             return Response(serializer.data, status=response_status)
         else:
+            import ipdb; ipdb.set_trace()
             return Response({}, status=status.HTTP_304_NOT_MODIFIED)
 
 

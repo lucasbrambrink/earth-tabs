@@ -24,37 +24,12 @@ if (lastImage !== null) {
 
 /* Load settings */
 var settings = {};
-chrome.storage.sync.get('token', function(items) {
-    var token = items.token;
-    if (!token) {
-        token = getRandomToken();
-        settings['token'] = token;
-        chrome.storage.sync.set({token: token});
-    } else {
-        settings['token'] = token;
-    }
-});
-
-chrome.storage.sync.get("settings_uid", function(item) {
-    if (!item) {
-        $.ajax({
-            url: API_URL + '/settings/new',
-            method: 'POST',
-            headers: {'token': settings.token}
-        }).success(function(resp) {
-            chrome.storage.sync.set({"settings_uid": resp.url_identifier});
-            settings['uid'] = resp.url_identifier;
-        });
-    }
-    else {
-        settings['uid'] = item.settings_uid;
-    }
-});
+loadOrCreateSettings(settings);
 
 /* Analytics */
 var _gaq = _gaq || [];
 
-
+/* Vue.js */
 (function() {
 
     var historyItem = Vue.component('history', {
@@ -177,6 +152,9 @@ var _gaq = _gaq || [];
             contain_reddit: false,
             contain_apod: false,
             contain_wiki: false,
+            ratio_reddit: 1,
+            ratio_apod: 1,
+            ratio_wiki: 1,
             save_copy: "Save",
             saving: false,
             history_items: [],
@@ -204,6 +182,15 @@ var _gaq = _gaq || [];
         created: function() {
             setTimeout(this.getSettings, 100);
         },
+        computed: {
+            relative_frequency: function () {
+                return [
+                    this.ratio_reddit,
+                    this.ratio_apod,
+                    this.ratio_wiki
+                ].join(',');
+            }
+        },
         methods: {
             settingsCallback: function(resp) {
                 allowed_sources = resp.allowed_sources.split(',');
@@ -216,6 +203,12 @@ var _gaq = _gaq || [];
                 for(i = 0; i < contain_data_sources.length; i++) {
                     source = contain_data_sources[i];
                     vmSettings['contain_' + source] = true;
+                }
+                var relative_frequency = resp.relative_frequency.split(',');
+                var sources = ['reddit', 'apod', 'wiki'];
+                for(i = 0; i < relative_frequency.length; i++) {
+                    source = sources[i];
+                    vmSettings['ratio_' + source] = parseInt(relative_frequency[i]);
                 }
                 var filter;
                 for (i = 0; i < resp.filters.length; i++) {
@@ -274,7 +267,8 @@ var _gaq = _gaq || [];
                     contain_apod: this.contain_apod,
                     contain_wiki: this.contain_wiki,
                     filters: this.serializerFilters(),
-                    token: settings.token
+                    token: settings.token,
+                    relative_frequency: this.relative_frequency
                 };
                 var url = API_URL + '/settings/save/' + settings.uid;
                 var that = this;

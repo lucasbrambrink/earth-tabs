@@ -49,6 +49,14 @@
                     <input type="checkbox" name="contain_reddit" value="contain_reddit" v-model="contain_reddit" id="contain_reddit">
                     Contain images to screen size
                 </label>
+                <label class="distribution" for="reddit_ratio" title="sets relative frequency for Reddit images"
+                       data-toggle="tooltip" >
+                    Frequency: {{ ratio_reddit }}:{{ ratio_apod }}:{{ ratio_wiki }}
+                    <input type="range"
+                        id="reddit_ratio"
+                        v-model="ratio_reddit"
+                        min="1" max="10" step="1">
+                </label>
                 <div v-for="filter in filters.reddit">
                     <filter :index="filter.index"
                         :source="filter.source"
@@ -68,6 +76,14 @@
                     <input type="checkbox" name="contain_apod" value="contain_apod" v-model="contain_apod" id="contain_apod">
                     Contain images to screen size
                 </label>
+                <label class="distribution" for="apod_ratio" title="sets relative frequency for APOD images"
+                       data-toggle="tooltip" >
+                    Frequency: {{ ratio_reddit }}:{{ ratio_apod }}:{{ ratio_wiki }}
+                    <input type="range"
+                        id="apod_ratio"
+                        v-model="ratio_apod"
+                        min="1" max="10" step="1">
+                </label>
                 <div v-for="filter in filters.apod">
                     <filter :index="filter.index"
                         :source="filter.source"
@@ -86,6 +102,14 @@
                 <label for="contain_wiki">
                     <input type="checkbox" name="contain_wiki" value="contain_wiki" v-model="contain_wiki" id="contain_wiki">
                     Contain images to screen size
+                </label>
+                <label class="distribution" for="wiki_ratio" title="sets relative frequency for Wiki images"
+                       data-toggle="tooltip" >
+                    Frequency: {{ ratio_reddit }}:{{ ratio_apod }}:{{ ratio_wiki }}
+                    <input type="range"
+                        id="wiki_ratio"
+                        v-model="ratio_wiki"
+                        min="1" max="10" step="1">
                 </label>
                 <div v-for="filter in filters.wiki">
                     <filter :index="filter.index"
