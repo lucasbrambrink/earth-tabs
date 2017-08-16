@@ -2,7 +2,8 @@
 Created by Lucas Brambrink, 2017;
 */
 
-var API_URL = 'https://earth-pics.tk/api/v0/earth';
+// var API_URL = 'https://earth-pics.tk/api/v0/earth';
+var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
 var getNewImage = function() {
     $.getJSON(API_URL + '/get')
         .success(function(resp) {
@@ -21,15 +22,29 @@ if (lastImage !== null) {
     getNewImage();
 }
 
-
+/* Load settings */
 var settings = {};
+chrome.storage.sync.get('token', function(items) {
+    var token = items.token;
+    if (!token) {
+        token = getRandomToken();
+        settings['token'] = token;
+        chrome.storage.sync.set({token: token});
+    } else {
+        settings['token'] = token;
+    }
+});
+
 chrome.storage.sync.get("settings_uid", function(item) {
-    if (item === null || item === undefined) {
-        $.getJSON(API_URL + '/settings/new')
-            .success(function(resp) {
-                chrome.storage.sync.set({"settings_uid": resp.url_identifier});
-                settings['uid'] = resp.url_identifier;
-            });
+    if (!item) {
+        $.ajax({
+            url: API_URL + '/settings/new',
+            method: 'POST',
+            headers: {'token': settings.token}
+        }).success(function(resp) {
+            chrome.storage.sync.set({"settings_uid": resp.url_identifier});
+            settings['uid'] = resp.url_identifier;
+        });
     }
     else {
         settings['uid'] = item.settings_uid;
@@ -95,27 +110,24 @@ var _gaq = _gaq || [];
                 }
             },
             serialize: function() {
-                data = [
-                    'type=' + this.type,
-                    'source=' + this.source,
-                    'filter_class=' + this.filter_class,
-                    'arguments=' + this.serializeArguments()
-                ];
-                return data.join(',')
+                return {
+                    type: this.type,
+                    source: this.source,
+                    filter_class: this.filter_class,
+                    arguments: this.serializeArguments()
+                };
             },
             serializeArguments: function() {
                 var mapped_fields = this.fields.length === 1
                     ? ['value']
                     : ['value_type', 'value_operand', 'value'];
                 var field;
-                var arguments = [];
+                var arguments = {};
                 for (var i = 0; i < this.fields.length; i++) {
                     field = this.fields[i];
-                    arguments.push(
-                        field + '*' + this[mapped_fields[i]]
-                    );
+                    arguments[field] = this[mapped_fields[i]];
                 }
-                return arguments.join('$');
+                return arguments;
             },
             updateFields: function(component) {
                 var mapped_fields = this.fields.length === 1
@@ -215,8 +227,11 @@ var _gaq = _gaq || [];
                 }
             },
             getSettings: function () {
-                $.getJSON(API_URL + '/settings/' + settings.uid)
-                    .success(this.settingsCallback)
+                $.ajax({
+                    url: API_URL + '/settings/' + settings.uid,
+                    method: 'GET',
+                    headers: {'token': settings.token}
+                }).success(this.settingsCallback)
             },
             getComponent: function(filter) {
                 var child;
@@ -247,7 +262,7 @@ var _gaq = _gaq || [];
                         }
                     });
                 }
-                return serialized_filters.join('|');
+                return serialized_filters;
             },
             submitSettings: function () {
                 _gaq.push(['_trackEvent', 'submit settings', 'clicked']);
@@ -258,10 +273,12 @@ var _gaq = _gaq || [];
                     contain_reddit: this.contain_reddit,
                     contain_apod: this.contain_apod,
                     contain_wiki: this.contain_wiki,
-                    filters: this.serializerFilters()
+                    filters: this.serializerFilters(),
+                    token: settings.token
                 };
-                var url = this.addAsQueryParams(API_URL + '/settings/save/' + settings.uid, values);
+                var url = API_URL + '/settings/save/' + settings.uid;
                 var that = this;
+                var state = JSON.stringify(values);
                 var submitSettingsCallback = function(resp, textStatus, xhr) {
                     that.save_copy = 'Saved!';
                     that.saving = true;
@@ -276,11 +293,18 @@ var _gaq = _gaq || [];
                 };
 
                 // prevent excessive API calls if state has not changed.
-                if (this.serialized_state === url) {
+                if (this.serialized_state === state) {
                     submitSettingsCallback(null, null, {});
                 } else {
-                    this.serialized_state = url;
-                    $.get(url).success(submitSettingsCallback);
+                    this.serialized_state = state;
+                    $.ajax({
+                        url: url,
+                        data: JSON.stringify(values),
+                        contentType: 'application/json',
+                        type: 'PUT',
+                        headers: {'token': settings.token},
+                        dataType: 'json'
+                    }).success(submitSettingsCallback);
                 }
             },
             getHistoryCallback: function(that, resp) {
@@ -292,8 +316,10 @@ var _gaq = _gaq || [];
                 this.show_history = true;
                 _gaq.push(['_trackEvent', 'show history', 'clicked']);
                 if (this.history_items.length === 0) {
-                    $.getJSON(API_URL + '/settings/history/' + settings.uid)
-                     .success(this.getHistoryCallback(this));
+                    $.ajax({
+                        url: API_URL + '/settings/history/' + settings.uid,
+                        headers: {'token': settings.token}
+                    }).success(this.getHistoryCallback(this));
                 }
             },
             addAsQueryParams: function(url, values) {

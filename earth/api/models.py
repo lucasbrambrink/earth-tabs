@@ -217,6 +217,7 @@ class QuerySetting(models.Model):
     allowed_sources = models.CharField(max_length=255, default=EarthImage.REDDIT)
     history = models.CharField(max_length=255, default='')
     contain_data_sources = models.CharField(max_length=255, default='')
+    device_token = models.CharField(max_length=255, default='')
 
     def __str__(self):
         return self.url_identifier

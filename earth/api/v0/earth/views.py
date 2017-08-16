@@ -5,8 +5,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import EarthImageSerializer, QuerySettingSerializer, HistorySerializer, FilterSerializer
 from api.models import EarthImage, QuerySetting, Filter
+from .serializers import EarthImageSerializer, QuerySettingSerializer, HistorySerializer, FilterSerializer
 
 
 class EarthImageView(generics.RetrieveAPIView):
@@ -59,56 +59,86 @@ class EarthImageView(generics.RetrieveAPIView):
                         status=response_status)
 
 
-class QuerySettingCreate(generics.RetrieveAPIView):
+class QuerySettingCreate(generics.CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = QuerySettingSerializer
 
-    def get_object(self):
+    def post(self, request, *args, **kwargs):
+        token = request.POST.get('token')
+        if not token:
+            return Response({}, status=status.HTTP_403_FORBIDDEN)
+
         new_setting = QuerySetting.objects.create(
+            device_token=token,
             url_identifier=QuerySetting.get_identifier())
         return new_setting
 
 
-class QuerySettingSave(generics.RetrieveAPIView):
-    permission_classes = (AllowAny,)
-    serializer_class = QuerySettingSerializer
-    queryset = QuerySetting.objects.all()
-    lookup_field = 'settings_uid'
+class QuerySettingRetrieveMixin(object):
+    """
+    requires token in header to match with db object's token
+    """
+    kwargs = None
+    lookup_field = None
 
-    def get_object(self):
+    def get_object(self, request):
+        token = request.META.get('HTTP_TOKEN')
         obj = None
         try:
             obj = QuerySetting.objects\
                 .prefetch_related('filter_set')\
                 .get(url_identifier=self.kwargs[self.lookup_field])
+            if obj.device_token != token:
+               obj = None
         except QuerySetting.DoesNotExist:
             pass
 
         return obj
 
+
+class QuerySettingRetrieveView(QuerySettingRetrieveMixin,
+                         generics.RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = QuerySettingSerializer
+    queryset = QuerySetting.objects.all()
+    lookup_field = 'settings_uid'
+
     def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
+        instance = self.get_object(request)
         if instance is None:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
-        values = {key: value for key, value in request.GET.items()}
+        instance.filters = instance.filter_set.all()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
+class QuerySettingSave(QuerySettingRetrieveMixin,
+                       generics.UpdateAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = QuerySettingSerializer
+    queryset = QuerySetting.objects.all()
+    lookup_field = 'settings_uid'
+
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object(request)
+        if instance is None:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        values = {key: value for key, value in request.data.items()}
+        print(values)
         if not len(values):
             instance.filters = instance.filter_set.all()
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
 
         filter_ids = set()
-        for filter_obj in filter(None, values.get('filters', '').split('|')):
-
-            parsed = dict(kw.split('=') for kw in filter_obj.split(','))
-            parsed['setting'] = instance.id
-            serializer = FilterSerializer(data=parsed)
+        for filter_obj in values.get('filters', []):
+            filter_obj['setting'] = instance.id
+            serializer = FilterSerializer(data=filter_obj)
             serializer.setting = instance
             if serializer.is_valid():
                 args = serializer.validated_data
-                args['arguments'] = '&'.join(args.get('arguments', '')\
-                    .replace('*', '=')\
-                    .split('$'))
                 try:
                     obj = Filter.objects.get(source=args.get('source'),
                                              filter_class=args.get('filter_class'),
@@ -150,21 +180,20 @@ class QuerySettingSave(generics.RetrieveAPIView):
             return Response({}, status=status.HTTP_304_NOT_MODIFIED)
 
 
-class HistoryListApi(generics.ListAPIView):
+class HistoryListApi(QuerySettingRetrieveMixin,
+                     generics.ListAPIView):
     serializer_class = HistorySerializer
     permission_classes = (AllowAny,)
-    lookup_url_kwarg = 'settings_uid'
+    lookup_field = 'settings_uid'
     queryset = QuerySetting.objects.all()
 
     def list(self, request, *args, **kwargs):
-        try:
-            setting = QuerySetting.objects\
-                .get(url_identifier=kwargs['settings_uid'])
-        except QuerySetting.DoesNotExist:
+        instance = self.get_object(request)
+        if instance is None:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
         # take slice to avoid showing cached result
-        image_ids = [int(image_id) for image_id in setting.history.split(',')
+        image_ids = [int(image_id) for image_id in instance.history.split(',')
                      if image_id != ''][1:]
         image_query = {i.id: i
                        for i in EarthImage.objects.filter(id__in=image_ids)}
@@ -172,7 +201,11 @@ class HistoryListApi(generics.ListAPIView):
         # preserve order
         images = []
         for image_id in image_ids:
-            earth_image = EarthImageSerializer(image_query[image_id])
-            images.append(earth_image.data)
+            earth_image = image_query.get(image_id)
+            if earth_image is None:
+                continue
+
+            serialized_image = EarthImageSerializer(earth_image)
+            images.append(serialized_image.data)
 
         return Response(images)
