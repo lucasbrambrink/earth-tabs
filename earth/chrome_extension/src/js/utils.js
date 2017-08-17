@@ -71,7 +71,7 @@ var loadOrCreateSettings = function (settings, load_image) {
         }
         else {
             $.ajax({
-                url: API_URL + '/settings/new',
+                url: API_URL + '/settings/new/',
                 method: 'POST',
                 headers: {'token': settings.token}
             }).success(function(resp) {
