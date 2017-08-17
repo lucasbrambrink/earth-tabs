@@ -81,7 +81,8 @@ class QuerySettingCreate(generics.CreateAPIView):
         new_setting = QuerySetting.objects.create(
             device_token=token,
             url_identifier=QuerySetting.get_identifier())
-        return new_setting
+        serializer = QuerySettingSerializer(new_setting)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class QuerySettingRetrieveMixin(object):
