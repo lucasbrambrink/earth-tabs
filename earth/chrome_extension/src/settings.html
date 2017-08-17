@@ -20,13 +20,25 @@
                         All</button></div>
                 <div v-on:click.prevent="filterNav = 1">
                     <button v-bind:class="{active: filterNav === 1, selected: allow_reddit}">
-                        Reddit</button> </div>
+                        Reddit</button>
+                    <span v-bind:class="{active: allow_reddit, hide: hide_ratios}"
+                          class="ratio" v-text="ratio_reddit + 'x'"
+                        title="indicates the relative frequency to other image type"></span>
+                </div>
                 <div v-on:click.prevent="filterNav = 2">
                     <button v-bind:class="{active: filterNav === 2, selected: allow_apod}">
-                        Apod</button></div>
+                        Apod</button>
+                    <span v-bind:class="{active: allow_apod, hide: hide_ratios}"
+                            class="ratio" v-text="ratio_apod + 'x'"
+                            title="indicates the relative frequency to other data source"></span>
+                </div>
                 <div v-on:click.prevent="filterNav = 3">
                     <button v-bind:class="{active: filterNav === 3, selected: allow_wiki}">
-                        Wikipedia</button></div>
+                        Wikipedia</button>
+                    <span v-bind:class="{active: allow_wiki, hide: hide_ratios}"
+                          class="ratio" v-text="ratio_wiki + 'x'"
+                          title="indicates the relative frequency to other data source"></span>
+                </div>
             </nav>
 
 
@@ -50,8 +62,9 @@
                     Contain images to screen size
                 </label>
                 <label class="distribution" for="reddit_ratio" title="sets relative frequency for Reddit images"
-                       data-toggle="tooltip" >
-                    Frequency: {{ ratio_reddit }}:{{ ratio_apod }}:{{ ratio_wiki }}
+                       data-toggle="tooltip"
+                       v-show="allow_reddit && !not_enough_for_ratio">
+                    relative frequency: {{ frequency }}
                     <input type="range"
                         id="reddit_ratio"
                         v-model="ratio_reddit"
@@ -77,8 +90,9 @@
                     Contain images to screen size
                 </label>
                 <label class="distribution" for="apod_ratio" title="sets relative frequency for APOD images"
-                       data-toggle="tooltip" >
-                    Frequency: {{ ratio_reddit }}:{{ ratio_apod }}:{{ ratio_wiki }}
+                       data-toggle="tooltip"
+                       v-show="allow_apod && !not_enough_for_ratio">
+                    relative frequency: {{ frequency }}
                     <input type="range"
                         id="apod_ratio"
                         v-model="ratio_apod"
@@ -104,8 +118,9 @@
                     Contain images to screen size
                 </label>
                 <label class="distribution" for="wiki_ratio" title="sets relative frequency for Wiki images"
-                       data-toggle="tooltip" >
-                    Frequency: {{ ratio_reddit }}:{{ ratio_apod }}:{{ ratio_wiki }}
+                       data-toggle="tooltip"
+                    v-show="allow_wiki && !not_enough_for_ratio">
+                    relative frequency: {{ frequency }}
                     <input type="range"
                         id="wiki_ratio"
                         v-model="ratio_wiki"
@@ -214,6 +229,11 @@
         <div>{{index}}</div>
         <div><a v-bind:href="image_url">[image]</a></div>
         <div><a v-bind:href="permalink">{{title}}</a></div>
+    </div>
+</template>
+<template id="frequency">
+    <div>
+
     </div>
 </template>
 <script type="text/javascript" src="js/analytics.js"></script>

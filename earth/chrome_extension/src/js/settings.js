@@ -189,6 +189,29 @@ var _gaq = _gaq || [];
                     this.ratio_apod,
                     this.ratio_wiki
                 ].join(',');
+            },
+            frequency: function () {
+                return this.active_ratios.join(':');
+            },
+            hide_ratios: function () {
+                return this.not_enough_for_ratio ||
+                    this.active_ratios.every(function(r) { return r === 1});
+            },
+            not_enough_for_ratio: function () {
+                return this.active_ratios.length < 2;
+            },
+            active_ratios: function() {
+                var active = [];
+                if (this.allow_reddit) {
+                    active.push(this.ratio_reddit)
+                }
+                if (this.allow_apod) {
+                    active.push(this.ratio_apod)
+                }
+                if (this.allow_wiki) {
+                    active.push(this.ratio_wiki)
+                }
+                return active;
             }
         },
         methods: {
@@ -208,7 +231,9 @@ var _gaq = _gaq || [];
                 var sources = ['reddit', 'apod', 'wiki'];
                 for(i = 0; i < relative_frequency.length; i++) {
                     source = sources[i];
-                    vmSettings['ratio_' + source] = parseInt(relative_frequency[i]);
+                    var freq = parseInt(relative_frequency[i]);
+                    if (isNaN(freq)) freq = 1;
+                    vmSettings['ratio_' + source] = freq;
                 }
                 var filter;
                 for (i = 0; i < resp.filters.length; i++) {

@@ -144,6 +144,7 @@ nav div {
   border: 1px solid #FCFCFC;
   display: inline-block;
   float: left;
+  position: relative;
 }
 nav div:first-child {
   width: 398px;
@@ -172,6 +173,20 @@ nav button.selected {
 }
 nav button.selected.active {
   background-color: rgba(26, 25, 51, 0.61);
+}
+nav span.ratio {
+  position: absolute;
+  top: 11px;
+  left: 10px;
+  display: none;
+  opacity: 0.8;
+}
+nav span.ratio.active {
+  display: inline-block;
+}
+nav span.ratio.hide,
+nav span.ratio.active.hide {
+  display: none;
 }
 input[type=checkbox] {
   width: 20px;
@@ -237,7 +252,7 @@ form {
 }
 input[type=range] {
   -webkit-appearance: none;
-  width: 70% !important;
+  width: 60% !important;
   border: none !important;
   padding: 4px !important;
   margin: 0 !important;

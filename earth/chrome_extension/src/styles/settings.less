@@ -169,6 +169,7 @@ nav {
     border: 1px solid @white;
     display: inline-block;
     float: left;
+    position: relative;
     &:first-child {
       width: 398px;
       border-bottom: none;
@@ -196,6 +197,19 @@ nav {
     }
     &.selected.active {
       background-color: @opaque-bg;
+    }
+  }
+  span.ratio {
+    position: absolute;
+    top: 11px;
+    left: 10px;
+    display: none;
+    opacity: 0.8;
+    &.active {
+      display: inline-block;
+    }
+    &.hide, &.active.hide {
+      display: none;
     }
   }
 }
@@ -271,7 +285,7 @@ input[type=checkbox] {
 
 input[type=range] {
   -webkit-appearance: none;
-  width: 70% !important;
+  width: 60% !important;
   border: none !important;
   padding: 4px !important;
   margin: 0 !important;
