@@ -192,7 +192,6 @@ class QuerySettingSave(QuerySettingRetrieveMixin,
                 else status.HTTP_200_OK
             return Response(serializer.data, status=response_status)
         else:
-            import ipdb; ipdb.set_trace()
             return Response({}, status=status.HTTP_304_NOT_MODIFIED)
 
 
