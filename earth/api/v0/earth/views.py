@@ -74,7 +74,7 @@ class QuerySettingCreate(generics.CreateAPIView):
     serializer_class = QuerySettingSerializer
 
     def post(self, request, *args, **kwargs):
-        token = request.POST.get('token')
+        token = request.META.get('HTTP_TOKEN')
         if not token:
             return Response({}, status=status.HTTP_403_FORBIDDEN)
 
