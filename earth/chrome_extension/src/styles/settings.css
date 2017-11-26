@@ -209,10 +209,10 @@ img {
 }
 .settings nav span.ratio {
   position: absolute;
-  top: 11px;
+  top: 7px;
   left: 10px;
   display: none;
-  opacity: 0.8;
+  color: #00b300;
 }
 .settings nav span.ratio.active {
   display: inline-block;

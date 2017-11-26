@@ -25,6 +25,16 @@ function setImage(imageData) {
                 console.log(resp);
                 if (xhr.status === 202) {
                     admin.text('Inactivated');
+                    admin.off('click').on('click', function(event) {
+                        event.preventDefault();
+                        $.ajax({
+                            url: API_URL + '/get/' + settings.uid + '/' + imageData.id,
+                            method: 'PUT',
+                            headers: {'token': settings.token}
+                        }).success(function(resp, textStatus, xhr) {
+                            admin.text('Reactivated');
+                        })
+                    });
                 } else {
                     console.log(resp);
                 }

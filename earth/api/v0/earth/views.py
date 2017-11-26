@@ -73,23 +73,35 @@ class EarthImageView(generics.RetrieveAPIView):
                         status=response_status)
 
 
-class EarthImageInactivate(generics.DestroyAPIView):
+class EarthImageSetPublic(generics.DestroyAPIView,
+                          generics.UpdateAPIView):
 
-    def delete(self, request, settings_uid, earth_image_id, *args, **kwargs):
+    def _update(self, settings_uid, earth_image_id, is_public):
         try:
             setting = QuerySetting.objects\
                 .get(url_identifier=settings_uid)
             if not setting.is_administrator:
                 raise PermissionError
             image = EarthImage.objects.get(id=earth_image_id)
+            image.is_public = is_public
+            image.save(update_fields=['is_public'])
         except (QuerySetting.DoesNotExist,
                 EarthImage.DoesNotExist,
                 PermissionError):
-            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+            return False
+        return True
 
-        image.is_public = False
-        image.save(update_fields=['is_public'])
-        return Response({}, status=status.HTTP_202_ACCEPTED)
+    def put(self, request, settings_uid, earth_image_id, *args, **kwargs):
+        success = self._update(settings_uid, earth_image_id,
+                               is_public=True)
+        response_status = status.HTTP_202_ACCEPTED if success else status.HTTP_400_BAD_REQUEST
+        return Response({}, status=response_status)
+
+    def delete(self, request, settings_uid, earth_image_id, *args, **kwargs):
+        success = self._update(settings_uid, earth_image_id,
+                               is_public=False)
+        response_status = status.HTTP_202_ACCEPTED if success else status.HTTP_400_BAD_REQUEST
+        return Response({}, status=response_status)
 
 
 class QuerySettingCreate(generics.CreateAPIView):

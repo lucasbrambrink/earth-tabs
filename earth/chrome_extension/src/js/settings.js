@@ -4,29 +4,12 @@ Created by Lucas Brambrink, 2017;
 
 // var API_URL = 'https://earth-pics.tk/api/v0/earth';
 var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
-// var getNewImage = function() {
-//     $.getJSON(API_URL + '/get')
-//         .success(function(resp) {
-//             newImage = resp;
-//             $('body').css("background-image", "url('" + newImage.preferred_image_url + "')");
-//         }).fail(function () {
-//             console.log('Image Request Failed');
-//         });
-// };
 
 // Attempt to get a photo from local storage
 var cachedImage = localStorage.getItem('cachedImage');
 if (cachedImage !== null && cachedImage !== undefined && cachedImage !== 'undefined') {
     setImage(JSON.parse(cachedImage));
 }
-
-// var lastImage  = localStorage.getItem('lastImage');
-// if (lastImage !== null) {
-//     var links = lastImage.split('|');
-//     $('body').css("background-image", "url('" + links[1] + "')");
-// } else {
-//     getNewImage();
-// }
 
 /* Load settings */
 var settings = {};
@@ -66,13 +49,13 @@ var _gaq = _gaq || [];
             suggestion: function () {
                 switch(this.source) {
                     case 'reddit':
-                        return 'try ...yosemite';
+                        return 'filter by keyword... try yosemite';
                     case 'apod':
-                        return 'try ...galaxy';
+                        return 'filter by keyword... try galaxy';
                     case 'wiki':
-                        return 'try ...president';
+                        return 'filter by keyword... try president';
                     default:
-                        return 'try ...nepal'
+                        return 'filter by keyword... try nepal';
                 }
             }
         }
@@ -174,16 +157,16 @@ var _gaq = _gaq || [];
             filters: {
                 all: {
                     query: Filter('query', 'global', 'all'),
-                    resolution: Filter('resolution', 'global', 'all')
+                    // resolution: Filter('resolution', 'global', 'all')
                 },
                 reddit: {
                     query: Filter('query', 'specific', 'reddit'),
-                    score: Filter('score', 'specific', 'reddit'),
-                    resolution: Filter('resolution', 'specific', 'reddit')
+                    // score: Filter('score', 'specific', 'reddit'),
+                    // resolution: Filter('resolution', 'specific', 'reddit')
                 },
                 apod: {
                     query: Filter('query', 'specific', 'apod'),
-                    resolution: Filter('resolution', 'specific', 'apod')
+                    // resolution: Filter('resolution', 'specific', 'apod')
                 },
                 wiki: {
                     query: Filter('query', 'specific', 'wiki'),
@@ -336,7 +319,6 @@ var _gaq = _gaq || [];
                 }
             },
             queueSettingsUpdate: function() {
-                console.log('queued!');
                 if (this.is_queued) {
                     return;
                 } else {
