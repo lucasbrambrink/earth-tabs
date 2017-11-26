@@ -1,37 +1,44 @@
-{% load staticfiles %}
+{% load static %}
 
 <html>
 <head>
     <title>Earth.pics</title>
     <link href="{% static 'styles/homepage.css' %}" rel="stylesheet">
     <link rel="shortcut icon" href="icons/mountain.ico">
-
+    <!--<link href="styles/extension.css" rel="stylesheet">-->
+    <!--<link href="styles/settings.css" rel="stylesheet">-->
 </head>
 
-<body class="earth">
+<!--<body class="earth">-->
 
-    <main>
-        <header>
-            <h2>Earth tabs</h2>
-        </header>
-        <section>
-            <p>Experience a new image from a variety of different open-source photo collections in every new tab.</p>
-            <p>After installing the chrome extension, every new tab will load a new picture based on your settings.</p>
-        </section>
+    <!--<main>-->
+    <!--</main>-->
 
-        <section>
-            <p>You can check out the <a href="https://github.com/lucasbrambrink/earth-tabs/">source code here.</a>
-            </p>
-        </section>
-    </main>
+    <!--&lt;!&ndash;<img src="{{ image.preferred_image_url }}" />&ndash;&gt;-->
 
-    <img src="{{ image.preferred_image_url }}" />
+<!--</body>-->
 
+<body class="earth" id="vm-settings">
+    <div class="image" style="background-image: url('{{ image.preferred_image_url }}')"></div>
+    <img id="cached-image" src="#" />
+
+    <section class="settings active">
+        <main v-bind:class="{saved_css: border_css === 'saved', too_restrictive: border_css === 'restrictive'}">
+
+            <header>
+                <h2>Earth tabs</h2>
+            </header>
+            <section>
+                <p>Experience a new image from a variety of different open-source photo collections in every new tab.</p>
+                <p>After installing the chrome extension, every new tab will load a new picture based on your settings.</p>
+            </section>
+
+            <section>
+                <p>You can check out the <a href="https://github.com/lucasbrambrink/earth-tabs/">source code here.</a>
+                </p>
+            </section>
+        </main>
+    </section>
 </body>
-
-<!--<script type="text/javascript" src="js/jquery/jquery.min.js"></script>-->
-<!--<script type="text/javascript" src="js/utils.js"></script>-->
-<!--<script type="text/javascript" src="js/earth.js"></script>-->
-<!--<script type="text/javascript" src="js/analytics.js"></script>-->
 
 </html>

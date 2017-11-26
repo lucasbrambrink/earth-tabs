@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '2m18h#t#r-+(d2^ysca7mhou-%!s_#3u5m6v8=qvo&%bbnv6mf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['earth-pics.tk', 'www.earth-pics.tk', '127.0.0.1']
 
@@ -124,7 +124,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'root')
+STATIC_ROOT = os.path.join(BASE_DIR, 'api', 'root')
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'api', 'static'),
+)
 
 SHELL_PLUS_POST_IMPORTS = [
     ('api.data_sources.reddit', ('EarthScraper')),
@@ -157,10 +160,10 @@ LOGGING = {
             'propagate': True,
         },
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG'
-    },
+    # 'root': {
+    #     'handlers': ['console'],
+    #     'level': 'DEBUG'
+    # },
 }
 
 try:

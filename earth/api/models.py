@@ -13,6 +13,21 @@ class EarthManager(models.Manager):
             .filter(score__gte=20)\
             .filter(is_public=True)
 
+class MarketingManager(models.Manager):
+    MARKETING_FILTER = filters.ScoreFilter(
+        type=filters.Filter.GLOBAL,
+        source='reddit',
+        score_type='score',
+        score_threshold_operand='gte',
+        score_value=20000
+    )
+
+    def get_queryset(self):
+        qs = super().get_queryset()\
+            .filter(is_public=True)
+        qs = self.MARKETING_FILTER.filter(qs)
+        return qs
+
 
 class EarthImage(models.Model):
     REDDIT = 'reddit'
@@ -53,6 +68,7 @@ class EarthImage(models.Model):
 
     objects = models.Manager()
     public = EarthManager()
+    marketing = MarketingManager()
 
     def __str__(self):
         return '{id}: {title}'.format(id=self.id, title=self.title)
