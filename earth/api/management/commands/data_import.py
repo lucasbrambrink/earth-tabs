@@ -19,4 +19,8 @@ class Command(BaseCommand):
         limit = options.get('limit')
         for scraper in (ApodScraper,
                         EarthScraper):
-            scraper().batch_import(limit)
+            try:
+                scraper().batch_import(limit)
+            except Exception as exc:
+                logger.error(exc)
+

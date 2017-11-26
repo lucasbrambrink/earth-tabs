@@ -4,22 +4,23 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-body.earth,
-html {
-
+body.earth {
   font-size: 100%;
   font-family: 'Open Sans', Arial, sans-serif;
-  font-weight: 600;
   line-height: 1.333;
   background-color: #fff;
   color: #fff;
-  height: 100%;
+  height: 100vh;
   width: 100%;
   padding: 0;
   margin: 0;
-  text-shadow: 0 0 1px rgba(0,0,0,0.6), 1px 1px 2px rgba(0,0,0,0.35);
+}
+
+#main-image {
+  font-weight: 600;
   -webkit-font-smoothing: antialiased;
-  
+  text-shadow: 0 0 1px rgba(0,0,0,0.6), 1px 1px 2px rgba(0,0,0,0.35);
+
 }
 
 .image {
@@ -41,7 +42,7 @@ html {
    
 }
 
-article {
+#main-image article {
 	text-align:right;
 	z-index: 1000;
 	position: absolute;
@@ -50,39 +51,41 @@ article {
 	padding: 0px;
 	font-size: 95%;
 }
-a, span, .author {
+#main-image a,
+#main-image span,
+#main-image .author {
 	opacity: 0.5;
     transition: opacity .25s ease-in-out;
    -moz-transition: opacity .25s ease-in-out;
    -webkit-transition: opacity .25s ease-in-out;
 }
 
-article:hover {
+#main-image article:hover {
     opacity:1 !important;
 }
 
-a { color:#FFF; text-decoration: none;  }
+#main-image a { color:#FFF; text-decoration: none;  }
+
 a:hover,
 .author:hover {
     opacity: 1 !important;
 }
 /*.last-title { margin-right: 55px; }*/
-.author {
+#main-image .author {
     font-size: 85%;
 }
-nav {
+#main-image nav {
     /*opacity: 0.5;*/
     position: absolute;
     bottom: 10px;
     right: 25px;
     font-size: 70%;
 }
-nav span {
+#main-image nav span {
     width: 20px;
     display: inline-block;
     text-align: center;
 }
-
 
 img {
   position: absolute;

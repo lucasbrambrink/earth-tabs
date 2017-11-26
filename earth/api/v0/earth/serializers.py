@@ -4,10 +4,11 @@ from api.models import EarthImage, QuerySetting, Filter
 
 class EarthImageSerializer(serializers.ModelSerializer):
     contain_image = serializers.BooleanField(default=False)
+    is_administrator = serializers.BooleanField(default=False)
 
     class Meta:
         model = EarthImage
-        exclude = ('id',)
+        exclude = ()
 
 
 class FilterSerializer(serializers.ModelSerializer):

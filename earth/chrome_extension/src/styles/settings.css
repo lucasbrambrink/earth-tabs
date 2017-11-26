@@ -1,31 +1,58 @@
+[v-cloak] {
+  display: none;
+}
 .settings {
   width: 100%;
   margin: 0;
-  height: 100vh;
-  float: left;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+}
+.settings.active {
+  opacity: 1;
+}
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: url('close.svg') center center no-repeat;
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+}
+.close-btn.large {
+  height: 30px;
+  width: 30px;
+}
+.refresh-btn {
+  position: absolute;
+  top: 12px;
+  right: 35px;
+  background: url('reload.svg') center center no-repeat;
+  height: 16px;
+  width: 16px;
+  cursor: pointer;
 }
 .settings main {
   max-width: 400px;
-  margin: 75px auto;
+  margin-top: 10vh;
   color: #FCFCFC;
   font-family: 'Open Sans', Arial, sans-serif;
   background: rgba(26, 25, 51, 0.61);
   width: 100%;
+  min-height: 60%;
   padding: 60px 80px;
-}
-body {
-  height: 100%;
-  width: 100%;
-  background-color: #000;
-  background-position: center center;
-  background-repeat: no-repeat;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  background-size: cover;
-  z-index: 100;
+  overflow-y: scroll;
 }
 main {
   position: relative;
+}
+a:hover {
+  cursor: pointer;
 }
 form {
   width: 100%;
@@ -33,7 +60,7 @@ form {
 }
 form label {
   display: block;
-  font-size: 105%;
+  font-size: 75%;
 }
 form input,
 form select {
@@ -116,17 +143,23 @@ img {
   z-index: -1;
   opacity: 0;
 }
+.history {
+  overflow-y: scroll;
+  height: 420px;
+}
 .history a {
   text-decoration: none;
   color: #FCFCFC;
-  font-size: 120%;
+  font-size: 14px;
   margin: 0 5px;
 }
 .history a:hover {
   text-decoration: underline;
 }
-.history a:first-child {
-  font-size: 100%;
+.history .show-more {
+  position: absolute;
+  bottom: 0;
+  left: 45%;
 }
 .filter-nav {
   position: absolute;
@@ -135,10 +168,10 @@ img {
 .filter-nav h4 {
   cursor: pointer;
 }
-nav {
+.settings nav {
   height: 80px;
 }
-nav div {
+.settings nav div {
   width: 132px;
   height: 35px;
   border: 1px solid #FCFCFC;
@@ -146,46 +179,46 @@ nav div {
   float: left;
   position: relative;
 }
-nav div:first-child {
+.settings nav div:first-child {
   width: 398px;
   border-bottom: none;
 }
-nav div:nth-child(2),
-nav div:nth-child(3) {
+.settings nav div:nth-child(2),
+.settings nav div:nth-child(3) {
   border-right: none;
 }
-nav button {
+.settings nav button {
   height: 100%;
   width: 100%;
-  font-size: 120%;
+  font-size: 100%;
   background-color: transparent;
   color: white;
   border: none;
 }
-nav button:hover,
-nav button.active {
+.settings nav button:hover,
+.settings nav button.active {
   background: rgba(26, 25, 51, 0.61);
 }
-nav button.selected {
+.settings nav button.selected {
   background: url(../icons/tick.svg) no-repeat;
   background-size: 16px;
   background-position: 110px 9px;
 }
-nav button.selected.active {
+.settings nav button.selected.active {
   background-color: rgba(26, 25, 51, 0.61);
 }
-nav span.ratio {
+.settings nav span.ratio {
   position: absolute;
   top: 11px;
   left: 10px;
   display: none;
   opacity: 0.8;
 }
-nav span.ratio.active {
+.settings nav span.ratio.active {
   display: inline-block;
 }
-nav span.ratio.hide,
-nav span.ratio.active.hide {
+.settings nav span.ratio.hide,
+.settings nav span.ratio.active.hide {
   display: none;
 }
 input[type=checkbox] {
@@ -214,8 +247,8 @@ input[type=checkbox] {
 }
 .filter-type span.x {
   position: absolute;
-  right: 0;
-  top: -10px;
+  right: -5px;
+  top: -12px;
   cursor: pointer;
 }
 .filter-type button {
@@ -238,7 +271,7 @@ form {
 }
 .row div {
   align-items: left;
-  padding: 10px 5px;
+  padding: 7px 5px;
   min-width: 15px;
 }
 .row div:nth-child(2) {

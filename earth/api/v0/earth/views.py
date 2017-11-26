@@ -1,5 +1,6 @@
 import random
 from django.db.models import Q
+from django.utils.text import Truncator
 
 from rest_framework.permissions import AllowAny
 from rest_framework import generics
@@ -18,7 +19,8 @@ class EarthImageView(generics.RetrieveAPIView):
         all_ids = all_ids or EarthImage.public\
             .values_list('id', flat=True)
 
-        return EarthImage.objects.get(id=random.choice(all_ids))
+        return EarthImage.objects\
+            .get(id=random.choice(all_ids))
 
     def get_object_via_settings(self, settings_uid):
         query_ids = None
@@ -54,6 +56,8 @@ class EarthImageView(generics.RetrieveAPIView):
             setting.update_history(image)
             if image.source in setting.contain_data_sources:
                 image.contain_image = True
+
+            image.is_administrator = setting.is_administrator
             return image
 
         return self.get_random_object(query_ids)
@@ -67,6 +71,25 @@ class EarthImageView(generics.RetrieveAPIView):
 
         return Response(EarthImageSerializer(obj).data,
                         status=response_status)
+
+
+class EarthImageInactivate(generics.DestroyAPIView):
+
+    def delete(self, request, settings_uid, earth_image_id, *args, **kwargs):
+        try:
+            setting = QuerySetting.objects\
+                .get(url_identifier=settings_uid)
+            if not setting.is_administrator:
+                raise PermissionError
+            image = EarthImage.objects.get(id=earth_image_id)
+        except (QuerySetting.DoesNotExist,
+                EarthImage.DoesNotExist,
+                PermissionError):
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        image.is_public = False
+        image.save(update_fields=['is_public'])
+        return Response({}, status=status.HTTP_202_ACCEPTED)
 
 
 class QuerySettingCreate(generics.CreateAPIView):
@@ -150,14 +173,17 @@ class QuerySettingSave(QuerySettingRetrieveMixin,
         filter_ids = set()
         for filter_obj in values.get('filters', []):
             filter_obj['setting'] = instance.id
+            # filter_obj['arguments'] = str()
             serializer = FilterSerializer(data=filter_obj)
             serializer.setting = instance
+
             if serializer.is_valid():
                 args = serializer.validated_data
                 try:
-                    obj = Filter.objects.get(source=args.get('source'),
-                                             filter_class=args.get('filter_class'),
-                                             setting=args.get('setting'))
+                    obj = Filter.objects\
+                        .get(source=args.get('source'),
+                             filter_class=args.get('filter_class'),
+                             setting=args.get('setting'))
                     obj.arguments = args.get('arguments')
                     obj.save()
                 except Filter.DoesNotExist:
@@ -180,7 +206,6 @@ class QuerySettingSave(QuerySettingRetrieveMixin,
             if is_selected:
                 contained_data_sources.append(contained_source)
         values['contain_data_sources'] = ','.join(contained_data_sources)
-
         values['url_identifier'] = self.kwargs[self.lookup_field]
         serializer = self.get_serializer(data=values)
         if serializer.is_valid():
@@ -192,6 +217,8 @@ class QuerySettingSave(QuerySettingRetrieveMixin,
                 else status.HTTP_200_OK
             return Response(serializer.data, status=response_status)
         else:
+            import ipdb;
+            ipdb.set_trace()
             return Response({}, status=status.HTTP_304_NOT_MODIFIED)
 
 
@@ -220,6 +247,7 @@ class HistoryListApi(QuerySettingRetrieveMixin,
             if earth_image is None:
                 continue
 
+            earth_image.title = Truncator(earth_image.title).chars(45)
             serialized_image = EarthImageSerializer(earth_image)
             images.append(serialized_image.data)
 

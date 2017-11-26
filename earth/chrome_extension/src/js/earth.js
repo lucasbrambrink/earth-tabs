@@ -1,6 +1,6 @@
 
-var API_URL = 'https://earth-pics.tk/api/v0/earth';
-// var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
+// var API_URL = 'https://earth-pics.tk/api/v0/earth';
+var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
 
 
 // Attempt to get a photo from local storage

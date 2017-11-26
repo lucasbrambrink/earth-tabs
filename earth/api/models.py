@@ -54,6 +54,9 @@ class EarthImage(models.Model):
     objects = models.Manager()
     public = EarthManager()
 
+    def __str__(self):
+        return '{id}: {title}'.format(id=self.id, title=self.title)
+
     @classmethod
     def create(cls, data):
         image_obj = cls(
@@ -93,7 +96,6 @@ class EarthImage(models.Model):
             title_string = title_string.replace(disallowed_word, '')
 
         return title_string.strip()
-
 
     def clean(self, commit=False):
         required_fields = ('permalink', 'title', 'preferred_image_url')
@@ -214,11 +216,12 @@ class QuerySetting(models.Model):
     )
 
     url_identifier = models.CharField(max_length=255)
-    allowed_sources = models.CharField(max_length=255, default=EarthImage.REDDIT)
-    history = models.CharField(max_length=255, default='')
-    contain_data_sources = models.CharField(max_length=255, default='')
-    relative_frequency = models.CharField(max_length=20, default='')
+    allowed_sources = models.CharField(max_length=255, default=EarthImage.REDDIT, blank=True)
+    history = models.CharField(max_length=255, default='', blank=True)
+    contain_data_sources = models.CharField(max_length=255, default='', blank=True)
+    relative_frequency = models.CharField(max_length=20, default='', blank=True)
     device_token = models.CharField(max_length=255, default='')
+    is_administrator = models.BooleanField(default=False)
 
     def __str__(self):
         return self.url_identifier

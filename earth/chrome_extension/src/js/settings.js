@@ -2,29 +2,35 @@
 Created by Lucas Brambrink, 2017;
 */
 
-var API_URL = 'https://earth-pics.tk/api/v0/earth';
-// var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
-var getNewImage = function() {
-    $.getJSON(API_URL + '/get')
-        .success(function(resp) {
-            newImage = resp;
-            $('body').css("background-image", "url('" + newImage.preferred_image_url + "')");
-        }).fail(function () {
-            console.log('Image Request Failed');
-        });
-};
+// var API_URL = 'https://earth-pics.tk/api/v0/earth';
+var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
+// var getNewImage = function() {
+//     $.getJSON(API_URL + '/get')
+//         .success(function(resp) {
+//             newImage = resp;
+//             $('body').css("background-image", "url('" + newImage.preferred_image_url + "')");
+//         }).fail(function () {
+//             console.log('Image Request Failed');
+//         });
+// };
 
-var lastImage  = localStorage.getItem('lastImage');
-if (lastImage !== null) {
-    var links = lastImage.split('|');
-    $('body').css("background-image", "url('" + links[1] + "')");
-} else {
-    getNewImage();
+// Attempt to get a photo from local storage
+var cachedImage = localStorage.getItem('cachedImage');
+if (cachedImage !== null && cachedImage !== undefined && cachedImage !== 'undefined') {
+    setImage(JSON.parse(cachedImage));
 }
+
+// var lastImage  = localStorage.getItem('lastImage');
+// if (lastImage !== null) {
+//     var links = lastImage.split('|');
+//     $('body').css("background-image", "url('" + links[1] + "')");
+// } else {
+//     getNewImage();
+// }
 
 /* Load settings */
 var settings = {};
-loadOrCreateSettings(settings);
+loadOrCreateSettings(settings, true);
 
 /* Analytics */
 var _gaq = _gaq || [];
@@ -47,6 +53,7 @@ var _gaq = _gaq || [];
                 if (!!this.value) {
                     this.active = true;
                 }
+                vmSettings.queueSettingsUpdate();
             },
             clear: function() {
                 this.updateValue('value', '');
@@ -97,12 +104,12 @@ var _gaq = _gaq || [];
                     ? ['value']
                     : ['value_type', 'value_operand', 'value'];
                 var field;
-                var arguments = {};
+                var serialized = [];
                 for (var i = 0; i < this.fields.length; i++) {
                     field = this.fields[i];
-                    arguments[field] = this[mapped_fields[i]];
+                    serialized.push(field + '=' + this[mapped_fields[i]])
                 }
-                return arguments;
+                return serialized.join('&');
             },
             updateFields: function(component) {
                 var mapped_fields = this.fields.length === 1
@@ -160,6 +167,10 @@ var _gaq = _gaq || [];
             history_items: [],
             show_history: false,
             serialized_state: '',
+            is_queued: false,
+            queued_image: false,
+            border_css: '',
+            show_settings: false,
             filters: {
                 all: {
                     query: Filter('query', 'global', 'all'),
@@ -178,9 +189,6 @@ var _gaq = _gaq || [];
                     query: Filter('query', 'specific', 'wiki'),
                 }
             },
-        },
-        created: function() {
-            setTimeout(this.getSettings, 100);
         },
         computed: {
             relative_frequency: function () {
@@ -283,7 +291,7 @@ var _gaq = _gaq || [];
                 return serialized_filters;
             },
             submitSettings: function () {
-                _gaq.push(['_trackEvent', 'submit settings', 'clicked']);
+                // _gaq.push(['_trackEvent', 'submit settings', 'clicked']);
                 values = {
                     allow_reddit: this.allow_reddit,
                     allow_apod: this.allow_apod,
@@ -300,12 +308,13 @@ var _gaq = _gaq || [];
                 var state = JSON.stringify(values);
                 var submitSettingsCallback = function(resp, textStatus, xhr) {
                     that.save_copy = 'Saved!';
+                    that.border_css = 'saved';
                     that.saving = true;
                     if (xhr.status === 206) {
-                        that.save_copy = '(Too Restrictive!)'
+                        that.border_css = 'restrictive';
                     }
                     setTimeout(function () {
-                        that.save_copy = 'Save';
+                        that.border_css = '';
                         that.saving = false;
                     }, 1000);
                     localStorage.clear();
@@ -325,6 +334,22 @@ var _gaq = _gaq || [];
                         dataType: 'json'
                     }).success(submitSettingsCallback);
                 }
+            },
+            queueSettingsUpdate: function() {
+                console.log('queued!');
+                if (this.is_queued) {
+                    return;
+                } else {
+                    this.is_queued = true;
+                }
+                this.border_css = 'saved';
+                _gaq.push(['_trackEvent', 'submit settings', 'clicked']);
+                setTimeout(function(that) {
+                    return function () {
+                        that.submitSettings();
+                        that.is_queued = false;
+                    }
+                }(this), 2000);
             },
             getHistoryCallback: function(that, resp) {
                 return function (resp) {
@@ -347,6 +372,20 @@ var _gaq = _gaq || [];
                     queries.push(key + '=' + values[key]);
                 });
                 return url + '?' + queries.join('&');
+            },
+            refreshImage: function () {
+                if (this.queued_image) {
+                    return;
+                } else {
+                    this.queued_image = true;
+                }
+                setTimeout(function(that) {
+                    return function () {
+                        localStorage.removeItem('cachedImage');
+                        getNewImage(settings.uid);
+                        that.queued_image = false;
+                    }
+                }(this), 500);
             }
         }
     });
