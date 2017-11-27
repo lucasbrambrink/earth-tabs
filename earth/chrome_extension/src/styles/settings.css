@@ -46,7 +46,6 @@
   width: 100%;
   min-height: 60%;
   padding: 60px 80px;
-  overflow-y: scroll;
 }
 main {
   position: relative;
