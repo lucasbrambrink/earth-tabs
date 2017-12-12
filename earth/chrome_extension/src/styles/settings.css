@@ -46,7 +46,6 @@
   width: 100%;
   min-height: 60%;
   padding: 60px 80px;
-  overflow-y: scroll;
 }
 main {
   position: relative;
@@ -382,4 +381,46 @@ input[type=range]:focus::-ms-fill-upper {
   padding: 10px;
   min-width: 180px;
   background: rgba(0, 0, 0, 0.7);
+}
+.alignment-box {
+  padding: 20px 0;
+}
+.alignment-box .outer-box {
+  border: 1px solid white;
+  background: rgba(26, 25, 51, 0.41);
+  padding: 5px;
+  position: relative;
+  height: 70px;
+  text-align: center;
+}
+.alignment-box .align-btn {
+  border: 1px solid white;
+  background: transparent;
+  width: 90px;
+  height: 12px;
+  border-radius: 0;
+  position: absolute;
+  bottom: 5px;
+}
+.alignment-box .align-btn:hover,
+.alignment-box .align-btn.active {
+  cursor: pointer;
+  background: rgba(34, 234, 99, 0.18);
+}
+.alignment-box .align-btn:focus {
+  outline: 0;
+}
+.alignment-box .left {
+  left: 5px;
+}
+.alignment-box .right {
+  right: 5px;
+}
+#main-image article.left {
+  left: 20px;
+  right: auto;
+  text-align: left;
+}
+#main-image nav.left {
+  left: 20px;
 }

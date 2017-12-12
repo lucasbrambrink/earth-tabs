@@ -9,32 +9,24 @@
 </head>
 
 <body class="earth" id="vm-settings">
-    <div class="image"></div>
-    <img id="cached-image" src="#" />
-    <section id="main-image" v-show="!showSettings">
-        <article>
-            <section class="info">
-                <a href="#" class="title" data-type="Permalink"></a>
-                <div class="author"></div>
-            </section>
-        </article>
+    <div class="image" id="initial-load-image"></div>
+    <earth-image v-for="image in image_data"
+        :align="align"
+        :cached_image_url="cached_image_url"
+        :image_url="image.preferred_image_url"
+        :permalink="image.permalink"
+        :author="image.author"
+        :title="image.title"
+        :is_administrator="image.is_administrator"
+        :contain_image="image.contain_image">
+    </earth-image>
 
-        <nav>
-            <a role="link" class="administrator">Set Inactive</a>
-            <span class="administrator-span">|</span>
-            <a href="#" class="last last-link">Last</a>
-            <a href='#' class="last last-image-link">image</a>
-            <span class="last-image-span">|</span>
-            <a v-on:click.prevent="show_settings = true" class="options">Settings</a>
-        </nav>
-    </section>
-
-    <section class="settings" v-show="show_settings" v-bind:class="{active: show_settings}">
+    <section class="settings" v-show="show_main_index > 0" v-bind:class="{active: show_main_index > 0}">
         <main v-bind:class="{saved_css: border_css === 'saved', too_restrictive: border_css === 'restrictive'}">
 
-        <form v-on:submit.prevent="submitSettings" v-show="!show_history">
+        <form v-on:submit.prevent="submitSettings" v-show="show_main_index === 1">
             <span title="Hide settings"
-                  v-on:click="show_settings = false" class="close-btn large"></span>
+                  v-on:click="show_main_index = 0" class="close-btn large"></span>
             <span title="Refresh background image"
                   v-on:click="refreshImage" class="refresh-btn"></span>
             <header>
@@ -68,14 +60,33 @@
             </nav>
 
 
-            <div v-show="filterNav === 0">
-                <filter v-for="filter in filters.all"
-                    :index="filter.index"
-                    :source="filter.source"
-                    :filter_class="filter.filter_class"
-                    :value="filter.value"
-                    :value_type="filter.value_type"
-                    :value_operand="filter.value_operand"></filter>
+            <div v-show="filterNav === 0" class="alignment-box">
+                <div class="outer-box">
+                    <span>Info box position</span>
+                    <button class="align-btn left" v-bind:class="{active: align === 1}"
+                        v-on:click.prevent="align = 1"></button>
+                    <button class="align-btn right" v-bind:class="{active: align === 0}"
+                            v-on:click.prevent="align = 0"></button>
+                </div>
+                <!--<label for="allow_reddit">-->
+                    <!---->
+                    <!---->
+                    <!---->
+                    <!--<select name="reddit" value="reddit"-->
+                           <!--v-model="align_info_box" id="align_info_box"-->
+                            <!--v-on:change="queueSettingsUpdate">-->
+                        <!--<option>Right</option>-->
+                        <!--<option>Left</option>-->
+                    <!--</select>-->
+                    <!--Align info box-->
+                <!--</label>-->
+                <!--<filter v-for="filter in filters.all"-->
+                    <!--:index="filter.index"-->
+                    <!--:source="filter.source"-->
+                    <!--:filter_class="filter.filter_class"-->
+                    <!--:value="filter.value"-->
+                    <!--:value_type="filter.value_type"-->
+                    <!--:value_operand="filter.value_operand"></filter>-->
             </div>
 
             <div v-show="filterNav === 1">
@@ -186,13 +197,12 @@
         </form>
 
         <div class="filter-nav">
-            <h4 v-on:click="getHistory" v-show="!show_history" class="history-nav">History</h4>
-            <h4 v-on:click="show_history = false" v-show="show_history" class="filter">Filters</h4>
+            <h4 v-on:click="getHistory" v-show="show_main_index === 1" class="history-nav">History</h4>
+            <h4 v-on:click="show_main_index = 1" v-show="show_main_index === 2" class="filter">Settings</h4>
         </div>
 
-
-        <div class="history" v-show="show_history">
-            <span v-on:click="show_settings = false" class="close-btn large"></span>
+        <div class="history" v-show="show_main_index === 2">
+            <span v-on:click="show_main_index = 0" class="close-btn large"></span>
             <h1>History</h1>
             <history v-for="(index, history) in history_items"
                 :index="index + 1"
@@ -219,52 +229,6 @@
             <p class="help-text">Use comma separated keywords</p>
         </div>
     </div>
-
-    <div id="score" class="filter-type" v-if="index === 1">
-        <button v-on:click.prevent="active = !active" v-show="!active">filter by votes</button>
-
-        <div v-show="active" class="filter-block limit">
-            <span class="close-btn x" v-on:click.prevent="clear"></span>
-            <select v-bind:value="value_type"
-                    v-on:change="updateValue('value_type', $event.target.value)">
-                <option value="score">Score</option>
-                <option value="ups">Upvotes</option>
-                <option value="downs">Downvotes</option>
-            </select>
-            <span>must be</span>
-            <select v-bind:value="value_operand"
-                    v-on:change="updateValue('value_operand', $event.target.value)">
-                <option value="gte">greater than</option>
-                <option value="lte">less than</option>
-            </select>
-            <input v-bind:value="value"
-                   v-on:input="updateValue('value', $event.target.value)" type="text" name="threshold"/>
-
-            <p class="help-text">Leave blank to set inactive.</p>
-        </div>
-    </div>
-
-    <div id="resolution" class="filter-type" v-if="index === 2">
-        <button v-on:click.prevent="active = !active" v-show="!active">filter by resolution</button>
-        <div v-show="active" class="filter-block resolution">
-            <span class="close-btn x" v-on:click.prevent="clear"></span>
-            <select v-bind:value="value_type"
-                    v-on:change="updateValue('value_type', $event.target.value)">
-                <option value="width">Width</option>
-                <option value="height">Height</option>
-            </select>
-            <span>must be</span>
-            <select v-bind:value="value_operand"
-                    v-on:change="updateValue('value_operand', $event.target.value)">
-                <option value="gte">greater than</option>
-                <option value="lte">less than</option>
-            </select>
-            <input v-bind:value="value"
-                   v-on:input="updateValue('value', $event.target.value)" type="text" name="threshold"/>
-
-            <p class="help-text">Leave blank to set inactive. </p>
-        </div>
-    </div>
 </template>
 
 <template id="history">
@@ -278,10 +242,31 @@
     <div>
     </div>
 </template>
+<template id="image">
+    <div class="image-container">
+        <!--<div class="image" v-bind:style="styleObject"></div>-->
+        <img id="cached-image" v-bind:src="cached_image_url" />
+        <section id="main-image" v-show="!showSettings">
+            <article v-bind:class="{left: align === 1}">
+                <section class="info">
+                    <a :href="permalink" class="title" data-type="Permalink"> {{ title }}</a>
+                    <div class="author"> {{ author }}</div>
+                </section>
+            </article>
+
+            <nav v-bind:class="{left: align === 1}">
+                <a v-if="is_administrator" role="link" class="administrator">Set Inactive</a>
+                <span v-if="is_administrator" class="administrator-span">|</span>
+                <a role="button" v-on:click.prevent="toggleHistory" class="last last-link">History</a>
+                <span class="last-image-span">|</span>
+                <a v-on:click.prevent="toggleSettings" class="options">Settings</a>
+            </nav>
+        </section>
+    </div>
+</template>
 
 <script type="text/javascript" src="js/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="js/vue.min.js"></script>
-<script type="text/javascript" src="js/utils.js"></script>
 <script type="text/javascript" src="js/settings.js"></script>
 <script type="text/javascript" src="js/analytics.js"></script>
 

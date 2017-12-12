@@ -238,6 +238,7 @@ class QuerySetting(models.Model):
     relative_frequency = models.CharField(max_length=20, default='', blank=True)
     device_token = models.CharField(max_length=255, default='')
     is_administrator = models.BooleanField(default=False)
+    align = models.IntegerField(default=0)
 
     def __str__(self):
         return self.url_identifier

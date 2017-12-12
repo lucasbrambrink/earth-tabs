@@ -4,9 +4,9 @@
   "name": "earth.tabs",
   "background": {
       "persistent": false,
-      "scripts": ["src/js/earth.js"]
+      "scripts": ["src/js/settings.js"]
   },
-  "version": "1.1.0",
+  "version": "1.1.2",
      "permissions": [
           "storage",
            "https://earth-pics.tk/",
@@ -14,7 +14,6 @@
        "http://127.0.0.1:8000/"
         ],
   "manifest_version": 2,
-  "options_page": "src/settings.html",
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
   "description": "Photos of earth compiled from various sources",
   "homepage_url": "https://earth.pics.tk",

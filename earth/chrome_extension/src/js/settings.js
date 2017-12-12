@@ -5,15 +5,68 @@ Created by Lucas Brambrink, 2017;
 var API_URL = 'https://earth-pics.tk/api/v0/earth';
 // var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
 
-// Attempt to get a photo from local storage
+
+/* Utils */
+var setImage = function (image_data) {
+    var imageDiv = document.getElementById('initial-load-image');
+    imageDiv.style.backgroundImage = "url('" + image_data.preferred_image_url + "')";
+};
+var getRandomToken = function () {
+    var randomPool = new Uint8Array(32);
+    crypto.getRandomValues(randomPool);
+    var hex = '';
+    for (var i = 0; i < randomPool.length; ++i) {
+        hex += randomPool[i].toString(16);
+    }
+    return hex;
+};
+
+/* Load Image */
+var image = {};
 var cachedImage = localStorage.getItem('cachedImage');
-if (cachedImage !== null && cachedImage !== undefined && cachedImage !== 'undefined') {
-    setImage(JSON.parse(cachedImage));
+if (cachedImage) {
+    image = JSON.parse(cachedImage);
+    setImage(image);
 }
 
 /* Load settings */
 var settings = {};
-loadOrCreateSettings(settings, true);
+(function (settings, load_image) {
+    chrome.storage.sync.get(['token', 'settings_uid'], function(items) {
+        var token = items.token;
+        if (!token) {
+            token = getRandomToken();
+            chrome.storage.sync.set({token: token});
+        }
+        settings.token = token;
+
+        var loadImageCallback = function(uid) {
+            if (window.vmSettings) {
+                window.vmSettings.getSettings();
+            }
+            if (load_image) {
+               window.vmSettings.getNewImage(uid);
+            }
+        };
+
+        var uid = items.settings_uid;
+        if (uid) {
+            settings.uid = uid;
+            loadImageCallback(settings.uid);
+        }
+        else {
+            $.ajax({
+                url: API_URL + '/settings/new/',
+                method: 'POST',
+                headers: {'token': settings.token}
+            }).success(function(resp) {
+                chrome.storage.sync.set({"settings_uid": resp.url_identifier});
+                settings.uid = resp.url_identifier;
+                loadImageCallback(settings.uid);
+            });
+        }
+    });
+})(settings, true);
 
 /* Analytics */
 var _gaq = _gaq || [];
@@ -21,9 +74,34 @@ var _gaq = _gaq || [];
 /* Vue.js */
 (function() {
 
+    var imageItem = Vue.component('earth-image', {
+        template: '#image',
+        props: ["image_url", "permalink", "title", "author", "contain_image", "is_administrator",
+            "align",
+            "cached_image_url"],
+        computed: {
+            styleObject: function() {
+                var background_size = this.contain_image ? "contain" : "cover";
+                return {
+                    backgroundImage: 'url(' + this.image_url + ')',
+                    backgroundSize: background_size
+
+                }
+            },
+        },
+        methods: {
+            toggleHistory: function () {
+                vmSettings.toggleHistory();
+            },
+            toggleSettings: function () {
+                vmSettings.show_main_index = vmSettings.show_main_index != 1 ? 1 : 0;
+            }
+        }
+    });
+
     var historyItem = Vue.component('history', {
         template: '#history',
-        props: ["index", "image_url", "permalink", "title"]
+        props: ["index", "image_url", "permalink", "title"],
     });
 
     var filter = Vue.component('filter', {
@@ -132,6 +210,8 @@ var _gaq = _gaq || [];
         el: '#vm-settings',
         mixins: [],
         data: {
+            image_data: [image],
+            cached_image_url: '',
             history: [],
             settings: [],
             filterNav: 0,
@@ -147,13 +227,16 @@ var _gaq = _gaq || [];
             ratio_wiki: 1,
             save_copy: "Save",
             saving: false,
+            loaded_history: false,
             history_items: [],
-            show_history: false,
+            needs_history_refresh: false,
+            show_main_index: 0,
             serialized_state: '',
             is_queued: false,
             queued_image: false,
+            align: 0,
             border_css: '',
-            show_settings: false,
+            align_info_box: 'right',
             filters: {
                 all: {
                     query: Filter('query', 'global', 'all'),
@@ -173,6 +256,13 @@ var _gaq = _gaq || [];
                 }
             },
         },
+        // mounted: function () {
+        //     this.image_data = [cachedImage];
+        //     // var cachedImage = localStorage.getItem('cachedImage');
+        //     // if (cachedImage !== null && cachedImage !== undefined && cachedImage !== 'undefined') {
+        //     //     this.image_data = [JSON.parse(cachedImage)];
+        //     // }
+        // },
         computed: {
             relative_frequency: function () {
                 return [
@@ -206,33 +296,37 @@ var _gaq = _gaq || [];
             }
         },
         methods: {
-            settingsCallback: function(resp) {
-                allowed_sources = resp.allowed_sources.split(',');
-                var source;
-                for(var i = 0; i < allowed_sources.length; i++) {
-                    source = allowed_sources[i];
-                    vmSettings['allow_' + source] = true;
-                }
-                var contain_data_sources = resp.contain_data_sources.split(',');
-                for(i = 0; i < contain_data_sources.length; i++) {
-                    source = contain_data_sources[i];
-                    vmSettings['contain_' + source] = true;
-                }
-                var relative_frequency = resp.relative_frequency.split(',');
-                var sources = ['reddit', 'apod', 'wiki'];
-                for(i = 0; i < relative_frequency.length; i++) {
-                    source = sources[i];
-                    var freq = parseInt(relative_frequency[i]);
-                    if (isNaN(freq)) freq = 1;
-                    vmSettings['ratio_' + source] = freq;
-                }
-                var filter;
-                for (i = 0; i < resp.filters.length; i++) {
-                    filter = resp.filters[i];
-                    source = filter['type'] === 'global' ? 'all' : filter.source;
-                    var object = vmSettings.filters[source][filter.filter_class];
-                    object.loadArguments(filter.arguments);
-                    object.updateFields(this.getComponent(object));
+            settingsCallback: function (that) {
+                return function(resp) {
+                    allowed_sources = resp.allowed_sources.split(',');
+                    var source;
+                    for(var i = 0; i < allowed_sources.length; i++) {
+                        source = allowed_sources[i];
+                        that['allow_' + source] = true;
+                    }
+                    var contain_data_sources = resp.contain_data_sources.split(',');
+                    for(i = 0; i < contain_data_sources.length; i++) {
+                        source = contain_data_sources[i];
+                        that['contain_' + source] = true;
+                    }
+                    var relative_frequency = resp.relative_frequency.split(',');
+                    var sources = ['reddit', 'apod', 'wiki'];
+                    for(i = 0; i < relative_frequency.length; i++) {
+                        source = sources[i];
+                        var freq = parseInt(relative_frequency[i]);
+                        if (isNaN(freq)) freq = 1;
+                        that['ratio_' + source] = freq;
+                    }
+                    var filter;
+                    for (i = 0; i < resp.filters.length; i++) {
+                        filter = resp.filters[i];
+                        source = filter['type'] === 'global' ? 'all' : filter.source;
+                        var object = that.filters[source][filter.filter_class];
+                        object.loadArguments(filter.arguments);
+                        object.updateFields(this.getComponent(object));
+                    }
+                    if (isNaN(resp.align)) resp.align = 0;
+                    that.align = resp.align;
                 }
             },
             getSettings: function () {
@@ -240,7 +334,7 @@ var _gaq = _gaq || [];
                     url: API_URL + '/settings/' + settings.uid,
                     method: 'GET',
                     headers: {'token': settings.token}
-                }).success(this.settingsCallback)
+                }).success(this.settingsCallback(this))
             },
             getComponent: function(filter) {
                 var child;
@@ -284,7 +378,8 @@ var _gaq = _gaq || [];
                     contain_wiki: this.contain_wiki,
                     filters: this.serializerFilters(),
                     token: settings.token,
-                    relative_frequency: this.relative_frequency
+                    relative_frequency: this.relative_frequency,
+                    align: this.align,
                 };
                 var url = API_URL + '/settings/save/' + settings.uid;
                 var that = this;
@@ -336,12 +431,14 @@ var _gaq = _gaq || [];
             getHistoryCallback: function(that, resp) {
                 return function (resp) {
                     that.history_items = resp;
+                    that.loaded_history = true;
+                    that.needs_history_refresh = false;
                 }
             },
             getHistory: function () {
-                this.show_history = true;
+                this.show_main_index = 2;
                 _gaq.push(['_trackEvent', 'show history', 'clicked']);
-                if (this.history_items.length === 0) {
+                if (!this.loaded_history || this.needs_history_refresh) {
                     $.ajax({
                         url: API_URL + '/settings/history/' + settings.uid,
                         headers: {'token': settings.token}
@@ -356,6 +453,7 @@ var _gaq = _gaq || [];
                 return url + '?' + queries.join('&');
             },
             refreshImage: function () {
+                this.needs_history_refresh = true;
                 if (this.queued_image) {
                     return;
                 } else {
@@ -364,11 +462,41 @@ var _gaq = _gaq || [];
                 setTimeout(function(that) {
                     return function () {
                         localStorage.removeItem('cachedImage');
-                        getNewImage(settings.uid);
+                        that.getNewImage(settings.uid);
                         that.queued_image = false;
                     }
-                }(this), 500);
-            }
+                }(this), 300);
+            },
+            toggleHistory: function () {
+                this.show_main_index = this.show_main_index === 2 ? 0 : 2;
+                if (this.show_main_index === 2) {
+                    this.getHistory();
+                }
+            },
+            getNewImage: function () {
+                var url = API_URL + '/get';
+                if (settings.uid) {
+                    url += '/' + settings.uid;
+                }
+                var successCallback = (function(that) {
+                    return function (resp) {
+                        cachedImage = localStorage.getItem('cachedImage');
+                        localStorage.removeItem('cachedImage');
+                        localStorage.setItem('cachedImage', JSON.stringify(resp));
+                        if (cachedImage === null) {
+                            that.image_data = [resp];
+                            setImage(resp);
+                            that.getNewImage();
+                        } else {
+                            that.cached_image_url = resp.preferred_image_url;
+                        }
+                    }
+                })(this);
+                $.getJSON(url)
+                    .success(successCallback).fail(function () {
+                        console.log('Image Request Failed');
+                });
+            },
         }
     });
     window.vmSettings = vmSettings;

@@ -66,9 +66,11 @@ body.earth {
 
 #main-image a { color:#FFF; text-decoration: none;  }
 
-a:hover,
+a:hover {
+    opacity: 0.9 !important;
+}
 .author:hover {
-    opacity: 1 !important;
+    opacity: 0.65 !important;
 }
 /*.last-title { margin-right: 55px; }*/
 #main-image .author {
@@ -81,6 +83,14 @@ a:hover,
     right: 25px;
     font-size: 70%;
 }
+#main-image nav.left {
+    /*opacity: 0.5;*/
+    position: absolute;
+    bottom: 10px;
+    left: 25px;
+    font-size: 70%;
+}
+
 #main-image nav span {
     width: 20px;
     display: inline-block;
