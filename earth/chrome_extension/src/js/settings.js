@@ -497,6 +497,10 @@ var _gaq = _gaq || [];
                         console.log('Image Request Failed');
                 });
             },
+            setAlign: function(num) {
+                this.align = num;
+                this.queueSettingsUpdate();
+            }
         }
     });
     window.vmSettings = vmSettings;

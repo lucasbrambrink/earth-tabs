@@ -64,9 +64,9 @@
                 <div class="outer-box">
                     <span>Info box position</span>
                     <button class="align-btn left" v-bind:class="{active: align === 1}"
-                        v-on:click.prevent="align = 1"></button>
+                        v-on:click.prevent="setAlign(1)"></button>
                     <button class="align-btn right" v-bind:class="{active: align === 0}"
-                            v-on:click.prevent="align = 0"></button>
+                            v-on:click.prevent="setAlign(0)"></button>
                 </div>
                 <!--<label for="allow_reddit">-->
                     <!---->
