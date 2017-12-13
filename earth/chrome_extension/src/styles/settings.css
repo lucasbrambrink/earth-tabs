@@ -143,7 +143,6 @@ img {
   opacity: 0;
 }
 .history {
-  overflow-y: scroll;
   height: 420px;
 }
 .history a {

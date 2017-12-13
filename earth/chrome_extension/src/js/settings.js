@@ -10,6 +10,9 @@ var API_URL = 'https://earth-pics.tk/api/v0/earth';
 var setImage = function (image_data) {
     var imageDiv = document.getElementById('initial-load-image');
     imageDiv.style.backgroundImage = "url('" + image_data.preferred_image_url + "')";
+    if (image_data.contain_image) {
+        imageDiv.style.backgroundSize = 'contain';
+    }
 };
 var getRandomToken = function () {
     var randomPool = new Uint8Array(32);
