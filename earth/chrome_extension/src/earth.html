@@ -35,24 +35,28 @@
             <nav>
                 <div v-on:click.prevent="filterNav = 0">
                     <button v-bind:class="{active: filterNav === 0}" id="all-button" tabindex="-1">
-                        All</button></div>
+                        General</button></div>
                 <div v-on:click.prevent="filterNav = 1">
-                    <button v-bind:class="{active: filterNav === 1, selected: allow_reddit}">
-                        Reddit</button>
+                    <button id="reddit-btn"
+                            title="Reddit"
+                            v-bind:class="{active: filterNav === 1, selected: allow_reddit}">
+                        </button>
                     <span v-bind:class="{active: allow_reddit, hide: hide_ratios}"
                           class="ratio" v-text="ratio_reddit + 'x'"
                         title="indicates the relative frequency to other image type"></span>
                 </div>
                 <div v-on:click.prevent="filterNav = 2">
-                    <button v-bind:class="{active: filterNav === 2, selected: allow_apod}">
-                        A.P.O.D.</button>
+                    <button id="apod-btn"
+                            title="A.P.O.D."
+                            v-bind:class="{active: filterNav === 2, selected: allow_apod}">
+                        </button>
                     <span v-bind:class="{active: allow_apod, hide: hide_ratios}"
                             class="ratio" v-text="ratio_apod + 'x'"
                             title="indicates the relative frequency to other data source"></span>
                 </div>
                 <div v-on:click.prevent="filterNav = 3">
-                    <button v-bind:class="{active: filterNav === 3, selected: allow_wiki}">
-                        Wikipedia</button>
+                    <button title="Wikipedia" id="wiki-btn" v-bind:class="{active: filterNav === 3, selected: allow_wiki}">
+                        </button>
                     <span v-bind:class="{active: allow_wiki, hide: hide_ratios}"
                           class="ratio" v-text="ratio_wiki + 'x'"
                           title="indicates the relative frequency to other data source"></span>
@@ -61,8 +65,8 @@
 
 
             <div v-show="filterNav === 0" class="alignment-box">
-                <div class="outer-box">
-                    <span>Info box position</span>
+                <div class="outer-box" title="select position of info box">
+                    <!--<span>Info box position</span>-->
                     <button class="align-btn left" v-bind:class="{active: align === 1}"
                         v-on:click.prevent="setAlign(1)"></button>
                     <button class="align-btn right" v-bind:class="{active: align === 0}"
@@ -95,7 +99,7 @@
                            name="reddit" value="reddit"
                            v-model="allow_reddit" id="allow_reddit"
                            v-on:change="queueSettingsUpdate">
-                    Allow reddit.com/r/Earth
+                    Enable reddit.com/r/Earth
                 </label>
                 <label for="contain_reddit">
                     <input type="checkbox" name="contain_reddit"
@@ -130,7 +134,7 @@
                            v-model="allow_apod"
                            v-on:change="queueSettingsUpdate"
                            id="allow_apod">
-                    Allow NASA's Astromony Picture of the Day
+                    Enable NASA's Astromony Picture of the Day
                 </label>
                 <label for="contain_apod">
                     <input type="checkbox" name="contain_apod"
@@ -162,7 +166,7 @@
                     <input type="checkbox" name="wiki" value="wiki"
                            v-model="allow_wiki" id="allow_wiki"
                             v-on:change="queueSettingsUpdate">
-                    Allow Wikipedia's Picture of the Day
+                    Enable Wikipedia's Picture of the Day
                 </label>
                 <label for="contain_wiki">
                     <input type="checkbox" name="contain_wiki" value="contain_wiki"
@@ -267,7 +271,7 @@
 
 <script type="text/javascript" src="js/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="js/vue.min.js"></script>
-<script type="text/javascript" src="js/settings.js"></script>
+<script type="text/javascript" src="js/earth.js"></script>
 <script type="text/javascript" src="js/analytics.js"></script>
 
 </html>

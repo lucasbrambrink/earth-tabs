@@ -4,14 +4,12 @@
   "name": "earth.tabs",
   "background": {
       "persistent": false,
-      "scripts": ["src/js/settings.js"]
+      "scripts": ["src/js/earth.js"]
   },
-  "version": "1.1.5",
+  "version": "1.1.6",
      "permissions": [
           "storage",
-          "https://earth-pics.tk/",
-          "http://127.0.0.1/",
-          "http://127.0.0.1:8000/"
+          "https://earth-pics.tk/"
         ],
   "manifest_version": 2,
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",

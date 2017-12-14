@@ -244,6 +244,7 @@ img {
     //transition: background 200ms ease;
     color: white;
     border: none;
+    cursor: pointer;
     &:hover, &.active {
       background: @opaque-bg;
     }
@@ -317,8 +318,10 @@ input[type=checkbox] {
   }
   //.filter-bl/
 }
-
-.history, form {
+.history {
+  padding-bottom: 10px;
+}
+form {
   padding-bottom: 30px;
 }
 
@@ -454,6 +457,11 @@ input[type=range]:focus::-ms-fill-upper {
     position: relative;
     height: 70px;
     text-align: center;
+
+    background: url(../icons/test.svg) no-repeat;
+    background-size: 55px;
+    background-position: center;
+
   }
   .align-btn {
     border: 1px solid white;
@@ -486,4 +494,19 @@ input[type=range]:focus::-ms-fill-upper {
 }
 #main-image nav.left {
   left: 20px;
+}
+#reddit-btn {
+  background: url(../icons/mountain.svg) no-repeat;
+  background-size: 36px;
+  background-position: center;
+}
+#apod-btn {
+  background: url(../icons/planet.svg) no-repeat;
+  background-size: 29px;
+  background-position: center;
+}
+#wiki-btn {
+  background: url(../icons/wikip.svg) no-repeat;
+  background-size: 30px;
+  background-position: center;
 }
