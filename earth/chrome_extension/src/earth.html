@@ -35,31 +35,36 @@
             <nav>
                 <div v-on:click.prevent="filterNav = 0">
                     <button v-bind:class="{active: filterNav === 0}" id="all-button" tabindex="-1">
-                        General</button></div>
-                <div v-on:click.prevent="filterNav = 1">
+                        General</button>
+                    <span class="check-mark"></span>
+                </div>
+                <div v-on:click.prevent="filterNav = 1" v-bind:class="{selected: allow_reddit}">
                     <button id="reddit-btn"
                             title="Reddit"
-                            v-bind:class="{active: filterNav === 1, selected: allow_reddit}">
+                            v-bind:class="{active: filterNav === 1}">
                         </button>
                     <span v-bind:class="{active: allow_reddit, hide: hide_ratios}"
                           class="ratio" v-text="ratio_reddit + 'x'"
                         title="indicates the relative frequency to other image type"></span>
+                    <div class="check-mark"></div>
                 </div>
-                <div v-on:click.prevent="filterNav = 2">
+                <div v-on:click.prevent="filterNav = 2" v-bind:class="{selected: allow_apod}">
                     <button id="apod-btn"
                             title="A.P.O.D."
-                            v-bind:class="{active: filterNav === 2, selected: allow_apod}">
+                            v-bind:class="{active: filterNav === 2}">
                         </button>
                     <span v-bind:class="{active: allow_apod, hide: hide_ratios}"
                             class="ratio" v-text="ratio_apod + 'x'"
                             title="indicates the relative frequency to other data source"></span>
+                    <div class="check-mark"></div>
                 </div>
-                <div v-on:click.prevent="filterNav = 3">
-                    <button title="Wikipedia" id="wiki-btn" v-bind:class="{active: filterNav === 3, selected: allow_wiki}">
+                <div v-on:click.prevent="filterNav = 3" v-bind:class="{selected: allow_wiki}">
+                    <button title="Wikipedia" id="wiki-btn" v-bind:class="{active: filterNav === 3}">
                         </button>
                     <span v-bind:class="{active: allow_wiki, hide: hide_ratios}"
                           class="ratio" v-text="ratio_wiki + 'x'"
                           title="indicates the relative frequency to other data source"></span>
+                    <div class="check-mark"></div>
                 </div>
             </nav>
 

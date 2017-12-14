@@ -235,8 +235,27 @@ img {
     &:nth-child(3){
       border-right: none;
     }
+    div.check-mark {
+      border: 0;
+      cursor: pointer;
+      z-index: 1;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url(../icons/tick.svg);
+      background-repeat: no-repeat;
+      background-size: 16px;
+      background-position: 110px 9px;
+      display: none;
+    }
+    &.selected .check-mark {
+      display: block;
+    }
   }
   button {
+    z-index: 2;
     height: 100%;
     width: 100%;
     font-size: 100%;
@@ -245,13 +264,8 @@ img {
     color: white;
     border: none;
     cursor: pointer;
-    &:hover, &.active {
-      background: @opaque-bg;
-    }
-    &.selected {
-      background: url(../icons/tick.svg) no-repeat;
-      background-size: 16px;
-      background-position: 110px 9px;
+    &:hover, &.active, &.selected.active {
+      background-color: @opaque-bg;
     }
     &.selected.active {
       background-color: @opaque-bg;
@@ -314,7 +328,7 @@ input[type=checkbox] {
     color: white;
     border: none;
     &:hover, &.active {
-      background: @opaque-bg;
+      background-color: @opaque-bg;
     }
   }
   //.filter-bl/
