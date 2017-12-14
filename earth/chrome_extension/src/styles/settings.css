@@ -254,6 +254,7 @@ input[type=checkbox] {
   width: 100%;
   height: 80px;
   background-color: transparent;
+  cursor: pointer;
   color: white;
   border: none;
 }
@@ -430,17 +431,20 @@ input[type=range]:focus::-ms-fill-upper {
   left: 20px;
 }
 #reddit-btn {
-  background: url(../icons/mountain.svg) no-repeat;
+  background-image: url(../icons/mountain.svg);
+  background-repeat: no-repeat;
   background-size: 36px;
   background-position: center;
 }
 #apod-btn {
-  background: url(../icons/planet.svg) no-repeat;
+  background-image: url(../icons/planet.svg);
+  background-repeat: no-repeat;
   background-size: 29px;
   background-position: center;
 }
 #wiki-btn {
-  background: url(../icons/wikip.svg) no-repeat;
+  background-image: url(../icons/wikip.svg);
+  background-repeat: no-repeat;
   background-size: 30px;
   background-position: center;
 }
