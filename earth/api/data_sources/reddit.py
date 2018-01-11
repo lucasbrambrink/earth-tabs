@@ -157,7 +157,7 @@ class EarthScraper(ScrapingMixin, object):
             sleep(0.5)
 
     def batch_import(self, limit_new=25, continue_batch=None, after_address=None,
-                     sort_top=False, time_frame=None, search_param=None):
+                     sort_top=True, time_frame=None, search_param=None):
         from api.models import EarthImage
 
         images_to_be_added = continue_batch or []
