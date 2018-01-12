@@ -106,6 +106,10 @@ var _gaq = _gaq || [];
         template: '#history',
         props: ["index", "image_url", "permalink", "title"],
     });
+    var favoriteItem = Vue.component('favorite', {
+        template: '#history',
+        props: ["index", "image_url", "permalink", "title"],
+    });
 
     var filter = Vue.component('filter', {
         template: '#filter',
@@ -232,6 +236,8 @@ var _gaq = _gaq || [];
             saving: false,
             loaded_history: false,
             history_items: [],
+            loaded_favorites: false,
+            favorite_items: [],
             needs_history_refresh: false,
             show_main_index: 0,
             serialized_state: '',
@@ -448,6 +454,23 @@ var _gaq = _gaq || [];
                     }).success(this.getHistoryCallback(this));
                 }
             },
+            getFavoriteCallback: function(that, resp) {
+                return function (resp) {
+                    that.history_items = resp;
+                    that.loaded_history = true;
+                    that.needs_history_refresh = false;
+                }
+            },
+            getFavorites: function () {
+                this.show_main_index = 3;
+                _gaq.push(['_trackEvent', 'show favorites', 'clicked']);
+                if (!this.loaded_favorites) {
+                    $.ajax({
+                        url: API_URL + '/favorite/' + settings.uid,
+                        headers: {'token': settings.token}
+                    }).success(this.getFavoriteCallback(this));
+                }
+            },
             addAsQueryParams: function(url, values) {
                 queries = [];
                 Object.keys(values).forEach(function(key, index) {
@@ -474,6 +497,12 @@ var _gaq = _gaq || [];
                 this.show_main_index = this.show_main_index === 2 ? 0 : 2;
                 if (this.show_main_index === 2) {
                     this.getHistory();
+                }
+            },
+            toggleFavorites: function () {
+                this.show_main_index = this.show_main_index === 3 ? 0 : 3;
+                if (this.show_main_index === 3) {
+                    this.getFavorites();
                 }
             },
             getNewImage: function () {

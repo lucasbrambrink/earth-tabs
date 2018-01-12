@@ -206,8 +206,9 @@
         </form>
 
         <div class="filter-nav">
-            <h4 v-on:click="getHistory" v-show="show_main_index === 1" class="history-nav">History</h4>
-            <h4 v-on:click="show_main_index = 1" v-show="show_main_index === 2" class="filter">Settings</h4>
+            <h4 v-on:click="show_main_index = 1" v-show="show_main_index !== 1" class="filter">Settings</h4>
+            <h4 v-on:click="getHistory" v-show="show_main_index !== 2" class="history-nav">History</h4>
+            <h4 v-on:click="getFavorites" v-show="show_main_index !== 3" class="history-nav">Favorites</h4>
         </div>
 
         <div class="history" v-show="show_main_index === 2">
@@ -219,6 +220,16 @@
                 :permalink="history.permalink"
                 :title="history.title">
             </history>
+        </div>
+        <div class="favorites" v-show="show_main_index === 3">
+            <span v-on:click="show_main_index = 0" class="close-btn large"></span>
+            <h1>Favorites</h1>
+            <favorite v-for="(index, history) in favorite_items"
+                :index="index + 1"
+                :image_url="history.preferred_image_url"
+                :permalink="history.permalink"
+                :title="history.title">
+            </favorite>
         </div>
         </main>
     </section>
@@ -266,6 +277,8 @@
             <nav v-bind:class="{left: align === 1}">
                 <a v-if="is_administrator" role="link" class="administrator">Set Inactive</a>
                 <span v-if="is_administrator" class="administrator-span">|</span>
+                <a role="button" v-on:click.prevent="toggleFavorites" class="last last-link">Favorites</a>
+                <span class="last-image-span">|</span>
                 <a role="button" v-on:click.prevent="toggleHistory" class="last last-link">History</a>
                 <span class="last-image-span">|</span>
                 <a v-on:click.prevent="toggleSettings" class="options">Settings</a>

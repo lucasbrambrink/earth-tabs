@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import EarthImage, QuerySetting, Filter
+from api.models import EarthImage, QuerySetting, Filter, FavoriteImageItem
 
 
 class EarthImageSerializer(serializers.ModelSerializer):
@@ -35,3 +35,10 @@ class HistorySerializer(serializers.Serializer):
 
     class Meta:
         fields = ('images',)
+
+
+class FavoriteImageItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = FavoriteImageItem
+        exclude = ('id', 'settings')

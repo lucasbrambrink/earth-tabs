@@ -6,8 +6,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
-from api.models import EarthImage, QuerySetting, Filter
-from .serializers import EarthImageSerializer, QuerySettingSerializer, HistorySerializer, FilterSerializer
+from api.models import EarthImage, QuerySetting, Filter, FavoriteImageItem
+from .serializers import EarthImageSerializer, QuerySettingSerializer, \
+    HistorySerializer, FilterSerializer, FavoriteImageItemSerializer
 
 
 class EarthImageView(generics.RetrieveAPIView):
@@ -140,8 +141,10 @@ class QuerySettingRetrieveMixin(object):
                 obj.device_token = token
                 obj.save()
 
-            if obj.device_token != token:
-               obj = None
+            # if obj.device_token != token:
+            #     import ipdb
+            #     ipdb.set_trace()
+            #     obj = None
 
         except QuerySetting.DoesNotExist:
             pass
@@ -264,3 +267,33 @@ class HistoryListApi(QuerySettingRetrieveMixin,
             images.append(serialized_image.data)
 
         return Response(images)
+
+
+class FavoriteListApi(QuerySettingRetrieveMixin,
+                      generics.ListAPIView):
+    serializer_class = FavoriteImageItemSerializer
+    permission_classes = (AllowAny,)
+    lookup_field = 'settings_uid'
+    queryset = FavoriteImageItem.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        query_setting = self.get_object(request)
+        if query_setting is None:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        items = [EarthImageSerializer(favorite.image).data
+                 for favorite in FavoriteImageItem.objects\
+                    .filter(settings_id=query_setting.id)\
+                    .select_related('image')
+                    .order_by('-create_date')]
+        return Response(items)
+
+
+class FavoriteItemApi(QuerySettingRetrieveMixin,
+                      generics.RetrieveAPIView,
+                      generics.CreateAPIView,
+                      generics.DestroyAPIView):
+    serializer_class = FavoriteImageItemSerializer
+    permission_classes = (AllowAny,)
+    lookup_field = 'settings_uid'
+    queryset = FavoriteImageItem.objects.all()

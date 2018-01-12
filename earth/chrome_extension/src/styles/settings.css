@@ -165,6 +165,8 @@ img {
 }
 .filter-nav h4 {
   cursor: pointer;
+  display: inline-block;
+  margin: 20px 20px 20px 0;
 }
 .settings nav {
   height: 80px;

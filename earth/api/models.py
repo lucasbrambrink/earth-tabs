@@ -291,3 +291,11 @@ class MarketingImage(models.Model):
     title = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True)
 
+
+class FavoriteImageItem(models.Model):
+    """
+    used for "favorite" functionality
+    """
+    image = models.ForeignKey(to=EarthImage)
+    settings = models.ForeignKey(to=QuerySetting)
+    create_date = models.DateTimeField(auto_now_add=True)
