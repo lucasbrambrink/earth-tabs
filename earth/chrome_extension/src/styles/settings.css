@@ -160,8 +160,25 @@ img {
   left: 45%;
 }
 .favorite-container {
-  overflow-y: scroll;
+  overflow-y: auto;
   height: 360px;
+}
+.favorite-container .row {
+  position: relative;
+}
+.favorite-container .text-field {
+  width: 285px;
+  padding-right: 0;
+  overflow: hidden;
+}
+.favorite-container .close-btn {
+  top: 3px;
+  right: 0;
+  width: 15px;
+  height: 15px;
+}
+.favorite-container a {
+  font-size: 13px;
 }
 .filter-nav {
   position: absolute;
@@ -173,7 +190,7 @@ img {
   cursor: pointer;
   display: inline-block;
   position: absolute;
-  margin: 20px 0;
+  margin: 0;
   left: 0;
 }
 .filter-nav h4.history-nav {
@@ -480,4 +497,18 @@ input[type=range]:focus::-ms-fill-upper {
   background-repeat: no-repeat;
   background-size: 30px;
   background-position: center;
+}
+.styled-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  background-color: transparent;
+}
+.styled-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: rgba(26, 25, 51, 0.41);
+}
+.styled-scrollbar::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: transparent;
 }
