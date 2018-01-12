@@ -173,7 +173,7 @@ img {
   cursor: pointer;
   display: inline-block;
   position: absolute;
-  margin: 20px 0;
+  margin: 0;
   left: 0;
 }
 .filter-nav h4.history-nav {
