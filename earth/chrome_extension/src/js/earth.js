@@ -2,8 +2,8 @@
 Created by Lucas Brambrink, 2017;
 */
 
-var API_URL = 'https://earth-pics.tk/api/v0/earth';
-// var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
+// var API_URL = 'https://earth-pics.tk/api/v0/earth';
+var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
 
 
 /* Utils */
@@ -79,7 +79,8 @@ var _gaq = _gaq || [];
 
     var imageItem = Vue.component('earth-image', {
         template: '#image',
-        props: ["image_url", "permalink", "title", "author", "contain_image", "is_administrator",
+        props: ["image_url", "permalink", "title", "author",
+            "contain_image", "is_administrator", "favorited",
             "align",
             "cached_image_url"],
         computed: {
@@ -96,8 +97,15 @@ var _gaq = _gaq || [];
             toggleHistory: function () {
                 vmSettings.toggleHistory();
             },
+            toggleFavorites: function () {
+                vmSettings.toggleFavorites();
+            },
             toggleSettings: function () {
                 vmSettings.show_main_index = vmSettings.show_main_index != 1 ? 1 : 0;
+            },
+            favoriteThisImage: function () {
+                this.favorited = true;
+                vmSettings.favoriteThisImage();
             }
         }
     });
@@ -456,19 +464,21 @@ var _gaq = _gaq || [];
             },
             getFavoriteCallback: function(that, resp) {
                 return function (resp) {
-                    that.history_items = resp;
-                    that.loaded_history = true;
-                    that.needs_history_refresh = false;
+                    that.favorite_items = resp;
+                    that.loaded_favorites = true;
                 }
+            },
+            loadFavorites: function () {
+                $.ajax({
+                    url: API_URL + '/favorite/' + settings.uid,
+                    headers: {'token': settings.token}
+                }).success(this.getFavoriteCallback(this));
             },
             getFavorites: function () {
                 this.show_main_index = 3;
                 _gaq.push(['_trackEvent', 'show favorites', 'clicked']);
                 if (!this.loaded_favorites) {
-                    $.ajax({
-                        url: API_URL + '/favorite/' + settings.uid,
-                        headers: {'token': settings.token}
-                    }).success(this.getFavoriteCallback(this));
+                    this.loadFavorites();
                 }
             },
             addAsQueryParams: function(url, values) {
@@ -501,7 +511,9 @@ var _gaq = _gaq || [];
             },
             toggleFavorites: function () {
                 this.show_main_index = this.show_main_index === 3 ? 0 : 3;
+                console.log('here')
                 if (this.show_main_index === 3) {
+                    console.log('there')
                     this.getFavorites();
                 }
             },
@@ -527,6 +539,18 @@ var _gaq = _gaq || [];
                 $.getJSON(url)
                     .success(successCallback).fail(function () {
                         console.log('Image Request Failed');
+                });
+            },
+            favoriteThisImage: function () {
+                _gaq.push(['_trackEvent', 'favorite item', 'clicked']);
+                var that = this;
+                var image = this.image_data[0];
+                $.ajax({
+                    url: API_URL + '/favorite/' + settings.uid + '/' + image.id,
+                    method: 'POST',
+                    headers: {'token': settings.token}
+                }).success(function() {
+                    that.loadFavorites();
                 });
             },
             setAlign: function(num) {

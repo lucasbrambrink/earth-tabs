@@ -207,8 +207,11 @@
 
         <div class="filter-nav">
             <h4 v-on:click="show_main_index = 1" v-show="show_main_index !== 1" class="filter">Settings</h4>
-            <h4 v-on:click="getHistory" v-show="show_main_index !== 2" class="history-nav">History</h4>
-            <h4 v-on:click="getFavorites" v-show="show_main_index !== 3" class="history-nav">Favorites</h4>
+            <h4 v-on:click="getHistory" v-show="show_main_index !== 2" class="history-nav"
+                v-bind:class="{active: show_main_index !== 2, first: show_main_index === 1}">History</h4>
+            <h4 v-on:click="getFavorites" v-show="show_main_index !== 3"
+                v-bind:class="{active: show_main_index !== 3}"
+                class="history-nav">Favorites</h4>
         </div>
 
         <div class="history" v-show="show_main_index === 2">
@@ -221,15 +224,17 @@
                 :title="history.title">
             </history>
         </div>
-        <div class="favorites" v-show="show_main_index === 3">
+        <div class="history favorites" v-show="show_main_index === 3">
             <span v-on:click="show_main_index = 0" class="close-btn large"></span>
             <h1>Favorites</h1>
-            <favorite v-for="(index, history) in favorite_items"
-                :index="index + 1"
-                :image_url="history.preferred_image_url"
-                :permalink="history.permalink"
-                :title="history.title">
-            </favorite>
+            <div class="favorite-container">
+                <favorite v-for="(index, history) in favorite_items"
+                    :index="index + 1"
+                    :image_url="history.preferred_image_url"
+                    :permalink="history.permalink"
+                    :title="history.title">
+                </favorite>
+            </div>
         </div>
         </main>
     </section>
@@ -258,6 +263,14 @@
         <div><a v-bind:href="permalink">{{title}}</a></div>
     </div>
 </template>
+<template id="favorites">
+    <div class="row">
+        <div>{{index}}</div>
+        <div><a v-bind:href="image_url">[image]</a></div>
+        <div><a v-bind:href="permalink">{{title}}</a></div>
+        <div><a role="button" v-on:click="delete">X</a></div>
+    </div>
+</template>
 <template id="frequency">
     <div>
     </div>
@@ -277,7 +290,8 @@
             <nav v-bind:class="{left: align === 1}">
                 <a v-if="is_administrator" role="link" class="administrator">Set Inactive</a>
                 <span v-if="is_administrator" class="administrator-span">|</span>
-                <a role="button" v-on:click.prevent="toggleFavorites" class="last last-link">Favorites</a>
+                <a role="button" v-if="!favorited" v-on:click.prevent="favoriteThisImage" class="last last-link">Favorite</a>
+                <a role="button" v-else v-on:click.prevent="" class="last last-link">Saved</a>
                 <span class="last-image-span">|</span>
                 <a role="button" v-on:click.prevent="toggleHistory" class="last last-link">History</a>
                 <span class="last-image-span">|</span>

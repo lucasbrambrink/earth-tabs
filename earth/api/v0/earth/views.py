@@ -281,11 +281,17 @@ class FavoriteListApi(QuerySettingRetrieveMixin,
         if query_setting is None:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
-        items = [EarthImageSerializer(favorite.image).data
-                 for favorite in FavoriteImageItem.objects\
-                    .filter(settings_id=query_setting.id)\
-                    .select_related('image')
-                    .order_by('-create_date')]
+        items = []
+        for favorite in FavoriteImageItem.objects\
+                .filter(settings_id=query_setting.id)\
+                .select_related('image')\
+                .order_by('-create_date'):
+            earth_image = favorite.image
+            earth_image.title = Truncator(earth_image.title).chars(45)
+            items.append(
+                EarthImageSerializer(earth_image).data
+            )
+
         return Response(items)
 
 
@@ -297,3 +303,37 @@ class FavoriteItemApi(QuerySettingRetrieveMixin,
     permission_classes = (AllowAny,)
     lookup_field = 'settings_uid'
     queryset = FavoriteImageItem.objects.all()
+
+
+    def create(self, request, *args, **kwargs):
+        query_setting = self.get_object(request)
+        if query_setting is None:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            image = EarthImage.objects.get(id=kwargs.pop('earth_image_id'))
+            _, created = FavoriteImageItem.objects.get_or_create(
+                settings=query_setting,
+                image=image)
+            response_status = status.HTTP_201_CREATED if created else \
+                status.HTTP_202_ACCEPTED
+
+        except EarthImage.DoesNotExist:
+            response_status = status.HTTP_400_BAD_REQUEST
+        return Response({}, status=response_status)
+
+    def delete(self, request, *args, **kwargs):
+        query_setting = self.get_object(request)
+        if query_setting is None:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            image = EarthImage.objects.get(id=kwargs.pop('earth_image_id'))
+            favorite_item = FavoriteImageItem.objects.get(
+                settings=query_setting,
+                image=image)
+            favorite_item.delete()
+            response_status = status.HTTP_200_OK
+        except (EarthImage.DoesNotExist, FavoriteImageItem.DoesNotExist):
+            response_status = status.HTTP_400_BAD_REQUEST
+        return Response({}, status=response_status)

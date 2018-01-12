@@ -159,14 +159,30 @@ img {
   bottom: 0;
   left: 45%;
 }
+.favorite-container {
+  overflow-y: scroll;
+  height: 360px;
+}
 .filter-nav {
   position: absolute;
-  bottom: 20px;
+  width: 400px;
+  height: 40px;
+  bottom: 25px;
 }
 .filter-nav h4 {
   cursor: pointer;
   display: inline-block;
-  margin: 20px 20px 20px 0;
+  position: absolute;
+  margin: 20px 0;
+  left: 0;
+}
+.filter-nav h4.history-nav {
+  right: 0;
+  left: auto;
+}
+.filter-nav h4.history-nav.first {
+  left: 0;
+  right: 0;
 }
 .settings nav {
   height: 80px;
