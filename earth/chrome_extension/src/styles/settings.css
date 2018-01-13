@@ -512,3 +512,10 @@ input[type=range]:focus::-ms-fill-upper {
   border-radius: 10px;
   background-color: transparent;
 }
+.show-on-hover-row .show-on-hover {
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+.show-on-hover-row:hover .show-on-hover {
+  opacity: 1;
+}

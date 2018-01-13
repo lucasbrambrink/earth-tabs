@@ -116,10 +116,10 @@ var _gaq = _gaq || [];
     });
     var favoriteItem = Vue.component('favorite', {
         template: '#favorites',
-        props: ["index", "image_url", "permalink", "title"],
+        props: ["index", "image_url", "permalink", "title", "image_id"],
         methods: {
             delete: function () {
-                console.log('deleted!');
+                vmSettings.deleteFavoriteImage(this.image_id);
             }
         }
 
@@ -554,6 +554,17 @@ var _gaq = _gaq || [];
                 $.ajax({
                     url: API_URL + '/favorite/' + settings.uid + '/' + image.id,
                     method: 'POST',
+                    headers: {'token': settings.token}
+                }).success(function() {
+                    that.loadFavorites();
+                });
+            },
+            deleteFavoriteImage: function(image_id) {
+                _gaq.push(['_trackEvent', 'favorite item deleted', 'clicked']);
+                var that = this;
+                $.ajax({
+                    url: API_URL + '/favorite/' + settings.uid + '/' + image_id,
+                    method: 'DELETE',
                     headers: {'token': settings.token}
                 }).success(function() {
                     that.loadFavorites();

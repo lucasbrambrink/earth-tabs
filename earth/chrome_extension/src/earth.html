@@ -232,7 +232,8 @@
                     :index="index + 1"
                     :image_url="history.preferred_image_url"
                     :permalink="history.permalink"
-                    :title="history.title">
+                    :title="history.title"
+                    :image_id="history.id">
                 </favorite>
             </div>
         </div>
@@ -264,11 +265,12 @@
     </div>
 </template>
 <template id="favorites">
-    <div class="row">
+    <div class="row show-on-hover-row">
         <div>{{index}}</div>
         <div><a v-bind:href="image_url">[image]</a></div>
         <div class="text-field"><a v-bind:href="permalink">{{title}}</a></div>
-        <div class="close-btn" v-on:click="delete" title="Delete this item from your lists of Favorites."></div>
+        <div class="close-btn show-on-hover" v-on:click="delete"
+             title="Delete this item from your lists of favorites."></div>
     </div>
 </template>
 <template id="frequency">
@@ -291,7 +293,7 @@
                 <a v-if="is_administrator" role="link" class="administrator">Set Inactive</a>
                 <span v-if="is_administrator" class="administrator-span">|</span>
                 <a role="button" v-if="!favorited" v-on:click.prevent="favoriteThisImage" class="last last-link">Favorite</a>
-                <a role="button" v-else v-on:click.prevent="" class="last last-link">Saved</a>
+                <a role="button" v-else v-on:click.prevent="toggleFavorites" class="last last-link">Saved</a>
                 <span class="last-image-span">|</span>
                 <a role="button" v-on:click.prevent="toggleHistory" class="last last-link">History</a>
                 <span class="last-image-span">|</span>
