@@ -287,18 +287,18 @@
                     <a :href="permalink" class="title" data-type="Permalink"> {{ title }}</a>
                     <div class="author"> {{ author }}</div>
                 </section>
+                <nav v-bind:class="{left: align === 1}">
+                    <a v-if="is_administrator" role="link" class="administrator">Set Inactive</a>
+                    <span v-if="is_administrator" class="administrator-span">|</span>
+                    <a role="button" v-if="!favorited" v-on:click.prevent="favoriteThisImage" class="last last-link">Favorite</a>
+                    <a role="button" v-else v-on:click.prevent="toggleFavorites" class="last last-link">Saved</a>
+                    <span class="last-image-span">|</span>
+                    <a role="button" v-on:click.prevent="toggleHistory" class="last last-link">History</a>
+                    <span class="last-image-span">|</span>
+                    <a v-on:click.prevent="toggleSettings" class="options">Settings</a>
+                </nav>
             </article>
 
-            <nav v-bind:class="{left: align === 1}">
-                <a v-if="is_administrator" role="link" class="administrator">Set Inactive</a>
-                <span v-if="is_administrator" class="administrator-span">|</span>
-                <a role="button" v-if="!favorited" v-on:click.prevent="favoriteThisImage" class="last last-link">Favorite</a>
-                <a role="button" v-else v-on:click.prevent="toggleFavorites" class="last last-link">Saved</a>
-                <span class="last-image-span">|</span>
-                <a role="button" v-on:click.prevent="toggleHistory" class="last last-link">History</a>
-                <span class="last-image-span">|</span>
-                <a v-on:click.prevent="toggleSettings" class="options">Settings</a>
-            </nav>
         </section>
     </div>
 </template>

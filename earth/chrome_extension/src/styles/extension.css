@@ -46,10 +46,11 @@ body.earth {
 	text-align:right;
 	z-index: 1000;
 	position: absolute;
-	bottom: 35px;
-	right: 25px;
-	padding: 0px;
+	bottom: 2px;
+	right: 10px;
+	padding: 20px;
 	font-size: 95%;
+
 }
 #main-image a,
 #main-image span,
@@ -66,22 +67,14 @@ body.earth {
 
 #main-image a { color:#FFF; text-decoration: none;  }
 
-a:hover {
-    opacity: 0.9 !important;
-}
-.author:hover {
-    opacity: 0.65 !important;
-}
 /*.last-title { margin-right: 55px; }*/
 #main-image .author {
     font-size: 85%;
 }
 #main-image nav {
     /*opacity: 0.5;*/
-    position: absolute;
-    bottom: 10px;
-    right: 25px;
     font-size: 70%;
+    padding: 10px 0 0 0;
 }
 #main-image nav.left {
     /*opacity: 0.5;*/

@@ -519,3 +519,19 @@ input[type=range]:focus::-ms-fill-upper {
 .show-on-hover-row:hover .show-on-hover {
   opacity: 1;
 }
+#main-image article {
+  transition: background 0.2s ease;
+}
+#main-image article a,
+#main-image article .author {
+  transition: opacity 0.2s ease;
+}
+#main-image article:hover {
+  background: rgba(26, 25, 51, 0.41);
+}
+#main-image article:hover a {
+  opacity: 0.9 !important;
+}
+#main-image article:hover .author {
+  opacity: 0.65 !important;
+}

@@ -596,3 +596,21 @@ input[type=range]:focus::-ms-fill-upper {
     }
   }
 }
+#main-image article {
+  transition: background 0.2s ease;
+  a, .author {
+    transition: opacity 0.2s ease;
+  }
+  &:hover {
+    background: @opaque-bg-light;
+    a {
+      opacity: 0.9 !important;
+    }
+    .author {
+        opacity: 0.65 !important;
+    }
+  }
+  nav {
+
+  }
+}
