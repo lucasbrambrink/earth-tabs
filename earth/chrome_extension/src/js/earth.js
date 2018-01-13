@@ -115,8 +115,14 @@ var _gaq = _gaq || [];
         props: ["index", "image_url", "permalink", "title"],
     });
     var favoriteItem = Vue.component('favorite', {
-        template: '#history',
+        template: '#favorites',
         props: ["index", "image_url", "permalink", "title"],
+        methods: {
+            delete: function () {
+                console.log('deleted!');
+            }
+        }
+
     });
 
     var filter = Vue.component('filter', {

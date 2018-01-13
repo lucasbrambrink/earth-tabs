@@ -214,8 +214,25 @@ img {
   //padding-bottom: 0;
 }
 .favorite-container {
-  overflow-y: scroll;
+  overflow-y: auto;
   height: 360px;
+  .row {
+    position: relative;
+  }
+  .text-field {
+    width: 285px;
+    padding-right: 0;
+    overflow: hidden;
+  }
+  .close-btn {
+    top: 3px;
+    right: 0;
+    width: 15px;
+    height: 15px;
+  }
+  a {
+    font-size: 13px;
+  }
 }
 
 .filter-nav {
@@ -549,4 +566,22 @@ input[type=range]:focus::-ms-fill-upper {
   background-repeat: no-repeat;
   background-size: 30px;
   background-position: center;
+}
+
+
+.styled-scrollbar {
+  &::-webkit-scrollbar {
+    width: 5px;
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: @opaque-blue-dark;
+  }
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    background-color: transparent;
+  }
 }
