@@ -106,7 +106,7 @@ class EarthImageSetPublic(generics.DestroyAPIView,
         return None
 
     def get(self, request, settings_uid, earth_image_id, *args, **kwargs):
-        image = self._retrieve(settings_uid, earth_image_id)
+        image = self._retrieve(earth_image_id)
         if not image:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
         if image.location:
