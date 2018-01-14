@@ -80,7 +80,7 @@ var _gaq = _gaq || [];
     var imageItem = Vue.component('earth-image', {
         template: '#image',
         props: ["image_url", "permalink", "title", "author",
-            "contain_image", "is_administrator", "favorited",
+            "contain_image", "is_administrator", "favorited", "maps_url",
             "align",
             "cached_image_url"],
         computed: {
@@ -106,6 +106,11 @@ var _gaq = _gaq || [];
             favoriteThisImage: function () {
                 this.favorited = true;
                 vmSettings.favoriteThisImage();
+            },
+            go_to_map: function () {
+                window.open(
+                    this.maps_url
+                );
             }
         }
     });
