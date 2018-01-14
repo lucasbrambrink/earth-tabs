@@ -270,6 +270,8 @@
         <div>{{index}}</div>
         <div><a v-bind:href="image_url">[image]</a></div>
         <div class="text-field"><a v-bind:href="permalink">{{title}}</a></div>
+        <div class="set-btn show-on-hover" v-on:click="set_image"
+             title="Set background."></div>
         <div class="close-btn show-on-hover" v-on:click="delete"
              title="Delete this item from your lists of favorites."></div>
     </div>

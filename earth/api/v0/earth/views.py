@@ -77,22 +77,39 @@ class EarthImageView(generics.RetrieveAPIView):
 
 
 class EarthImageSetPublic(generics.DestroyAPIView,
+                          generics.RetrieveAPIView,
                           generics.UpdateAPIView):
 
     def _update(self, settings_uid, earth_image_id, is_public):
+        image = self._retrieve(settings_uid, earth_image_id)
+        if image:
+            image.is_public = is_public
+            image.save(update_fields=['is_public'])
+            return True
+        else:
+            return False
+
+    def _retrieve(self, settings_uid, earth_image_id):
         try:
             setting = QuerySetting.objects\
                 .get(url_identifier=settings_uid)
             if not setting.is_administrator:
                 raise PermissionError
             image = EarthImage.objects.get(id=earth_image_id)
-            image.is_public = is_public
-            image.save(update_fields=['is_public'])
+            return image
         except (QuerySetting.DoesNotExist,
                 EarthImage.DoesNotExist,
                 PermissionError):
-            return False
-        return True
+            return None
+
+    def get(self, request, settings_uid, earth_image_id, *args, **kwargs):
+        image = self._retrieve(settings_uid, earth_image_id)
+        if not image:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        if image.location:
+            image.google_map_url = image.location.get_maps_url()
+        return Response(EarthImageSerializer(image).data,
+                        status=status.HTTP_200_OK)
 
     def put(self, request, settings_uid, earth_image_id, *args, **kwargs):
         success = self._update(settings_uid, earth_image_id,

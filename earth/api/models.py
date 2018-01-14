@@ -314,12 +314,7 @@ class Location(models.Model):
         return self.name
 
     def get_maps_url(self):
-        # url = 'https://www.google.com/maps/?q={lat},{long}&t=k&z=12'.format(
-        #     lat=self.lat,
-        #     long='-{}'.format(self.long)
-        # )
         url = 'https://www.google.com/maps/?q={name}&t=k&zoom=20'.format(
             name='+'.join(self.name.split()),
-            # long='-{}'.format(self.long)
         )
         return url

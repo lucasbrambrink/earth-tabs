@@ -125,6 +125,9 @@ var _gaq = _gaq || [];
         methods: {
             delete: function () {
                 vmSettings.deleteFavoriteImage(this.image_id);
+            },
+            set_image: function () {
+                vmSettings.refreshImageWithId(this.image_id);
             }
         }
 
@@ -578,6 +581,15 @@ var _gaq = _gaq || [];
             setAlign: function(num) {
                 this.align = num;
                 this.queueSettingsUpdate();
+            },
+            refreshImageWithId: function(image_id) {
+                $.ajax({
+                    url: API_URL + '/get/' + settings.uid + '/' + image_id,
+                    method: 'GET',
+                    headers: {'token': settings.token}
+                }).success(function(resp) {
+                    console.log(resp);
+                });
             }
         }
     });
