@@ -67,7 +67,7 @@ class EarthImage(models.Model):
     contain_image = False
     location = models.ForeignKey(to='Location', null=True,
                                  on_delete=models.SET_NULL)
-
+    google_map_url = ''
     objects = models.Manager()
     public = EarthManager()
     marketing = MarketingManager()
