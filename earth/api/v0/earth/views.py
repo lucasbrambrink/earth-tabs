@@ -60,7 +60,7 @@ class EarthImageView(generics.RetrieveAPIView):
 
             image.is_administrator = setting.is_administrator
             if image.location:
-                image.google_maps_url = image.location.get_maps_url()
+                image.google_map_url = image.location.get_maps_url()
             return image
 
         return self.get_random_object(query_ids)
