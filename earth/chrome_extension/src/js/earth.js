@@ -117,7 +117,13 @@ var _gaq = _gaq || [];
 
     var historyItem = Vue.component('history', {
         template: '#history',
-        props: ["index", "image_url", "permalink", "title"],
+        props: ["index", "image_url", "permalink", "title", "image_id", "saved"],
+        methods : {
+            save: function () {
+                this.saved = true;
+                vmSettings.favoriteImage(this.image_id);
+            }
+        }
     });
     var favoriteItem = Vue.component('favorite', {
         template: '#favorites',
@@ -555,17 +561,20 @@ var _gaq = _gaq || [];
                         console.log('Image Request Failed');
                 });
             },
-            favoriteThisImage: function () {
-                _gaq.push(['_trackEvent', 'favorite item', 'clicked']);
+            favoriteImage: function (image_id) {
                 var that = this;
-                var image = this.image_data[0];
                 $.ajax({
-                    url: API_URL + '/favorite/' + settings.uid + '/' + image.id,
+                    url: API_URL + '/favorite/' + settings.uid + '/' + image_id,
                     method: 'POST',
                     headers: {'token': settings.token}
                 }).success(function() {
                     that.loadFavorites();
                 });
+            },
+            favoriteThisImage: function () {
+                _gaq.push(['_trackEvent', 'favorite item', 'clicked']);
+                var image = this.image_data[0];
+                this.favoriteImage(image.id);
             },
             deleteFavoriteImage: function(image_id) {
                 _gaq.push(['_trackEvent', 'favorite item deleted', 'clicked']);
@@ -583,12 +592,14 @@ var _gaq = _gaq || [];
                 this.queueSettingsUpdate();
             },
             refreshImageWithId: function(image_id) {
+                var that = this;
                 $.ajax({
                     url: API_URL + '/get/' + settings.uid + '/' + image_id,
                     method: 'GET',
                     headers: {'token': settings.token}
                 }).success(function(resp) {
-                    console.log(resp);
+                    that.image_data = [resp];
+                    setImage(resp);
                 });
             }
         }

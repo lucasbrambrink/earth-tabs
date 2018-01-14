@@ -28,6 +28,19 @@
   height: 30px;
   width: 30px;
 }
+.save-image-btn {
+  position: absolute;
+  top: 9px;
+  right: -5px;
+  background: url('../icons/heart.svg') center center no-repeat;
+  height: 2px;
+  width: 2px;
+  cursor: pointer;
+}
+.save-image-btn.saved {
+  height: 1px;
+  background: url('../icons/heart_fill.svg') center center no-repeat;
+}
 .refresh-btn,
 .set-btn {
   position: absolute;
@@ -146,6 +159,9 @@ img {
 .history {
   height: 420px;
 }
+.history .row {
+  position: relative;
+}
 .history a {
   text-decoration: none;
   color: #FCFCFC;
@@ -162,6 +178,7 @@ img {
 }
 .favorite-container {
   overflow-y: auto;
+  overflow-x: hidden;
   height: 360px;
 }
 .favorite-container .row {

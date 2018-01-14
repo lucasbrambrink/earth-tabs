@@ -6,7 +6,7 @@
       "persistent": false,
       "scripts": ["src/js/earth.js"]
   },
-  "version": "1.1.13",
+  "version": "1.1.14",
      "permissions": [
           "storage",
           "https://earth-pics.tk/"],

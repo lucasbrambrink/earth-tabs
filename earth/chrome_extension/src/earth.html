@@ -222,7 +222,8 @@
                 :index="index + 1"
                 :image_url="history.preferred_image_url"
                 :permalink="history.permalink"
-                :title="history.title">
+                :title="history.title"
+                :image_id="history.id">
             </history>
         </div>
         <div class="history favorites" v-show="show_main_index === 3">
@@ -259,10 +260,13 @@
 </template>
 
 <template id="history">
-    <div class="row">
+    <div class="row show-on-hover-row">
         <div>{{index}}</div>
         <div><a v-bind:href="image_url">[image]</a></div>
         <div><a v-bind:href="permalink">{{title}}</a></div>
+        <div class="save-image-btn show-on-hover" v-on:click="save"
+             v-bind:class="{saved: saved}"
+             title="Save this post."></div>
     </div>
 </template>
 <template id="favorites">
