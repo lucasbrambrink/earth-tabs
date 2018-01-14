@@ -318,7 +318,7 @@ class Location(models.Model):
         #     lat=self.lat,
         #     long='-{}'.format(self.long)
         # )
-        url = 'https://www.google.com/maps/?q={name}&t=k&z=17'.format(
+        url = 'https://www.google.com/maps/?q={name}&t=k&z=20'.format(
             name='+'.join(self.name.split()),
             # long='-{}'.format(self.long)
         )
