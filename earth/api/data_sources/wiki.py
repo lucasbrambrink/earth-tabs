@@ -96,4 +96,3 @@ class WikiScraper(ScrapingMixin,
     def run(self, url):
         links = self.scrape_wiki(url)
         self.create_models(links)
-

@@ -44,3 +44,45 @@ class ScrapingMixin(object):
 
         url = urlunparse(parsed_url._replace(query=urlencode(query_parameters, doseq=True)))
         return url
+
+
+import re
+class GetLatLong(object):
+    """
+    Wikipedia
+    """
+    import re
+    KWARGS = [
+        'List_of_',
+        'wiki/Category:',
+        'wiki/Wikipedia:'
+    ]
+
+    def dms2dd(self, degrees, minutes, seconds, direction):
+        dd = float(degrees) + float(minutes) / 60 + float(seconds) / (60 * 60)
+        if direction == 'E' or direction == 'N':
+            dd *= -1
+        return dd;
+
+    def dd2dms(self, deg):
+        d = int(deg)
+        md = abs(deg - d) * 60
+        m = int(md)
+        sd = (md - m) * 60
+        return [d, m, sd]
+
+    def parse_dms(self, dms):
+        parts = re.split('[^\d\w.]+', dms)
+        lat = self.dms2dd(parts[0], parts[1], parts[2], parts[3])
+        return (lat)
+
+    def get_latitude_long_from_wikipedia_url(self, url):
+        content = ScrapingMixin.get(url, as_json=False)
+        soup = BeautifulSoup(content)
+        latitude = soup.find_all('span', {'class': 'latitude'})[0]
+        longitude = soup.find_all('span', {'class': 'longitude'})[0]
+        values = (
+            self.parse_dms(latitude.text),
+            self.parse_dms(longitude.text)
+        )
+        return values

@@ -65,6 +65,8 @@ class EarthImage(models.Model):
     last_seen = models.DateTimeField(auto_now=True)
     source = models.CharField(max_length=100, choices=VERIFIED_SOURCES, default=REDDIT)
     contain_image = False
+    location = models.ForeignKey(to='Location', null=True,
+                                 on_delete=models.SET_NULL)
 
     objects = models.Manager()
     public = EarthManager()
@@ -299,3 +301,21 @@ class FavoriteImageItem(models.Model):
     image = models.ForeignKey(to=EarthImage)
     settings = models.ForeignKey(to=QuerySetting)
     create_date = models.DateTimeField(auto_now_add=True)
+
+
+class Location(models.Model):
+    lat = models.DecimalField(max_digits=16, decimal_places=12, null=True)
+    long = models.DecimalField(max_digits=16, decimal_places=12, null=True)
+    name = models.CharField(max_length=255)
+    link = models.URLField(null=True)
+    google_maps_url = models.URLField(null=True)
+
+    def __str__(self):
+        return self.name
+
+    def get_maps_url(self):
+        url = 'https://www.google.com/maps/?q={lat},{long}&t=k'.format(
+            lat=self.lat,
+            long=self.long
+        )
+        return url
