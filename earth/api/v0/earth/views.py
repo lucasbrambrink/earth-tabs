@@ -81,26 +81,29 @@ class EarthImageSetPublic(generics.DestroyAPIView,
                           generics.UpdateAPIView):
 
     def _update(self, settings_uid, earth_image_id, is_public):
-        image = self._retrieve(settings_uid, earth_image_id)
-        if image:
-            image.is_public = is_public
-            image.save(update_fields=['is_public'])
-            return True
-        else:
-            return False
-
-    def _retrieve(self, settings_uid, earth_image_id):
+        image = self._retrieve(earth_image_id)
         try:
-            setting = QuerySetting.objects\
+            setting = QuerySetting.objects \
                 .get(url_identifier=settings_uid)
             if not setting.is_administrator:
                 raise PermissionError
-            image = EarthImage.objects.get(id=earth_image_id)
-            return image
+
+            if image:
+                image.is_public = is_public
+                image.save(update_fields=['is_public'])
+                return True
+            else:
+                return False
         except (QuerySetting.DoesNotExist,
-                EarthImage.DoesNotExist,
                 PermissionError):
-            return None
+            return False
+
+    def _retrieve(self, earth_image_id):
+        try:
+            return EarthImage.objects.get(id=earth_image_id)
+        except EarthImage.DoesNotExist:
+            pass
+        return None
 
     def get(self, request, settings_uid, earth_image_id, *args, **kwargs):
         image = self._retrieve(settings_uid, earth_image_id)
