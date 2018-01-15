@@ -67,6 +67,9 @@ class EarthImage(models.Model):
     contain_image = False
     location = models.ForeignKey(to='Location', null=True,
                                  on_delete=models.SET_NULL)
+
+    video_url = models.URLField(null=True)
+    is_video = models.BooleanField(default=False)
     google_map_url = ''
     objects = models.Manager()
     public = EarthManager()

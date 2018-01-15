@@ -326,7 +326,6 @@ class FavoriteItemApi(QuerySettingRetrieveMixin,
     lookup_field = 'settings_uid'
     queryset = FavoriteImageItem.objects.all()
 
-
     def create(self, request, *args, **kwargs):
         query_setting = self.get_object(request)
         if query_setting is None:
