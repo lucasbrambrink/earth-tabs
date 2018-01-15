@@ -317,7 +317,8 @@ var _gaq = _gaq || [];
                 return [
                     this.ratio_reddit,
                     this.ratio_apod,
-                    this.ratio_wiki
+                    this.ratio_wiki,
+                    this.ratio_video,
                 ].join(',');
             },
             frequency: function () {
@@ -426,6 +427,7 @@ var _gaq = _gaq || [];
                     contain_reddit: this.contain_reddit,
                     contain_apod: this.contain_apod,
                     contain_wiki: this.contain_wiki,
+                    contain_video: false,
                     filters: this.serializerFilters(),
                     token: settings.token,
                     relative_frequency: this.relative_frequency,
@@ -551,10 +553,10 @@ var _gaq = _gaq || [];
                 }
             },
             getNewImage: function () {
-                var url = API_URL + '/get-video';
-                // if (settings.uid) {
-                //     url += '/' + settings.uid;
-                // }
+                var url = API_URL + '/get';
+                if (settings.uid) {
+                    url += '/' + settings.uid;
+                }
                 var successCallback = (function(that) {
                     return function (resp) {
                         cachedImage = localStorage.getItem('cachedImage');

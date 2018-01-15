@@ -259,7 +259,7 @@ class QuerySetting(models.Model):
 
     @property
     def frequencies(self):
-        frequency = (1, 1, 1)
+        frequency = (1, 1, 1, 1)
         try:
             frequency = tuple(
                 int(f) for f in self.relative_frequency.split(',')
