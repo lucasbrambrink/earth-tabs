@@ -65,15 +65,23 @@ class EarthImageView(generics.RetrieveAPIView):
 
         return self.get_random_object(query_ids)
 
-    def get(self, request, settings_uid=None, *args, **kwargs):
-        obj = self.get_random_object() if settings_uid is None else \
-            self.get_object_via_settings(settings_uid)
 
-        response_status = status.HTTP_206_PARTIAL_CONTENT if self.too_restrictive\
-            else status.HTTP_200_OK
+class EarthImageVideoView(generics.RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    serializers = EarthImageSerializer
+    too_restrictive = False
 
-        return Response(EarthImageSerializer(obj).data,
-                        status=response_status)
+    def get_random_object(self, all_ids=None):
+        all_ids = all_ids or EarthImage.filter(is_video=True)\
+            .values_list('id', flat=True)
+
+        return EarthImage.objects\
+            .get(id=random.choice(all_ids))
+
+    def get(self, request, *args, **kwargs):
+        obj = self.get_random_object()
+        return Response(EarthImageSerializer(obj).data if obj else {},
+                        status=status.HTTP_200_OK)
 
 
 class EarthImageSetPublic(generics.DestroyAPIView,
