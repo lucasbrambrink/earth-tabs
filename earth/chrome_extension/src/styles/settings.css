@@ -31,7 +31,7 @@
 .save-image-btn {
   position: absolute;
   top: 9px;
-  right: -5px;
+  right: 5px;
   background: url('../icons/heart.svg') center center no-repeat;
   height: 2px;
   width: 2px;
@@ -50,6 +50,10 @@
   height: 16px;
   width: 16px;
   cursor: pointer;
+}
+.set-btn {
+  background: url('../icons/play-button.svg') center center no-repeat;
+  background-size: 60%;
 }
 .settings main {
   max-width: 400px;
@@ -176,33 +180,36 @@ img {
   bottom: 0;
   left: 45%;
 }
+.history-container {
+  width: 102%;
+}
 .favorite-container {
   overflow-y: auto;
   overflow-x: hidden;
   height: 360px;
+  width: 103%;
+  margin: 0 -10px;
+  padding: 0 10px;
 }
 .favorite-container .row {
   position: relative;
 }
 .favorite-container .text-field {
-  width: 285px;
+  width: 287px;
   padding-right: 0;
   overflow: hidden;
 }
 .favorite-container .close-btn {
   top: 3px;
-  right: -5px;
+  right: 17px;
   width: 15px;
   height: 15px;
 }
 .favorite-container .set-btn {
   top: 10px;
-  right: 15px;
+  right: 33px;
   width: 1px;
   height: 1px;
-}
-.favorite-container a {
-  font-size: 13px;
 }
 .filter-nav {
   position: absolute;
@@ -351,7 +358,7 @@ form {
   min-width: 15px;
 }
 .row div:nth-child(2) {
-  min-width: 46px;
+  min-width: 38px;
 }
 .row a {
   margin: 5px 0;
@@ -536,9 +543,18 @@ input[type=range]:focus::-ms-fill-upper {
   border-radius: 10px;
   background-color: transparent;
 }
+.show-on-hover-row {
+  border-radius: 3px;
+  padding: 0 10px;
+  margin: 0 -10px;
+  width: 104%;
+}
 .show-on-hover-row .show-on-hover {
   opacity: 0;
   transition: opacity 0.1s ease;
+}
+.show-on-hover-row:hover {
+  background: rgba(26, 25, 51, 0.41);
 }
 .show-on-hover-row:hover .show-on-hover {
   opacity: 1;
