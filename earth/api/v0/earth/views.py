@@ -251,14 +251,20 @@ class QuerySettingSave(QuerySettingRetrieveMixin,
 
         selected_sources = []
         for source in EarthImage.SOURCES:
-            is_selected = values.pop('allow_{}'.format(source))
+            key = 'allow_{}'.format(source)
+            if key not in values:
+                continue
+            is_selected = values.pop(key)
             if is_selected:
                 selected_sources.append(source)
         values['allowed_sources'] = ','.join(selected_sources)
 
         contained_data_sources = []
         for contained_source in EarthImage.SOURCES:
-            is_selected = values.pop('contain_{}'.format(contained_source))
+            key = 'allow_{}'.format(contained_source)
+            if key not in values:
+                continue
+            is_selected = values.pop(key)
             if is_selected:
                 contained_data_sources.append(contained_source)
         values['contain_data_sources'] = ','.join(contained_data_sources)

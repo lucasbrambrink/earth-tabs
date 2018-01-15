@@ -219,6 +219,15 @@
                             v-on:change="queueSettingsUpdate">
                     Enable Videos in new tabs.
                 </label>
+                <label class="distribution" for="wiki_ratio" title="sets relative frequency for videos"
+                       data-toggle="tooltip"
+                    v-show="allow_video && !not_enough_for_ratio">
+                    relative frequency: {{ frequency }}
+                    <input type="range"
+                        id="video_ratio"
+                        v-model="ratio_video"
+                        min="1" max="10" step="1">
+                </label>
             </div>
             <!--<div class="filter-block">-->
                 <!--<input class="save" value="Save" v-model="save_copy"-->

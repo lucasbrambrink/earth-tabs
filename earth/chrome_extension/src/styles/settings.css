@@ -247,11 +247,12 @@ img,
   position: relative;
 }
 .settings nav div:first-child {
-  width: 398px;
+  width: 397px;
   border-bottom: none;
 }
 .settings nav div:nth-child(2),
-.settings nav div:nth-child(3) {
+.settings nav div:nth-child(3),
+.settings nav div:nth-child(4) {
   border-right: none;
 }
 .settings nav div div.check-mark {
