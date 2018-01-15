@@ -74,7 +74,7 @@ class EarthImageView(generics.RetrieveAPIView):
 
         return Response(EarthImageSerializer(obj).data,
                         status=response_status)
-    
+
 
 class EarthImageVideoView(generics.RetrieveAPIView):
     permission_classes = (AllowAny,)
@@ -82,7 +82,8 @@ class EarthImageVideoView(generics.RetrieveAPIView):
     too_restrictive = False
 
     def get_random_object(self, all_ids=None):
-        all_ids = all_ids or EarthImage.filter(is_video=True)\
+        all_ids = all_ids or EarthImage.objects\
+            .filter(is_video=True)\
             .values_list('id', flat=True)
 
         return EarthImage.objects\

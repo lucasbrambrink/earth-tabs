@@ -537,10 +537,10 @@ var _gaq = _gaq || [];
                 }
             },
             getNewImage: function () {
-                var url = API_URL + '/get';
-                if (settings.uid) {
-                    url += '/' + settings.uid;
-                }
+                var url = API_URL + '/get-video';
+                // if (settings.uid) {
+                //     url += '/' + settings.uid;
+                // }
                 var successCallback = (function(that) {
                     return function (resp) {
                         cachedImage = localStorage.getItem('cachedImage');
