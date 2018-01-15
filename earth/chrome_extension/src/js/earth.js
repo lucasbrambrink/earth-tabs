@@ -9,9 +9,20 @@ var API_URL = 'https://earth-pics.tk/api/v0/earth';
 /* Utils */
 var setImage = function (image_data) {
     var imageDiv = document.getElementById('initial-load-image');
-    imageDiv.style.backgroundImage = "url('" + image_data.preferred_image_url + "')";
-    if (image_data.contain_image) {
-        imageDiv.style.backgroundSize = 'contain';
+    if (image_data.is_video) {
+        var video_source = document.getElementById('video-source');
+        video_source.src = image_data.video_url;
+        var video = document.getElementById('video');
+        setTimeout(function () {
+            video.play();
+        }, 100);
+        imageDiv.style.display = 'none';
+    } else {
+        imageDiv.style.backgroundImage = "url('" + image_data.preferred_image_url + "')";
+        if (image_data.contain_image) {
+            imageDiv.style.backgroundSize = 'contain';
+        }
+        imageDiv.style.display = 'block';
     }
 };
 var getRandomToken = function () {
@@ -81,7 +92,7 @@ var _gaq = _gaq || [];
         template: '#image',
         props: ["image_url", "permalink", "title", "author",
             "contain_image", "is_administrator", "favorited", "maps_url",
-            "align",
+            "align", "is_video", "video_url",
             "cached_image_url"],
         computed: {
             styleObject: function() {
@@ -253,12 +264,14 @@ var _gaq = _gaq || [];
             allow_reddit: false,
             allow_apod: false,
             allow_wiki: false,
+            allow_video: false,
             contain_reddit: false,
             contain_apod: false,
             contain_wiki: false,
             ratio_reddit: 1,
             ratio_apod: 1,
             ratio_wiki: 1,
+            ratio_video: 1,
             save_copy: "Save",
             saving: false,
             loaded_history: false,
@@ -409,6 +422,7 @@ var _gaq = _gaq || [];
                     allow_reddit: this.allow_reddit,
                     allow_apod: this.allow_apod,
                     allow_wiki: this.allow_wiki,
+                    allow_video: this.allow_video,
                     contain_reddit: this.contain_reddit,
                     contain_apod: this.contain_apod,
                     contain_wiki: this.contain_wiki,

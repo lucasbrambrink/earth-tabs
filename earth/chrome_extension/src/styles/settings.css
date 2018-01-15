@@ -155,10 +155,13 @@ form input[type=submit]:focus {
 .sources input {
   width: 20px;
 }
-img {
+img,
+#cached-video {
   position: absolute;
   z-index: -1;
   opacity: 0;
+  top: 0;
+  left: 0;
 }
 .history {
   height: 420px;
@@ -236,7 +239,7 @@ img {
   height: 80px;
 }
 .settings nav div {
-  width: 132px;
+  width: 98.5px;
   height: 35px;
   border: 1px solid #FCFCFC;
   display: inline-block;
@@ -529,6 +532,12 @@ input[type=range]:focus::-ms-fill-upper {
   background-size: 30px;
   background-position: center;
 }
+#video-btn {
+  background-image: url(../icons/video-camera.svg);
+  background-repeat: no-repeat;
+  background-size: 26px;
+  background-position: center;
+}
 .styled-scrollbar::-webkit-scrollbar {
   width: 5px;
   background-color: transparent;
@@ -574,4 +583,10 @@ input[type=range]:focus::-ms-fill-upper {
 }
 #main-image article:hover .author {
   opacity: 0.65 !important;
+}
+video {
+  min-height: 100%;
+  width: auto;
+  min-width: 100%;
+  float: left;
 }

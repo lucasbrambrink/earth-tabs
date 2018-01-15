@@ -10,7 +10,9 @@
 
 <body class="earth" id="vm-settings">
     <div class="image" id="initial-load-image"></div>
-    <video><source type="video/mp4"></video>
+    <video id="video" loop>
+        <source id="video-source" type="video/mp4">
+    </video>
     <earth-image v-for="image in image_data"
         :align="align"
         :cached_image_url="cached_image_url"
@@ -20,7 +22,9 @@
         :title="image.title"
         :is_administrator="image.is_administrator"
         :maps_url="image.google_map_url"
-        :contain_image="image.contain_image">
+        :contain_image="image.contain_image"
+        :is_video="image.is_video"
+        :video_url="image.video_url">
     </earth-image>
 
     <section class="settings" v-show="show_main_index > 0" v-bind:class="{active: show_main_index > 0}">
@@ -65,6 +69,14 @@
                         </button>
                     <span v-bind:class="{active: allow_wiki, hide: hide_ratios}"
                           class="ratio" v-text="ratio_wiki + 'x'"
+                          title="indicates the relative frequency to other data source"></span>
+                    <div class="check-mark"></div>
+                </div>
+                <div v-on:click.prevent="filterNav = 4" v-bind:class="{selected: allow_video}">
+                    <button title="Videos" id="video-btn" v-bind:class="{active: filterNav === 4}">
+                        </button>
+                    <span v-bind:class="{active: allow_video, hide: hide_ratios}"
+                          class="ratio" v-text="ratio_video + 'x'"
                           title="indicates the relative frequency to other data source"></span>
                     <div class="check-mark"></div>
                 </div>
@@ -200,6 +212,14 @@
                 </div>
             </div>
 
+            <div v-show="filterNav === 4">
+                <label for="allow_video">
+                    <input type="checkbox" name="wiki" value="wiki"
+                           v-model="allow_video" id="allow_video"
+                            v-on:change="queueSettingsUpdate">
+                    Enable Videos in new tabs.
+                </label>
+            </div>
             <!--<div class="filter-block">-->
                 <!--<input class="save" value="Save" v-model="save_copy"-->
                        <!--v-bind:class="{saved: saving}"-->
@@ -296,6 +316,9 @@
     <div class="image-container">
         <!--<div class="image" v-bind:style="styleObject"></div>-->
         <img id="cached-image" v-bind:src="cached_image_url" />
+        <!--<video v-if="is_video" id="cached-video">-->
+            <!--<source v-bind:src="video_url" id="cached-video-source" type="video/mp4">-->
+        <!--</video>-->
         <section id="main-image" v-show="!showSettings">
             <article v-bind:class="{left: align === 1}">
                 <section class="info">

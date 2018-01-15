@@ -33,15 +33,17 @@ class EarthImage(models.Model):
     REDDIT = 'reddit'
     APOD = 'apod'
     WIKI = 'wiki'
+    VIDEO = 'video'
     ALL = 'all'
     # WIKIPEDIA = 'wikipedia'
     VERIFIED_SOURCES = (
         (ALL, 'all'),
         (REDDIT, 'reddit.com/r/Earth'),
         (APOD, "NASA's Astronomy Picture of the Day"),
-        (WIKI, 'Wikipedia Picture of the Day')
+        (WIKI, 'Wikipedia Picture of the Day'),
+        (VIDEO, 'Video')
     )
-    SOURCES = (REDDIT, APOD, WIKI)
+    SOURCES = (REDDIT, APOD, WIKI, VIDEO)
 
     # fields
     permalink = models.URLField()
