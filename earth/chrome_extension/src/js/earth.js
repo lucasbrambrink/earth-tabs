@@ -136,7 +136,6 @@ var _gaq = _gaq || [];
                 vmSettings.refreshImageWithId(this.image_id);
             }
         }
-
     });
 
     var filter = Vue.component('filter', {
