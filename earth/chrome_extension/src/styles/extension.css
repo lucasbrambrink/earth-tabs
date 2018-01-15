@@ -78,7 +78,6 @@ body.earth {
 }
 #main-image nav.left {
     /*opacity: 0.5;*/
-    position: absolute;
     bottom: 10px;
     left: 25px;
     font-size: 70%;

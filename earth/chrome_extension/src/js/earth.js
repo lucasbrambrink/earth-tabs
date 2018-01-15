@@ -17,6 +17,7 @@ var setImage = function (image_data) {
             video.play();
         }, 100);
         imageDiv.style.display = 'none';
+        // localStorage.removeItem('cachedImage');
     } else {
         imageDiv.style.backgroundImage = "url('" + image_data.preferred_image_url + "')";
         if (image_data.contain_image) {
@@ -342,6 +343,9 @@ var _gaq = _gaq || [];
                 if (this.allow_wiki) {
                     active.push(this.ratio_wiki)
                 }
+                if (this.allow_video) {
+                    active.push(this.ratio_video)
+                }
                 return active;
             }
         },
@@ -360,7 +364,7 @@ var _gaq = _gaq || [];
                         that['contain_' + source] = true;
                     }
                     var relative_frequency = resp.relative_frequency.split(',');
-                    var sources = ['reddit', 'apod', 'wiki'];
+                    var sources = ['reddit', 'apod', 'wiki', 'video'];
                     for(i = 0; i < relative_frequency.length; i++) {
                         source = sources[i];
                         var freq = parseInt(relative_frequency[i]);
@@ -565,9 +569,13 @@ var _gaq = _gaq || [];
                         if (cachedImage === null) {
                             that.image_data = [resp];
                             setImage(resp);
-                            that.getNewImage();
+                            if (!this.is_video) {
+                                that.getNewImage();
+                            }
                         } else {
-                            that.cached_image_url = resp.preferred_image_url;
+                            if (!resp.is_video) {
+                                that.cached_image_url = resp.preferred_image_url;
+                            }
                         }
                     }
                 })(this);
