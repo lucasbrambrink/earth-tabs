@@ -9,14 +9,15 @@ var API_URL = 'https://earth-pics.tk/api/v0/earth';
 /* Utils */
 var setImage = function (image_data) {
     var imageDiv = document.getElementById('initial-load-image');
+    var video = document.getElementById('video');
     if (image_data.is_video) {
         var video_source = document.getElementById('video-source');
         video_source.src = image_data.video_url;
-        var video = document.getElementById('video');
         setTimeout(function () {
             video.play();
         }, 100);
         imageDiv.style.display = 'none';
+        video.style.display = 'block';
         // localStorage.removeItem('cachedImage');
     } else {
         imageDiv.style.backgroundImage = "url('" + image_data.preferred_image_url + "')";
@@ -24,6 +25,7 @@ var setImage = function (image_data) {
             imageDiv.style.backgroundSize = 'contain';
         }
         imageDiv.style.display = 'block';
+        video.style.display = 'none';
     }
 };
 var getRandomToken = function () {
