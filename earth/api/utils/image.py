@@ -30,6 +30,9 @@ class InspectImage(ScrapingMixin,
     @classmethod
     def inspect(cls, image_obj, commit=True):
         try:
+            # need to make sure not to invalidate videos.
+            if image_obj.is_video:
+                return
             image = cls.get_image(url=image_obj.preferred_image_url)
         except (ValueError, OSError):
             image = None
