@@ -143,8 +143,6 @@ class EarthScraper(ScrapingMixin, object):
         try:
             data = content[0]['data']['children'][0]['data']
         except (IndexError, KeyError):
-            import ipdb
-            ipdb.set_trace()
             pass
 
         return data
