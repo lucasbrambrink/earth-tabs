@@ -64,8 +64,8 @@ class EarthImage(models.Model):
     resolution_height = models.IntegerField(null=True)
     last_seen = models.DateTimeField(auto_now=True)
     source = models.CharField(max_length=100, choices=VERIFIED_SOURCES, default=REDDIT)
-    modify_date = models.DateTimeField(auto_now=True)
-    create_date = models.DateTimeField(auto_now_add=True)
+    modify_date = models.DateTimeField(auto_now=True, null=True)
+    create_date = models.DateTimeField(auto_now_add=True, null=True)
     contain_image = False
 
     objects = models.Manager()
@@ -241,8 +241,8 @@ class QuerySetting(models.Model):
     device_token = models.CharField(max_length=255, default='')
     is_administrator = models.BooleanField(default=False)
     align = models.IntegerField(default=0)
-    modify_date = models.DateTimeField(auto_now=True)
-    create_date = models.DateTimeField(auto_now_add=True)
+    modify_date = models.DateTimeField(auto_now=True, null=True)
+    create_date = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return self.url_identifier
