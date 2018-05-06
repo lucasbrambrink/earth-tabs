@@ -5,6 +5,7 @@ from api.models import EarthImage, QuerySetting, Filter, FavoriteImageItem
 class EarthImageSerializer(serializers.ModelSerializer):
     contain_image = serializers.BooleanField(default=False)
     is_administrator = serializers.BooleanField(default=False)
+    google_map_url = serializers.CharField(max_length=255)
 
     class Meta:
         model = EarthImage

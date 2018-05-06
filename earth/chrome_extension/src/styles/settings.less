@@ -45,7 +45,20 @@
     width: 30px;
   }
 }
-.refresh-btn {
+.save-image-btn {
+  position: absolute;
+  top: 9px;
+  right: 5px;
+  background: url('../icons/heart.svg') center center no-repeat;
+  height: 2px;
+  width: 2px;
+  cursor: pointer;
+  &.saved {
+    height: 1px;
+    background: url('../icons/heart_fill.svg') center center no-repeat;
+  }
+}
+.refresh-btn, .set-btn {
   position: absolute;
   top: 12px;
   right: 35px;
@@ -53,6 +66,10 @@
   height: 16px;
   width: 16px;
   cursor: pointer;
+}
+.set-btn {
+  background: url('../icons/play-button.svg') center center no-repeat;
+  background-size: 60%;
 }
 .settings main {
     max-width: 400px;
@@ -184,15 +201,20 @@ form {
   }
 }
 
-img {
+img, #cached-video {
   position: absolute;
   z-index: -1;
   opacity: 0;
+  top: 0;
+  left: 0;
 }
 
 .history {
   //opacity: 0;
   //overflow-y: scroll;
+  .row {
+    position: relative;
+  }
   height: 420px;
   a {
     text-decoration: none;
@@ -209,29 +231,39 @@ img {
     left: 45%;
   }
 }
+.history-container {
+  width: 102%;
+}
 .favorites {
   //margin-bottom: 25px;
   //padding-bottom: 0;
 }
 .favorite-container {
   overflow-y: auto;
+  overflow-x: hidden;
   height: 360px;
+  width: 103%;
+  margin: 0 -10px;
+  padding: 0 10px;
   .row {
     position: relative;
   }
   .text-field {
-    width: 285px;
+    width: 287px;
     padding-right: 0;
     overflow: hidden;
   }
   .close-btn {
     top: 3px;
-    right: 0;
+    right: 17px;
     width: 15px;
     height: 15px;
   }
-  a {
-    font-size: 13px;
+  .set-btn {
+    top: 10px;
+    right: 33px;
+    width: 1px;
+    height: 1px;
   }
 }
 
@@ -260,18 +292,19 @@ img {
 .settings nav {
   height: 80px;
   div {
-    width: 132px;
+    width: 98.5px;
     height: 35px;
     border: 1px solid @white;
     display: inline-block;
     float: left;
     position: relative;
     &:first-child {
-      width: 398px;
+      width: 397px;
       border-bottom: none;
     }
     &:nth-child(2),
-    &:nth-child(3){
+    &:nth-child(3),
+    &:nth-child(4) {
       border-right: none;
     }
     div.check-mark {
@@ -285,8 +318,8 @@ img {
       height: 100%;
       background-image: url(../icons/tick.svg);
       background-repeat: no-repeat;
-      background-size: 16px;
-      background-position: 110px 9px;
+      background-size: 13px;
+      background-position: 75px 11px;
       display: none;
     }
     &.selected .check-mark {
@@ -387,7 +420,7 @@ form {
     min-width: 15px;
   }
   div:nth-child(2) {
-    min-width: 46px;
+    min-width: 38px;
   }
   a {
     margin: 5px 0;
@@ -567,7 +600,12 @@ input[type=range]:focus::-ms-fill-upper {
   background-size: 30px;
   background-position: center;
 }
-
+#video-btn {
+  background-image: url(../icons/video-camera.svg);
+  background-repeat: no-repeat;
+  background-size: 26px;
+  background-position: center;
+}
 
 .styled-scrollbar {
   &::-webkit-scrollbar {
@@ -584,4 +622,42 @@ input[type=range]:focus::-ms-fill-upper {
     border-radius: 10px;
     background-color: transparent;
   }
+}
+.show-on-hover-row {
+  .show-on-hover {
+    opacity: 0;
+    transition: opacity 0.1s ease;
+  }
+  border-radius: 3px;
+  padding: 0 10px;
+  margin: 0 -10px;
+  width: 104%;
+  &:hover {
+    background: @opaque-blue-dark;
+    .show-on-hover {
+      opacity: 1;
+    }
+  }
+}
+#main-image article {
+  transition: background 0.2s ease;
+  a, .author {
+    transition: opacity 0.2s ease;
+  }
+  &:hover {
+    background: @opaque-bg-light;
+    a {
+      opacity: 0.9 !important;
+    }
+    .author {
+        opacity: 0.65 !important;
+    }
+  }
+}
+video {
+  min-height: 100%;
+  min-width: 100%;
+  object-fit: cover;
+  width: auto;
+  float: left;
 }

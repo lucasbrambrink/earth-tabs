@@ -33,15 +33,17 @@ class EarthImage(models.Model):
     REDDIT = 'reddit'
     APOD = 'apod'
     WIKI = 'wiki'
+    VIDEO = 'video'
     ALL = 'all'
     # WIKIPEDIA = 'wikipedia'
     VERIFIED_SOURCES = (
         (ALL, 'all'),
         (REDDIT, 'reddit.com/r/Earth'),
         (APOD, "NASA's Astronomy Picture of the Day"),
-        (WIKI, 'Wikipedia Picture of the Day')
+        (WIKI, 'Wikipedia Picture of the Day'),
+        (VIDEO, 'Video')
     )
-    SOURCES = (REDDIT, APOD, WIKI)
+    SOURCES = (REDDIT, APOD, WIKI, VIDEO)
 
     # fields
     permalink = models.URLField()
@@ -67,7 +69,12 @@ class EarthImage(models.Model):
     modify_date = models.DateTimeField(auto_now=True, null=True)
     create_date = models.DateTimeField(auto_now_add=True, null=True)
     contain_image = False
+    location = models.ForeignKey(to='Location', null=True,
+                                 on_delete=models.SET_NULL)
 
+    video_url = models.URLField(null=True)
+    is_video = models.BooleanField(default=False)
+    google_map_url = ''
     objects = models.Manager()
     public = EarthManager()
     marketing = MarketingManager()
@@ -256,7 +263,7 @@ class QuerySetting(models.Model):
 
     @property
     def frequencies(self):
-        frequency = (1, 1, 1)
+        frequency = (1, 1, 1, 1)
         try:
             frequency = tuple(
                 int(f) for f in self.relative_frequency.split(',')
@@ -303,3 +310,20 @@ class FavoriteImageItem(models.Model):
     image = models.ForeignKey(to=EarthImage)
     settings = models.ForeignKey(to=QuerySetting)
     create_date = models.DateTimeField(auto_now_add=True)
+
+
+class Location(models.Model):
+    lat = models.DecimalField(max_digits=16, decimal_places=12, null=True)
+    long = models.DecimalField(max_digits=16, decimal_places=12, null=True)
+    name = models.CharField(max_length=255)
+    link = models.URLField(null=True)
+    google_maps_url = models.URLField(null=True)
+
+    def __str__(self):
+        return self.name
+
+    def get_maps_url(self):
+        url = 'https://www.google.com/maps/?q={name}&t=k&zoom=20'.format(
+            name='+'.join(self.name.split()),
+        )
+        return url

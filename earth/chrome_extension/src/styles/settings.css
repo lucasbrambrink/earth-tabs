@@ -28,7 +28,21 @@
   height: 30px;
   width: 30px;
 }
-.refresh-btn {
+.save-image-btn {
+  position: absolute;
+  top: 9px;
+  right: 5px;
+  background: url('../icons/heart.svg') center center no-repeat;
+  height: 2px;
+  width: 2px;
+  cursor: pointer;
+}
+.save-image-btn.saved {
+  height: 1px;
+  background: url('../icons/heart_fill.svg') center center no-repeat;
+}
+.refresh-btn,
+.set-btn {
   position: absolute;
   top: 12px;
   right: 35px;
@@ -36,6 +50,10 @@
   height: 16px;
   width: 16px;
   cursor: pointer;
+}
+.set-btn {
+  background: url('../icons/play-button.svg') center center no-repeat;
+  background-size: 60%;
 }
 .settings main {
   max-width: 400px;
@@ -137,13 +155,19 @@ form input[type=submit]:focus {
 .sources input {
   width: 20px;
 }
-img {
+img,
+#cached-video {
   position: absolute;
   z-index: -1;
   opacity: 0;
+  top: 0;
+  left: 0;
 }
 .history {
   height: 420px;
+}
+.history .row {
+  position: relative;
 }
 .history a {
   text-decoration: none;
@@ -159,26 +183,36 @@ img {
   bottom: 0;
   left: 45%;
 }
+.history-container {
+  width: 102%;
+}
 .favorite-container {
   overflow-y: auto;
+  overflow-x: hidden;
   height: 360px;
+  width: 103%;
+  margin: 0 -10px;
+  padding: 0 10px;
 }
 .favorite-container .row {
   position: relative;
 }
 .favorite-container .text-field {
-  width: 285px;
+  width: 287px;
   padding-right: 0;
   overflow: hidden;
 }
 .favorite-container .close-btn {
   top: 3px;
-  right: 0;
+  right: 17px;
   width: 15px;
   height: 15px;
 }
-.favorite-container a {
-  font-size: 13px;
+.favorite-container .set-btn {
+  top: 10px;
+  right: 33px;
+  width: 1px;
+  height: 1px;
 }
 .filter-nav {
   position: absolute;
@@ -205,7 +239,7 @@ img {
   height: 80px;
 }
 .settings nav div {
-  width: 132px;
+  width: 98.5px;
   height: 35px;
   border: 1px solid #FCFCFC;
   display: inline-block;
@@ -213,11 +247,12 @@ img {
   position: relative;
 }
 .settings nav div:first-child {
-  width: 398px;
+  width: 397px;
   border-bottom: none;
 }
 .settings nav div:nth-child(2),
-.settings nav div:nth-child(3) {
+.settings nav div:nth-child(3),
+.settings nav div:nth-child(4) {
   border-right: none;
 }
 .settings nav div div.check-mark {
@@ -231,8 +266,8 @@ img {
   height: 100%;
   background-image: url(../icons/tick.svg);
   background-repeat: no-repeat;
-  background-size: 16px;
-  background-position: 110px 9px;
+  background-size: 13px;
+  background-position: 75px 11px;
   display: none;
 }
 .settings nav div.selected .check-mark {
@@ -327,7 +362,7 @@ form {
   min-width: 15px;
 }
 .row div:nth-child(2) {
-  min-width: 46px;
+  min-width: 38px;
 }
 .row a {
   margin: 5px 0;
@@ -498,6 +533,12 @@ input[type=range]:focus::-ms-fill-upper {
   background-size: 30px;
   background-position: center;
 }
+#video-btn {
+  background-image: url(../icons/video-camera.svg);
+  background-repeat: no-repeat;
+  background-size: 26px;
+  background-position: center;
+}
 .styled-scrollbar::-webkit-scrollbar {
   width: 5px;
   background-color: transparent;
@@ -511,4 +552,43 @@ input[type=range]:focus::-ms-fill-upper {
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   background-color: transparent;
+}
+.show-on-hover-row {
+  border-radius: 3px;
+  padding: 0 10px;
+  margin: 0 -10px;
+  width: 104%;
+}
+.show-on-hover-row .show-on-hover {
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+.show-on-hover-row:hover {
+  background: rgba(26, 25, 51, 0.41);
+}
+.show-on-hover-row:hover .show-on-hover {
+  opacity: 1;
+}
+#main-image article {
+  transition: background 0.2s ease;
+}
+#main-image article a,
+#main-image article .author {
+  transition: opacity 0.2s ease;
+}
+#main-image article:hover {
+  background: rgba(26, 25, 51, 0.41);
+}
+#main-image article:hover a {
+  opacity: 0.9 !important;
+}
+#main-image article:hover .author {
+  opacity: 0.65 !important;
+}
+video {
+  min-height: 100%;
+  min-width: 100%;
+  object-fit: cover;
+  width: auto;
+  float: left;
 }

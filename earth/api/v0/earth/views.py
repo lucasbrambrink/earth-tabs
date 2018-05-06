@@ -59,6 +59,8 @@ class EarthImageView(generics.RetrieveAPIView):
                 image.contain_image = True
 
             image.is_administrator = setting.is_administrator
+            if image.location:
+                image.google_map_url = image.location.get_maps_url()
             return image
 
         return self.get_random_object(query_ids)
@@ -67,30 +69,69 @@ class EarthImageView(generics.RetrieveAPIView):
         obj = self.get_random_object() if settings_uid is None else \
             self.get_object_via_settings(settings_uid)
 
-        response_status = status.HTTP_206_PARTIAL_CONTENT if self.too_restrictive\
+        response_status = status.HTTP_206_PARTIAL_CONTENT if self.too_restrictive \
             else status.HTTP_200_OK
 
         return Response(EarthImageSerializer(obj).data,
                         status=response_status)
 
 
+class EarthImageVideoView(generics.RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    serializers = EarthImageSerializer
+    too_restrictive = False
+
+    def get_random_object(self, all_ids=None):
+        all_ids = all_ids or EarthImage.objects\
+            .filter(is_video=True)\
+            .values_list('id', flat=True)
+
+        return EarthImage.objects\
+            .get(id=random.choice(all_ids))
+
+    def get(self, request, *args, **kwargs):
+        obj = self.get_random_object()
+        return Response(EarthImageSerializer(obj).data if obj else {},
+                        status=status.HTTP_200_OK)
+
+
 class EarthImageSetPublic(generics.DestroyAPIView,
+                          generics.RetrieveAPIView,
                           generics.UpdateAPIView):
 
     def _update(self, settings_uid, earth_image_id, is_public):
+        image = self._retrieve(earth_image_id)
         try:
-            setting = QuerySetting.objects\
+            setting = QuerySetting.objects \
                 .get(url_identifier=settings_uid)
             if not setting.is_administrator:
                 raise PermissionError
-            image = EarthImage.objects.get(id=earth_image_id)
-            image.is_public = is_public
-            image.save(update_fields=['is_public'])
+
+            if image:
+                image.is_public = is_public
+                image.save(update_fields=['is_public'])
+                return True
+            else:
+                return False
         except (QuerySetting.DoesNotExist,
-                EarthImage.DoesNotExist,
                 PermissionError):
             return False
-        return True
+
+    def _retrieve(self, earth_image_id):
+        try:
+            return EarthImage.objects.get(id=earth_image_id)
+        except EarthImage.DoesNotExist:
+            pass
+        return None
+
+    def get(self, request, settings_uid, earth_image_id, *args, **kwargs):
+        image = self._retrieve(earth_image_id)
+        if not image:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        if image.location:
+            image.google_map_url = image.location.get_maps_url()
+        return Response(EarthImageSerializer(image).data,
+                        status=status.HTTP_200_OK)
 
     def put(self, request, settings_uid, earth_image_id, *args, **kwargs):
         success = self._update(settings_uid, earth_image_id,
@@ -210,14 +251,20 @@ class QuerySettingSave(QuerySettingRetrieveMixin,
 
         selected_sources = []
         for source in EarthImage.SOURCES:
-            is_selected = values.pop('allow_{}'.format(source))
+            key = 'allow_{}'.format(source)
+            if key not in values:
+                continue
+            is_selected = values.pop(key)
             if is_selected:
                 selected_sources.append(source)
         values['allowed_sources'] = ','.join(selected_sources)
 
         contained_data_sources = []
         for contained_source in EarthImage.SOURCES:
-            is_selected = values.pop('contain_{}'.format(contained_source))
+            key = 'allow_{}'.format(contained_source)
+            if key not in values:
+                continue
+            is_selected = values.pop(key)
             if is_selected:
                 contained_data_sources.append(contained_source)
         values['contain_data_sources'] = ','.join(contained_data_sources)
@@ -303,7 +350,6 @@ class FavoriteItemApi(QuerySettingRetrieveMixin,
     permission_classes = (AllowAny,)
     lookup_field = 'settings_uid'
     queryset = FavoriteImageItem.objects.all()
-
 
     def create(self, request, *args, **kwargs):
         query_setting = self.get_object(request)

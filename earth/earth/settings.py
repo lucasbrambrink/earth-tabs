@@ -133,6 +133,7 @@ SHELL_PLUS_POST_IMPORTS = [
     ('api.data_sources.reddit', ('EarthScraper')),
     ('api.data_sources.apod', ('ApodScraper')),
     ('api.data_sources.wiki', ('WikiScraper')),
+    ('api.utils.scraping', ('GetLatLong', 'StateParks')),
 ]
 
 

@@ -9,9 +9,23 @@ var API_URL = 'https://earth-pics.tk/api/v0/earth';
 /* Utils */
 var setImage = function (image_data) {
     var imageDiv = document.getElementById('initial-load-image');
-    imageDiv.style.backgroundImage = "url('" + image_data.preferred_image_url + "')";
-    if (image_data.contain_image) {
-        imageDiv.style.backgroundSize = 'contain';
+    var video = document.getElementById('video');
+    if (image_data.is_video) {
+        var video_source = document.getElementById('video-source');
+        video_source.src = image_data.video_url;
+        setTimeout(function () {
+            video.play();
+        }, 100);
+        imageDiv.style.display = 'none';
+        video.style.display = 'block';
+        // localStorage.removeItem('cachedImage');
+    } else {
+        imageDiv.style.backgroundImage = "url('" + image_data.preferred_image_url + "')";
+        if (image_data.contain_image) {
+            imageDiv.style.backgroundSize = 'contain';
+        }
+        imageDiv.style.display = 'block';
+        video.style.display = 'none';
     }
 };
 var getRandomToken = function () {
@@ -80,8 +94,8 @@ var _gaq = _gaq || [];
     var imageItem = Vue.component('earth-image', {
         template: '#image',
         props: ["image_url", "permalink", "title", "author",
-            "contain_image", "is_administrator", "favorited",
-            "align",
+            "contain_image", "is_administrator", "favorited", "maps_url",
+            "align", "is_video", "video_url",
             "cached_image_url"],
         computed: {
             styleObject: function() {
@@ -106,23 +120,36 @@ var _gaq = _gaq || [];
             favoriteThisImage: function () {
                 this.favorited = true;
                 vmSettings.favoriteThisImage();
+            },
+            go_to_map: function () {
+                window.open(
+                    this.maps_url
+                );
             }
         }
     });
 
     var historyItem = Vue.component('history', {
         template: '#history',
-        props: ["index", "image_url", "permalink", "title"],
+        props: ["index", "image_url", "permalink", "title", "image_id", "saved"],
+        methods : {
+            save: function () {
+                this.saved = true;
+                vmSettings.favoriteImage(this.image_id);
+            }
+        }
     });
     var favoriteItem = Vue.component('favorite', {
         template: '#favorites',
-        props: ["index", "image_url", "permalink", "title"],
+        props: ["index", "image_url", "permalink", "title", "image_id"],
         methods: {
             delete: function () {
-                console.log('deleted!');
+                vmSettings.deleteFavoriteImage(this.image_id);
+            },
+            set_image: function () {
+                vmSettings.refreshImageWithId(this.image_id);
             }
         }
-
     });
 
     var filter = Vue.component('filter', {
@@ -240,12 +267,14 @@ var _gaq = _gaq || [];
             allow_reddit: false,
             allow_apod: false,
             allow_wiki: false,
+            allow_video: false,
             contain_reddit: false,
             contain_apod: false,
             contain_wiki: false,
             ratio_reddit: 1,
             ratio_apod: 1,
             ratio_wiki: 1,
+            ratio_video: 1,
             save_copy: "Save",
             saving: false,
             loaded_history: false,
@@ -291,7 +320,8 @@ var _gaq = _gaq || [];
                 return [
                     this.ratio_reddit,
                     this.ratio_apod,
-                    this.ratio_wiki
+                    this.ratio_wiki,
+                    this.ratio_video,
                 ].join(',');
             },
             frequency: function () {
@@ -315,6 +345,9 @@ var _gaq = _gaq || [];
                 if (this.allow_wiki) {
                     active.push(this.ratio_wiki)
                 }
+                if (this.allow_video) {
+                    active.push(this.ratio_video)
+                }
                 return active;
             }
         },
@@ -333,7 +366,7 @@ var _gaq = _gaq || [];
                         that['contain_' + source] = true;
                     }
                     var relative_frequency = resp.relative_frequency.split(',');
-                    var sources = ['reddit', 'apod', 'wiki'];
+                    var sources = ['reddit', 'apod', 'wiki', 'video'];
                     for(i = 0; i < relative_frequency.length; i++) {
                         source = sources[i];
                         var freq = parseInt(relative_frequency[i]);
@@ -396,9 +429,11 @@ var _gaq = _gaq || [];
                     allow_reddit: this.allow_reddit,
                     allow_apod: this.allow_apod,
                     allow_wiki: this.allow_wiki,
+                    allow_video: this.allow_video,
                     contain_reddit: this.contain_reddit,
                     contain_apod: this.contain_apod,
                     contain_wiki: this.contain_wiki,
+                    contain_video: false,
                     filters: this.serializerFilters(),
                     token: settings.token,
                     relative_frequency: this.relative_frequency,
@@ -536,9 +571,13 @@ var _gaq = _gaq || [];
                         if (cachedImage === null) {
                             that.image_data = [resp];
                             setImage(resp);
-                            that.getNewImage();
+                            if (!this.is_video) {
+                                that.getNewImage();
+                            }
                         } else {
-                            that.cached_image_url = resp.preferred_image_url;
+                            if (!resp.is_video) {
+                                that.cached_image_url = resp.preferred_image_url;
+                            }
                         }
                     }
                 })(this);
@@ -547,13 +586,27 @@ var _gaq = _gaq || [];
                         console.log('Image Request Failed');
                 });
             },
+            favoriteImage: function (image_id) {
+                var that = this;
+                $.ajax({
+                    url: API_URL + '/favorite/' + settings.uid + '/' + image_id,
+                    method: 'POST',
+                    headers: {'token': settings.token}
+                }).success(function() {
+                    that.loadFavorites();
+                });
+            },
             favoriteThisImage: function () {
                 _gaq.push(['_trackEvent', 'favorite item', 'clicked']);
-                var that = this;
                 var image = this.image_data[0];
+                this.favoriteImage(image.id);
+            },
+            deleteFavoriteImage: function(image_id) {
+                _gaq.push(['_trackEvent', 'favorite item deleted', 'clicked']);
+                var that = this;
                 $.ajax({
-                    url: API_URL + '/favorite/' + settings.uid + '/' + image.id,
-                    method: 'POST',
+                    url: API_URL + '/favorite/' + settings.uid + '/' + image_id,
+                    method: 'DELETE',
                     headers: {'token': settings.token}
                 }).success(function() {
                     that.loadFavorites();
@@ -562,6 +615,17 @@ var _gaq = _gaq || [];
             setAlign: function(num) {
                 this.align = num;
                 this.queueSettingsUpdate();
+            },
+            refreshImageWithId: function(image_id) {
+                var that = this;
+                $.ajax({
+                    url: API_URL + '/get/' + settings.uid + '/' + image_id,
+                    method: 'GET',
+                    headers: {'token': settings.token}
+                }).success(function(resp) {
+                    that.image_data = [resp];
+                    setImage(resp);
+                });
             }
         }
     });
