@@ -632,7 +632,18 @@ var _gaq = _gaq || [];
                     that.image_data = [resp];
                     setImage(resp);
                 });
-            }
+            },
+            favoritesChange: function(event) {
+                var selected_own = event.target.name === 'only_favorites_own';
+                var selected_general = event.target.name === 'only_favorites';
+                if (selected_own && this.only_favorites) {
+                    this.only_favorites = false
+                }
+                if (selected_general && this.only_favorites_own) {
+                    this.only_favorites_own = false;
+                }
+                this.queueSettingsUpdate();
+            },
         }
     });
     window.vmSettings = vmSettings;

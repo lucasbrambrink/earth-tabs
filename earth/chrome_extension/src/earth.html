@@ -24,6 +24,7 @@
         :maps_url="image.google_map_url"
         :contain_image="image.contain_image"
         :is_video="image.is_video"
+        :favorited="image.is_favorite"
         :video_url="image.video_url">
     </earth-image>
 
@@ -91,40 +92,20 @@
                     <button class="align-btn right" v-bind:class="{active: align === 0}"
                             v-on:click.prevent="setAlign(0)"></button>
                 </div>
-
                 <label for="only_favorites">
                     <input type="checkbox"
                            name="only_favorites" value="only_favorites"
                            v-model="only_favorites" id="only_favorites"
-                           v-on:change="queueSettingsUpdate">
+                           v-on:click="favoritesChange">
                     Only show images from everybody's favorites
                 </label>
                 <label for="only_favorites_own">
                     <input type="checkbox"
                            name="only_favorites_own" value="only_favorites_own"
                            v-model="only_favorites_own" id="only_favorites_own"
-                           v-on:change="queueSettingsUpdate">
+                           v-on:click="favoritesChange">
                     Only show images from your own favorites
                 </label>
-                <!--<label for="allow_reddit">-->
-                    <!---->
-                    <!---->
-                    <!---->
-                    <!--<select name="reddit" value="reddit"-->
-                           <!--v-model="align_info_box" id="align_info_box"-->
-                            <!--v-on:change="queueSettingsUpdate">-->
-                        <!--<option>Right</option>-->
-                        <!--<option>Left</option>-->
-                    <!--</select>-->
-                    <!--Align info box-->
-                <!--</label>-->
-                <!--<filter v-for="filter in filters.all"-->
-                    <!--:index="filter.index"-->
-                    <!--:source="filter.source"-->
-                    <!--:filter_class="filter.filter_class"-->
-                    <!--:value="filter.value"-->
-                    <!--:value_type="filter.value_type"-->
-                    <!--:value_operand="filter.value_operand"></filter>-->
             </div>
 
             <div v-show="filterNav === 1">
@@ -283,7 +264,7 @@
             <span v-on:click="show_main_index = 0" class="close-btn large"></span>
             <span title="Refresh background image"
                   v-on:click="refreshImage" class="refresh-btn"></span>
-            <h1>Favorites</h1>
+            <h1>Favorites ({{ favorite_items.length }})</h1>
             <div class="favorite-container styled-scrollbar">
                 <favorite v-for="(index, history) in favorite_items"
                     :index="index + 1"

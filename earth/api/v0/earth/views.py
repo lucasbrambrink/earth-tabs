@@ -63,6 +63,7 @@ class EarthImageView(generics.RetrieveAPIView):
                 image.google_map_url = image.location.get_maps_url()
 
             image.is_favorite = setting.favoriteimageitem_set.filter(image_id=image.id).exists()
+            image.favorite_count = FavoriteImageItem.objects.fitler(image_id=image.id).count()
             return image
 
         return self.get_random_object(query_ids)
