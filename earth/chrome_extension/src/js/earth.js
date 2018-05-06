@@ -375,6 +375,8 @@ var _gaq = _gaq || [];
                         if (isNaN(freq)) freq = 1;
                         that['ratio_' + source] = freq;
                     }
+                    that.only_favorites = resp.only_favorites;
+                    that.only_favorites_own = resp.only_favorites_own;
                     var filter;
                     for (i = 0; i < resp.filters.length; i++) {
                         filter = resp.filters[i];
