@@ -285,10 +285,10 @@ class QuerySetting(models.Model):
 
     def filter_queryset(self, query_set):
         if self.only_favorites:
-            query_set = EarthImage.objects.filter(favoriteimageitem__isnull=False)
+            query_set = query_set.filter(favoriteimageitem__isnull=False)
 
         if self.only_favorites_own:
-            query_set = EarthImage.objects.filter(favoriteimageitem__settings_id=self.id)
+            query_set = query_set.filter(favoriteimageitem__settings_id=self.id)
 
         for source in EarthImage.SOURCES:
             if source not in self.allowed_sources:
