@@ -2,8 +2,8 @@
 Created by Lucas Brambrink, 2017;
 */
 
-var API_URL = 'https://earth-pics.tk/api/v0/earth';
-// var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
+// var API_URL = 'https://earth-pics.tk/api/v0/earth';
+var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
 
 
 /* Utils */
@@ -264,6 +264,8 @@ var _gaq = _gaq || [];
             settings: [],
             filterNav: 0,
             setting_uid: null,
+            only_favorites: false,
+            only_favorites_own: false,
             allow_reddit: false,
             allow_apod: false,
             allow_wiki: false,
@@ -438,6 +440,8 @@ var _gaq = _gaq || [];
                     token: settings.token,
                     relative_frequency: this.relative_frequency,
                     align: this.align,
+                    only_favorites: this.only_favorites,
+                    only_favorites_own: this.only_favorites_own
                 };
                 var url = API_URL + '/settings/save/' + settings.uid;
                 var that = this;

@@ -242,6 +242,8 @@ class QuerySetting(models.Model):
 
     url_identifier = models.CharField(max_length=255)
     allowed_sources = models.CharField(max_length=255, default=EarthImage.REDDIT, blank=True)
+    only_favorites = models.BooleanField(default=False)
+    only_favorites_own = models.BooleanField(default=False)
     history = models.CharField(max_length=255, default='', blank=True)
     contain_data_sources = models.CharField(max_length=255, default='', blank=True)
     relative_frequency = models.CharField(max_length=20, default='', blank=True)

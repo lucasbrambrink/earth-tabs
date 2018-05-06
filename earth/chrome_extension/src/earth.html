@@ -84,6 +84,21 @@
 
 
             <div v-show="filterNav === 0" class="alignment-box">
+                <label for="only_favorites">
+                    <input type="checkbox"
+                           name="only_favorites" value="only_favorites"
+                           v-model="only_favorites" id="only_favorites"
+                           v-on:change="queueSettingsUpdate">
+                    Only choose from everybody's favorites
+                </label>
+                <label for="only_favorites_own">
+                    <input type="checkbox"
+                           name="only_favorites_own" value="only_favorites_own"
+                           v-model="only_favorites" id="only_favorites_own"
+                           v-on:change="queueSettingsUpdate">
+                    Only choose from your own favorites
+                </label>
+
                 <div class="outer-box" title="select position of info box">
                     <!--<span>Info box position</span>-->
                     <button class="align-btn left" v-bind:class="{active: align === 1}"
