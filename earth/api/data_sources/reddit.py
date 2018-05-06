@@ -143,9 +143,26 @@ class EarthScraper(ScrapingMixin, object):
         try:
             data = content[0]['data']['children'][0]['data']
         except (IndexError, KeyError):
+            import ipdb
+            ipdb.set_trace()
             pass
 
         return data
+
+    def import_from_reddit_post(self, reddit_link):
+        from api.models import EarthImage
+        post_data = self.get_post_data_from_permalink(reddit_link)
+        image_obj = EarthImage.create(post_data)
+
+        preview, preferred = self.get_image_urls(post_data)
+        image_obj.preview_image_url = preview
+        image_obj.preferred_image_url = preferred
+        image_obj.original_source = preferred == image_obj.image_url
+        image_obj.permalink = '{}{}'.format(self.REDDIT_URL[:-1],
+                                            image_obj.permalink)
+        image_obj.update_raw_title(post_data)
+        image_obj.set_public()
+        image_obj.save()
 
     def update_existing_instances(self):
         from api.models import EarthImage
