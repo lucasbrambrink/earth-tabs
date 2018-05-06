@@ -61,6 +61,8 @@ class EarthImageView(generics.RetrieveAPIView):
             image.is_administrator = setting.is_administrator
             if image.location:
                 image.google_map_url = image.location.get_maps_url()
+
+            image.is_favorite = setting.favoriteimageitem_set.filter(id=image.id).exists()
             return image
 
         return self.get_random_object(query_ids)

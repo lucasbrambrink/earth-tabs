@@ -6,6 +6,7 @@ class EarthImageSerializer(serializers.ModelSerializer):
     contain_image = serializers.BooleanField(default=False)
     is_administrator = serializers.BooleanField(default=False)
     google_map_url = serializers.CharField(max_length=255)
+    is_favorite = serializers.BooleanField(default=False)
 
     class Meta:
         model = EarthImage

@@ -287,7 +287,6 @@ class QuerySetting(models.Model):
         if self.only_favorites:
             query_set = EarthImage.objects.filter(favoriteimageitem__isnull=False)
 
-
         if self.only_favorites_own:
             query_set = EarthImage.objects.filter(favoriteimageitem__settings_id=self.id)
 
