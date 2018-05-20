@@ -57,8 +57,11 @@ body.earth {
   opacity: 1 !important;
 }
 #main-image a {
-  color: #FFF;
+  color: #FCFCFC;
   text-decoration: none;
+}
+a {
+  color: #FCFCFC;
 }
 a:hover,
 .author:hover {
@@ -159,6 +162,9 @@ img {
 }
 main {
   position: relative;
+}
+p {
+  margin: 30px 0;
 }
 a:hover {
   cursor: pointer;
