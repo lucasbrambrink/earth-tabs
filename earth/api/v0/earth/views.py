@@ -16,14 +16,20 @@ class EarthImageView(generics.RetrieveAPIView):
     serializers = EarthImageSerializer
     too_restrictive = False
 
-    def get_random_object(self, all_ids=None):
-        all_ids = all_ids or EarthImage.public\
-            .values_list('id', flat=True)
+    def get_random_object(self, all_ids=None, width=None, height=None):
+        all_ids = all_ids or EarthImage.public.all()
+        if all_ids is None:
+            if width is not None:
+                all_ids = all_ids.filter(resolution_width__gte=width)
+            if height is not None:
+                all_ids = all_ids.filter(resolution_height__gte=height)
+
+            all_ids = all_ids.values_list('id', flat=True)
 
         return EarthImage.objects\
             .get(id=random.choice(all_ids))
 
-    def get_object_via_settings(self, settings_uid):
+    def get_object_via_settings(self, settings_uid, width=None, height=None):
         query_ids = None
         try:
             setting = QuerySetting.objects\
@@ -32,7 +38,13 @@ class EarthImageView(generics.RetrieveAPIView):
         except QuerySetting.DoesNotExist:
             pass
         else:
-            query_ids = setting.filter_queryset(EarthImage.public)
+            queryset = EarthImage.public
+            if width is not None:
+                queryset = queryset.filter(resolution_width__gte=width)
+            if height is not None:
+                queryset = queryset.filter(resolution_height__gte=height)
+
+            query_ids = setting.filter_queryset(queryset)
             # if no results, allow random -- prevent null response
             if not query_ids.count():
                 self.too_restrictive = True
@@ -69,8 +81,12 @@ class EarthImageView(generics.RetrieveAPIView):
         return self.get_random_object(query_ids)
 
     def get(self, request, settings_uid=None, *args, **kwargs):
-        obj = self.get_random_object() if settings_uid is None else \
-            self.get_object_via_settings(settings_uid)
+        width = request.GET.get('width')
+        height = request.GET.get('height')
+        if settings_uid is None:
+            obj = self.get_random_object(width=width, height=height)
+        else:
+            obj = self.get_object_via_settings(settings_uid, width, height)
 
         response_status = status.HTTP_206_PARTIAL_CONTENT if self.too_restrictive \
             else status.HTTP_200_OK
