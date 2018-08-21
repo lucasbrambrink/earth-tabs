@@ -6,11 +6,10 @@
       "persistent": false,
       "scripts": ["src/js/earth.js"]
   },
-  "version": "1.2.4",
+  "version": "1.2.5",
      "permissions": [
           "storage",
-          "https://earth-pics.tk/",
-          "http://127.0.0.1:8000/"],
+          "https://earth-pics.tk/"],
   "manifest_version": 2,
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
   "description": "Photos of earth compiled from various sources",

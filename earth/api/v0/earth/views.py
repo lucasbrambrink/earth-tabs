@@ -17,17 +17,17 @@ class EarthImageView(generics.RetrieveAPIView):
     too_restrictive = False
 
     def get_random_object(self, all_ids=None, width=None, height=None):
-        all_ids = all_ids or EarthImage.public.all()
+        image_ids = all_ids or EarthImage.public.all()
         if all_ids is None:
             if width is not None:
-                all_ids = all_ids.filter(resolution_width__gte=width)
+                image_ids = image_ids.filter(resolution_width__gte=width)
             if height is not None:
-                all_ids = all_ids.filter(resolution_height__gte=height)
+                image_ids = image_ids.filter(resolution_height__gte=height)
 
-            all_ids = all_ids.values_list('id', flat=True)
+            image_ids = image_ids.values_list('id', flat=True)
 
         return EarthImage.objects\
-            .get(id=random.choice(all_ids))
+            .get(id=random.choice(image_ids))
 
     def get_object_via_settings(self, settings_uid, width=None, height=None):
         query_ids = None
