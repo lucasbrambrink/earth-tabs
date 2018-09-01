@@ -58,6 +58,8 @@ if (cachedImage) {
     setImage(image);
 }
 
+var refreshedWithVideo = window.location.href.indexOf('refreshed') > -1;
+
 /* Load settings */
 var settings = {};
 (function (settings, load_image) {
@@ -74,7 +76,7 @@ var settings = {};
                 window.vmSettings.getSettings();
             }
             if (load_image) {
-               window.vmSettings.getNewImage(uid);
+               window.vmSettings.getNewImage();
             }
         };
 
@@ -307,7 +309,7 @@ var _gaq = _gaq || [];
             loaded_favorites: false,
             favorite_items: [],
             needs_history_refresh: false,
-            show_main_index: 0,
+            show_main_index: refreshedWithVideo ? 1 : 0,
             serialized_state: '',
             is_queued: false,
             queued_image: false,
@@ -406,7 +408,7 @@ var _gaq = _gaq || [];
                         source = filter['type'] === 'global' ? 'all' : filter.source;
                         var object = that.filters[source][filter.filter_class];
                         object.loadArguments(filter.arguments);
-                        object.updateFields(this.getComponent(object));
+                        object.updateFields(that.getComponent(object));
                     }
                     if (isNaN(resp.align)) resp.align = 0;
                     that.align = resp.align;
@@ -568,7 +570,7 @@ var _gaq = _gaq || [];
                 setTimeout(function(that) {
                     return function () {
                         localStorage.removeItem('cachedImage');
-                        that.getNewImage(settings.uid);
+                        that.getNewImage(true);
                         that.queued_image = false;
                     }
                 }(this), 300);
@@ -587,12 +589,12 @@ var _gaq = _gaq || [];
                     this.getFavorites();
                 }
             },
-            getNewImage: function () {
+            getNewImage: function (is_refresh) {
                 var url = API_URL + '/get';
                 if (settings.uid) {
                     url += '/' + settings.uid;
                 }
-                // url += '?width=' + window.innerWidth + '&height=' + window.innerHeight;
+                url += '?width=' + window.innerWidth + '&height=' + window.innerHeight;
                 var successCallback = (function(that) {
                     return function (resp) {
                         cachedImage = localStorage.getItem('cachedImage');
@@ -601,13 +603,17 @@ var _gaq = _gaq || [];
                         if (cachedImage === null) {
                             that.image_data = [resp];
                             setImage(resp);
-                            if (!this.is_video) {
+                            if (!resp.is_video) {
                                 that.getNewImage();
                             }
                         } else {
                             if (!resp.is_video) {
                                 that.cached_image_url = resp.preferred_image_url;
                             }
+                        }
+                        if (is_refresh && resp.is_video) {
+                            var extension = refreshedWithVideo ? '' : '?refreshed=1';
+                            window.location.href = window.location.href + extension;
                         }
                     }
                 })(this);
