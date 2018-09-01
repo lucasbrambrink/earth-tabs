@@ -130,10 +130,13 @@ class EarthScraper(ScrapingMixin, object):
         return direct_link
 
     def get_post_data_from_permalink(self, permalink):
+        if permalink.endswith('/'):
+            permalink = permalink[:-1]
+
         url = '{base}{permalink}{json}'.format(
             base=self.REDDIT_URL, permalink=urlparse(permalink).path[1:], json=self.JSON_SUFFIX)
         try:
-            content = self.get(url=url)
+            content = self.get(url=url, headers=self.HEADERS)
         except Exception as exc:
             logger.warning('Unable to load %s' % url)
             logger.warning(exc)
