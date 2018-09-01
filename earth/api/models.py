@@ -62,6 +62,7 @@ class EarthImage(models.Model):
     created_raw = models.CharField(max_length=255)
     cleaned = models.BooleanField(default=False)
     is_public = models.BooleanField(default=True)
+    special_css = models.CharField(max_length=255, default='')
     resolution_width = models.IntegerField(null=True)
     resolution_height = models.IntegerField(null=True)
     last_seen = models.DateTimeField(auto_now=True)

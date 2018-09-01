@@ -2,8 +2,8 @@
 Created by Lucas Brambrink, 2017;
 */
 
-var API_URL = 'https://earth-pics.tk/api/v0/earth';
-// var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
+// var API_URL = 'https://earth-pics.tk/api/v0/earth';
+var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
 
 
 /* Utils */
@@ -18,6 +18,18 @@ var setImage = function (image_data) {
         }, 100);
         imageDiv.style.display = 'none';
         video.style.display = 'block';
+        if (image_data.special_css) {
+            var styles = image_data.special_css.split(';').filter(function(value) {
+                return value.length;
+            });
+            var style, attribute, css_value;
+            for(var i = 0; i < styles.length; i++) {
+                style = styles[i];
+                attribute = style.split(':')[0];
+                css_value = style.split(':')[1];
+                video.style[attribute] = css_value;
+            }
+        }
         // localStorage.removeItem('cachedImage');
     } else {
         imageDiv.style.backgroundImage = "url('" + image_data.preferred_image_url + "')";
@@ -569,7 +581,7 @@ var _gaq = _gaq || [];
                 if (settings.uid) {
                     url += '/' + settings.uid;
                 }
-                url += '?width=' + window.innerWidth + '&height=' + window.innerHeight;
+                // url += '?width=' + window.innerWidth + '&height=' + window.innerHeight;
                 var successCallback = (function(that) {
                     return function (resp) {
                         cachedImage = localStorage.getItem('cachedImage');

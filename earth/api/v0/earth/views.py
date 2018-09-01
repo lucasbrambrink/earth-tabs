@@ -17,7 +17,7 @@ class EarthImageView(generics.RetrieveAPIView):
     too_restrictive = False
 
     def get_random_object(self, all_ids=None, width=None, height=None):
-        image_ids = all_ids or EarthImage.public.all()
+        image_ids = all_ids or EarthImage.public.values_list('id', flat=True)
         if all_ids is None:
             if width is not None:
                 image_ids = image_ids.filter(resolution_width__gte=width)
@@ -54,6 +54,9 @@ class EarthImageView(generics.RetrieveAPIView):
             for source, frequency in zip(EarthImage.SOURCES,
                                          setting.frequencies):
                 if source not in setting.allowed_sources:
+                    continue
+
+                if not query_ids:
                     continue
 
                 filtered_by_source = query_ids.filter(source=source)
