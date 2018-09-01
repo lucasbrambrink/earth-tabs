@@ -105,9 +105,9 @@ var _gaq = _gaq || [];
 
     var imageItem = Vue.component('earth-image', {
         template: '#image',
-        props: ["image_url", "permalink", "title", "author",
+        props: ["image_url", "image_id", "permalink", "title", "author",
             "contain_image", "is_administrator", "favorited", "maps_url",
-            "align", "is_video", "video_url",
+            "align", "is_video", "video_url", "reverse_inactive",
             "cached_image_url"],
         computed: {
             styleObject: function() {
@@ -137,6 +137,17 @@ var _gaq = _gaq || [];
                 window.open(
                     this.maps_url
                 );
+            },
+            set_image_status: function (set_inactive) {
+                var that = this;
+                var method = set_inactive ? 'DELETE' : 'PUT';
+                $.ajax({
+                    url: API_URL + '/get/' + settings.uid + '/' + this.image_id,
+                    method: method,
+                    headers: {'token': settings.token}
+                }).success(function() {
+                    that.reverse_inactive = set_inactive;
+                });
             }
         }
     });
@@ -657,6 +668,7 @@ var _gaq = _gaq || [];
                 }
                 this.queueSettingsUpdate();
             },
+
         }
     });
     window.vmSettings = vmSettings;

@@ -15,6 +15,8 @@
     </video>
     <earth-image v-for="image in image_data"
         :align="align"
+        :image_id="image.id"
+        :reverse_inactive="false"
         :cached_image_url="cached_image_url"
         :image_url="image.preferred_image_url"
         :permalink="image.permalink"
@@ -334,7 +336,12 @@
                     <div class="author"> {{ author }}</div>
                 </section>
                 <nav v-bind:class="{left: align === 1}">
-                    <a v-if="is_administrator" role="link" class="administrator">Set Inactive</a>
+                    <a v-if="is_administrator && !reverse_inactive" role="link"
+                       v-on:click.prevent="set_image_status(true)"
+                       class="administrator">Set Inactive</a>
+                    <a v-if="is_administrator && reverse_inactive" role="link"
+                       v-on:click.prevent="set_image_status(false)"
+                       class="administrator">Set Active</a>
                     <span v-if="is_administrator" class="administrator-span">|</span>
                     <a v-if="maps_url" role="link" v-on:click.prevent="go_to_map"
                        class="administrator">Google Earth location</a>
