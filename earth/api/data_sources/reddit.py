@@ -185,6 +185,7 @@ class EarthScraper(ScrapingMixin, object):
             url = self.get_url(after_address=after_address, sort_top=sort_top,
                                time_frame=time_frame, search_param=search_param)
             data = self.get(url, headers=self.HEADERS).get('data', {})
+            print(data)
             after_address = data.get('after')
             posts = data.get('children')
             for post in posts:
@@ -196,6 +197,7 @@ class EarthScraper(ScrapingMixin, object):
                 preview, preferred = self.get_image_urls(post_data)
                 image_obj.preview_image_url = preview
                 image_obj.preferred_image_url = preferred
+                image_obj.source = self.get_source()
                 image_obj.original_source = preferred == image_obj.image_url
                 image_obj.permalink = '{}{}'.format(self.REDDIT_URL[:-1],
                                                     image_obj.permalink)
@@ -223,3 +225,15 @@ class EarthScraper(ScrapingMixin, object):
                                      search_param=search_param)
 
         EarthImage.objects.bulk_create(images_to_be_added[:limit_new])
+
+    def get_source(self):
+        from api.models import EarthImage
+        return EarthImage.REDDIT
+
+
+class WallpaperScraper(EarthScraper):
+    DEFAULT_SUBREDDIT = "wallpapers"
+
+    def get_source(self):
+        from api.models import EarthImage
+        return EarthImage.WALLPAPERS

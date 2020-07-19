@@ -31,6 +31,7 @@ class MarketingManager(models.Manager):
 
 class EarthImage(models.Model):
     REDDIT = 'reddit'
+    WALLPAPERS = 'wallpapers'
     APOD = 'apod'
     WIKI = 'wiki'
     VIDEO = 'video'
@@ -41,7 +42,8 @@ class EarthImage(models.Model):
         (REDDIT, 'reddit.com/r/Earth'),
         (APOD, "NASA's Astronomy Picture of the Day"),
         (WIKI, 'Wikipedia Picture of the Day'),
-        (VIDEO, 'Video')
+        (VIDEO, 'Video'),
+        (WALLPAPERS, "Wallpapers"),
     )
     SOURCES = (REDDIT, APOD, WIKI, VIDEO)
 
