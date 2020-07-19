@@ -185,7 +185,6 @@ class EarthScraper(ScrapingMixin, object):
             url = self.get_url(after_address=after_address, sort_top=sort_top,
                                time_frame=time_frame, search_param=search_param)
             data = self.get(url, headers=self.HEADERS).get('data', {})
-            print(data)
             after_address = data.get('after')
             posts = data.get('children')
             for post in posts:
