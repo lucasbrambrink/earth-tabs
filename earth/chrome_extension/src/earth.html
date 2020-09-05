@@ -83,23 +83,6 @@
                           title="indicates the relative frequency to other data source"></span>
                     <div class="check-mark"></div>
                 </div>
-<!--                <div v-on:click.prevent="filterNav = 5" v-bind:class="{selected: allow_wallpapers}">-->
-<!--                    <button title="Wallpapers" id="wallpaper-btn" v-bind:class="{active: filterNav === 5}">-->
-<!--                        </button>-->
-<!--                    <span v-bind:class="{active: allow_wallpapers, hide: hide_ratios}"-->
-<!--                          class="ratio" v-text="ratio_video + 'x'"-->
-<!--                          title="indicates the relative frequency to other data source"></span>-->
-<!--                    <div class="check-mark"></div>-->
-<!--                </div>-->
-<!--                <div v-on:click.prevent="filterNav = 6" v-bind:class="{selected: allow_imaginarylandscapes}">-->
-<!--                    <button title="Imaginary Landscapes" id="landscapes-btn" v-bind:class="{active: filterNav === 6}">-->
-<!--                        </button>-->
-<!--                    <span v-bind:class="{active: allow_imaginarylandscapes, hide: hide_ratios}"-->
-<!--                          class="ratio" v-text="ratio_video + 'x'"-->
-<!--                          title="indicates the relative frequency to other data source"></span>-->
-<!--                    <div class="check-mark"></div>-->
-<!--                </div>-->
-
             </nav>
 
 
@@ -135,27 +118,6 @@
                            v-on:change="queueSettingsUpdate">
                     Enable reddit.com/r/Earth
                 </label>
-                <label for="allow_imaginarylandscapes">
-                    <input type="checkbox"
-                           name="reddit" value="reddit"
-                           v-model="allow_imaginarylandscapes" id="allow_imaginarylandscapes"
-                           v-on:change="queueSettingsUpdate">
-                    Enable reddit.com/r/ImaginaryLandscapes
-                </label>
-<!--                <label for="allow_wallpapers">-->
-<!--                    <input type="checkbox"-->
-<!--                           name="reddit" value="reddit"-->
-<!--                           v-model="allow_wallpapers" id="allow_wallpapers"-->
-<!--                           v-on:change="queueSettingsUpdate">-->
-<!--                    Enable reddit.com/r/Wallpapers-->
-<!--                </label>-->
-                <label for="contain_reddit">
-                    <input type="checkbox" name="contain_reddit"
-                           value="contain_reddit" v-model="contain_reddit"
-                           id="contain_reddit"
-                           v-on:change="queueSettingsUpdate">
-                    Contain images to screen size
-                </label>
                 <label class="distribution" for="reddit_ratio" title="sets relative frequency for Reddit images"
                        data-toggle="tooltip"
                        v-show="allow_reddit && !not_enough_for_ratio">
@@ -165,6 +127,30 @@
                         v-model="ratio_reddit"
                            v-on:change="queueSettingsUpdate"
                         min="1" max="10" step="1">
+                </label>
+                <label for="allow_imaginarylandscapes">
+                    <input type="checkbox"
+                           name="reddit" value="reddit"
+                           v-model="allow_imaginarylandscapes" id="allow_imaginarylandscapes"
+                           v-on:change="queueSettingsUpdate">
+                    Enable reddit.com/r/ImaginaryLandscapes
+                </label>
+                <label class="distribution" for="ratio_imaginarylandscapes" title="sets relative frequency for Imaginary Landscapes"
+                       data-toggle="tooltip"
+                       v-show="allow_imaginarylandscapes && !not_enough_for_ratio">
+                    relative frequency: {{ frequency }}
+                    <input type="range"
+                        id="ratio_imaginarylandscapes"
+                        v-model="ratio_imaginarylandscapes"
+                           v-on:change="queueSettingsUpdate"
+                        min="1" max="10" step="1">
+                </label>
+                <label for="contain_reddit">
+                    <input type="checkbox" name="contain_reddit"
+                           value="contain_reddit" v-model="contain_reddit"
+                           id="contain_reddit"
+                           v-on:change="queueSettingsUpdate">
+                    Contain images to screen size
                 </label>
                 <div v-for="filter in filters.reddit">
                     <filter :index="filter.index"
@@ -261,24 +247,6 @@
                         min="1" max="10" step="1">
                 </label>
             </div>
-
-<!--            <div v-show="filterNav === 5">-->
-<!--                <label for="allow_wallpapers">-->
-<!--                    <input type="checkbox" name="wallpaper" value="wallpaper"-->
-<!--                           v-model="allow_wallpapers" id="allow_wallpapers"-->
-<!--                            v-on:change="queueSettingsUpdate">-->
-<!--                    Enable Wallpapers in new tabs.-->
-<!--                </label>-->
-<!--            </div>-->
-
-<!--            <div v-show="filterNav === 6">-->
-<!--                <label for="allow_imaginarylandscapes">-->
-<!--                    <input type="checkbox" name="landscapes" value="landscapes"-->
-<!--                           v-model="allow_imaginarylandscapes" id="allow_imaginarylandscapes"-->
-<!--                            v-on:change="queueSettingsUpdate">-->
-<!--                    Enable Imaginary Landscapes in new tabs.-->
-<!--                </label>-->
-<!--            </div>-->
             <!--<div class="filter-block">-->
                 <!--<input class="save" value="Save" v-model="save_copy"-->
                        <!--v-bind:class="{saved: saving}"-->

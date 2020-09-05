@@ -353,7 +353,6 @@ var _gaq = _gaq || [];
                     this.ratio_apod,
                     this.ratio_wiki,
                     this.ratio_video,
-                    this.ratio_wallpapers,
                     this.ratio_imaginarylandscapes,
                 ].join(',');
             },
