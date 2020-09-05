@@ -32,6 +32,7 @@ class MarketingManager(models.Manager):
 class EarthImage(models.Model):
     REDDIT = 'reddit'
     WALLPAPERS = 'wallpapers'
+    LANDSCAPES = 'imaginarylandscapes'
     APOD = 'apod'
     WIKI = 'wiki'
     VIDEO = 'video'
@@ -45,7 +46,7 @@ class EarthImage(models.Model):
         (VIDEO, 'Video'),
         (WALLPAPERS, "Wallpapers"),
     )
-    SOURCES = (REDDIT, APOD, WIKI, VIDEO)
+    SOURCES = (REDDIT, APOD, WIKI, VIDEO, LANDSCAPES)
 
     # fields
     permalink = models.URLField()
@@ -88,8 +89,8 @@ class EarthImage(models.Model):
     @classmethod
     def create(cls, data):
         image_obj = cls(
-            permalink=data.get('permalink'),
-            image_url=data.get('url'),
+            permalink=data.get('permalink', '')[:200],
+            image_url=data.get('url', '')[:200],
             raw_title=data.get('title'),
             title=cls.clean_title(data.get('title')),
             author=data.get('author'),
@@ -268,7 +269,7 @@ class QuerySetting(models.Model):
 
     @property
     def frequencies(self):
-        frequency = (1, 1, 1, 1)
+        frequency = (1, 1, 1, 1, 1)
         try:
             frequency = tuple(
                 int(f) for f in self.relative_frequency.split(',')

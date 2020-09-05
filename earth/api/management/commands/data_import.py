@@ -1,7 +1,7 @@
 import logging
 from django.core.management.base import BaseCommand, CommandError
 from api.data_sources.apod import ApodScraper
-from api.data_sources.reddit import EarthScraper, WallpaperScraper
+from api.data_sources.reddit import EarthScraper, WallpaperScraper, ImaginaryLandscapes
 
 
 logger = logging.getLogger(__name__)
@@ -19,9 +19,8 @@ class Command(BaseCommand):
         limit = options.get('limit')
         for scraper in (ApodScraper,
                         EarthScraper,
-                        WallpaperScraper):
+                        ImaginaryLandscapes):
             try:
                 scraper().batch_import(limit)
             except Exception as exc:
                 logger.error(exc)
-

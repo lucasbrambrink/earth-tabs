@@ -4,12 +4,24 @@
   "name": "earth.tabs",
   "background": {
       "persistent": false,
-      "scripts": ["src/js/earth.js"]
+      "scripts": [
+        "src/js/vue.min.js",
+        "src/js/analytics.js",
+        "src/js/jquery/jquery.min.js",
+        "src/js/earth.js"
+      ]
   },
-  "version": "1.2.8",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/js/vue.min.js"]
+    }
+  ],
+  "version": "1.2.10",
      "permissions": [
           "storage",
-          "https://earth-pics.ml/"],
+          "https://earth-pics.ml/",
+          "http://127.0.0.1:8000/"],
   "manifest_version": 2,
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
   "description": "Photos of earth compiled from various sources",

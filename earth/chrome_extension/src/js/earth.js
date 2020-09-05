@@ -2,8 +2,8 @@
 Created by Lucas Brambrink, 2017;
 */
 
-var API_URL = 'https://earth-pics.ml/api/v0/earth';
-// var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
+// var API_URL = 'https://earth-pics.ml/api/v0/earth';
+var API_URL = 'http://127.0.0.1:8000/api/v0/earth';
 
 
 /* Utils */
@@ -295,6 +295,8 @@ var _gaq = _gaq || [];
             allow_apod: false,
             allow_wiki: false,
             allow_video: false,
+            allow_wallpapers: false,
+            allow_imaginarylandscapes: false,
             contain_reddit: false,
             contain_apod: false,
             contain_wiki: false,
@@ -302,6 +304,8 @@ var _gaq = _gaq || [];
             ratio_apod: 1,
             ratio_wiki: 1,
             ratio_video: 1,
+            ratio_wallpapers: 1,
+            ratio_imaginarylandscapes: 1,
             save_copy: "Save",
             saving: false,
             loaded_history: false,
@@ -349,6 +353,8 @@ var _gaq = _gaq || [];
                     this.ratio_apod,
                     this.ratio_wiki,
                     this.ratio_video,
+                    this.ratio_wallpapers,
+                    this.ratio_imaginarylandscapes,
                 ].join(',');
             },
             frequency: function () {
@@ -375,6 +381,12 @@ var _gaq = _gaq || [];
                 if (this.allow_video) {
                     active.push(this.ratio_video)
                 }
+                if (this.allow_wallpapers) {
+                    active.push(this.ratio_wallpapers)
+                }
+                if (this.allow_imaginarylandscapes) {
+                    active.push(this.ratio_imaginarylandscapes)
+                }
                 return active;
             }
         },
@@ -393,7 +405,7 @@ var _gaq = _gaq || [];
                         that['contain_' + source] = true;
                     }
                     var relative_frequency = resp.relative_frequency.split(',');
-                    var sources = ['reddit', 'apod', 'wiki', 'video'];
+                    var sources = ['reddit', 'apod', 'wiki', 'video', 'wallpapers'];
                     for(i = 0; i < relative_frequency.length; i++) {
                         source = sources[i];
                         var freq = parseInt(relative_frequency[i]);
@@ -459,6 +471,8 @@ var _gaq = _gaq || [];
                     allow_apod: this.allow_apod,
                     allow_wiki: this.allow_wiki,
                     allow_video: this.allow_video,
+                    allow_wallpapers: this.allow_wallpapers,
+                    allow_imaginarylandscapes: this.allow_imaginarylandscapes,
                     contain_reddit: this.contain_reddit,
                     contain_apod: this.contain_apod,
                     contain_wiki: this.contain_wiki,

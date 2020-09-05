@@ -65,7 +65,7 @@ class EarthScraper(ScrapingMixin, object):
         if image_url is not None and image_url not in self.DISALLOWED_LINKS:
             try:
                 image = self.get_data(image_url, timeout=1)
-            except (requests.HTTPError, requests.ReadTimeout):
+            except (requests.HTTPError, requests.ReadTimeout, Exception):
                 pass
 
         # get reddit hosted preview image URL
@@ -175,36 +175,45 @@ class EarthScraper(ScrapingMixin, object):
             sleep(0.5)
 
     def batch_import(self, limit_new=25, continue_batch=None, after_address=None,
-                     sort_top=True, time_frame=None, search_param=None):
+                     sort_top=True, time_frame=None, search_param=None, print_results=False):
         from api.models import EarthImage
 
         images_to_be_added = continue_batch or []
         seen_urls = {i.permalink for i in images_to_be_added}
 
         while len(images_to_be_added) < limit_new:
+            if print_results:
+                print("Added", len(images_to_be_added), "images")
             url = self.get_url(after_address=after_address, sort_top=sort_top,
                                time_frame=time_frame, search_param=search_param)
             data = self.get(url, headers=self.HEADERS).get('data', {})
+            if print_results:
+                print("fetched data")
             after_address = data.get('after')
             posts = data.get('children')
             for post in posts:
                 post_data = post.get('data')
-                image_obj = EarthImage.create(post_data)
-                if image_obj.permalink in seen_urls:
+                try:
+                    image_obj = EarthImage.create(post_data)
+                except Exception as exc:
+                    print("Unable to create image", exc)
                     continue
 
+                if image_obj.permalink in seen_urls:
+                    continue
                 preview, preferred = self.get_image_urls(post_data)
-                image_obj.preview_image_url = preview
-                image_obj.preferred_image_url = preferred
+
+                image_obj.preview_image_url = preview[:200]
+                image_obj.preferred_image_url = preferred[:200]
                 image_obj.source = self.get_source()
                 image_obj.original_source = preferred == image_obj.image_url
                 image_obj.permalink = '{}{}'.format(self.REDDIT_URL[:-1],
-                                                    image_obj.permalink)
+                                                    image_obj.permalink)[:200]
                 seen_urls.add(image_obj.permalink)
                 images_to_be_added.append(image_obj)
 
             # throttle request speed a little bit
-            sleep(5)
+            sleep(2)
 
         # fetch posts that already exist (1 SQL query)
         urls = [obj.permalink for obj in images_to_be_added]
@@ -221,7 +230,8 @@ class EarthScraper(ScrapingMixin, object):
                                      continue_batch=images_to_be_added,
                                      after_address=after_address,
                                      sort_top=sort_top, time_frame=time_frame,
-                                     search_param=search_param)
+                                     search_param=search_param,
+                                     print_results=print_results)
 
         EarthImage.objects.bulk_create(images_to_be_added[:limit_new])
 
@@ -236,3 +246,11 @@ class WallpaperScraper(EarthScraper):
     def get_source(self):
         from api.models import EarthImage
         return EarthImage.WALLPAPERS
+
+
+class ImaginaryLandscapes(EarthScraper):
+    DEFAULT_SUBREDDIT = "imaginarylandscapes"
+
+    def get_source(self):
+        from api.models import EarthImage
+        return EarthImage.LANDSCAPES
